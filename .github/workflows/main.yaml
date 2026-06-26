@@ -1,0 +1,27 @@
+name: Main branch protection
+
+run-name: "Main branch protection: ${{ github.run_number }}"
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  go:
+    name: Golang
+    uses: ./.github/workflows/go.yaml
+
+  py:
+    name: Python
+    uses: ./.github/workflows/py.yaml
+
+  image:
+    name: Image
+    uses: ./.github/workflows/image.yaml
+    with:
+      push: false
