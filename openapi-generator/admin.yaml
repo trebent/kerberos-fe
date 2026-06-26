@@ -1,0 +1,9 @@
+generatorName: typescript-angular
+inputSpec: openapi/admin.yaml
+output: src/app/api/admin
+additionalProperties:
+  ngVersion: "21"
+  supportsES6: "true"
+  withInterfaces: "true"
+  apiModulePrefix: Admin
+  fileNaming: kebab-case

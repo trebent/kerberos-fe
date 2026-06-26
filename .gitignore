@@ -1,0 +1,37 @@
+# Angular cache
+.angular/
+
+# Compiled output
+/dist
+
+# Node modules
+/node_modules
+
+# IDEs
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/mcp.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
