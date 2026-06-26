@@ -1,13 +1,19 @@
 import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { DebugComponent } from './debug/debug.component';
+import { OasComponent } from './oas/oas.component';
 
 @Component({
   selector: 'app-flow',
   template: `
-    <app-page-header title="Flow" icon="account_tree" />
-    <mat-card><mat-card-content>Not yet implemented.</mat-card-content></mat-card>
+    <h2>Flow</h2>
+    <p>Flow — not yet implemented.</p>
+
+    <h3>Debug</h3>
+    <app-debug />
+
+    <h3>OAS</h3>
+    <app-oas />
   `,
-  imports: [MatCardModule, PageHeaderComponent],
+  imports: [DebugComponent, OasComponent],
 })
 export class FlowComponent {}

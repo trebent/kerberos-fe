@@ -4,50 +4,29 @@ import { authGuard } from './core/auth/auth.guard';
 export const routes: Routes = [
   {
     path: 'login',
-    loadChildren: () =>
-      import('./features/login/login.routes').then(m => m.LOGIN_ROUTES),
+    loadComponent: () =>
+      import('./features/login/login.component').then(m => m.LoginComponent),
   },
   {
     path: '',
     loadComponent: () =>
-      import('./shared/shell/shell.component').then(m => m.ShellComponent),
+      import('./core/landing/landing.component').then(m => m.LandingComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'users', pathMatch: 'full' },
-      {
-        path: 'users',
-        loadChildren: () =>
-          import('./features/users/users.routes').then(m => m.USERS_ROUTES),
-      },
-      {
-        path: 'groups',
-        loadChildren: () =>
-          import('./features/groups/groups.routes').then(m => m.GROUPS_ROUTES),
-      },
-      {
-        path: 'permissions',
-        loadChildren: () =>
-          import('./features/permissions/permissions.routes').then(m => m.PERMISSIONS_ROUTES),
-      },
-      {
-        path: 'debug',
-        loadChildren: () =>
-          import('./features/debug/debug.routes').then(m => m.DEBUG_ROUTES),
-      },
       {
         path: 'flow',
-        loadChildren: () =>
-          import('./features/flow/flow.routes').then(m => m.FLOW_ROUTES),
+        loadComponent: () =>
+          import('./features/flow/flow.component').then(m => m.FlowComponent),
       },
       {
-        path: 'oas',
-        loadChildren: () =>
-          import('./features/oas/oas.routes').then(m => m.OAS_ROUTES),
+        path: 'user-mgmt',
+        loadComponent: () =>
+          import('./features/user-mgmt/user-mgmt.component').then(m => m.UserMgmtComponent),
       },
       {
         path: 'auth-basic',
-        loadChildren: () =>
-          import('./features/auth-basic/auth-basic.routes').then(m => m.AUTH_BASIC_ROUTES),
+        loadComponent: () =>
+          import('./features/auth-basic/auth-basic.component').then(m => m.AuthBasicComponent),
       },
     ],
   },
