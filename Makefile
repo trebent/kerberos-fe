@@ -1,5 +1,8 @@
 .PHONY: codegen lint build test
 
+install:
+	npm ci
+
 codegen:
 	./node_modules/.bin/openapi-generator-cli generate \
 		-g typescript-angular \

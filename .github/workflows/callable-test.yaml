@@ -19,7 +19,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: make install
 
       - name: Test
-        run: npm run test -- --watch=false
+        run: make test
