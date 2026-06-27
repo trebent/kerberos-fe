@@ -1,7 +1,7 @@
 .PHONY: codegen lint build test
 
 install:
-	npm ci
+	npm install
 
 codegen:
 	./node_modules/.bin/openapi-generator-cli generate \
