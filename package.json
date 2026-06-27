@@ -39,7 +39,15 @@
     "vitest": "^4.0.8"
   },
   "engines": {
-    "node": ">=24.0.0",
-    "npm": ">=11.6.2"
+    "node": ">=24.17.0",
+    "npm": ">=11.17.0"
+  },
+  "allowScripts": {
+    "@openapitools/openapi-generator-cli@2.39.0": true,
+    "@parcel/watcher@2.5.6": true,
+    "lmdb@3.5.1": true,
+    "msgpackr-extract@3.0.4": true,
+    "esbuild@0.27.7": true,
+    "esbuild@0.28.1": true
   }
 }
