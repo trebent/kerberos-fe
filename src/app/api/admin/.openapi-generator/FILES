@@ -1,14 +1,9 @@
 .gitignore
-README.md
 api.base.service.ts
-api.module.ts
 api/api.ts
-api/default.service.ts
-api/default.serviceInterface.ts
+api/default.admin.ts
 configuration.ts
 encoder.ts
-git_push.sh
-index.ts
 model/api-error-response.ts
 model/change-user-password-request.ts
 model/create-group-request.ts
@@ -38,4 +33,6 @@ model/update-user-groups-request.ts
 model/update-user-request.ts
 model/user.ts
 param.ts
+provide-api.ts
+query.params.ts
 variables.ts

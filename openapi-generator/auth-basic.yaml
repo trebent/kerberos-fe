@@ -1,9 +1,0 @@
-generatorName: typescript-angular
-inputSpec: openapi/auth_basic.yaml
-output: src/app/api/auth-basic
-additionalProperties:
-  ngVersion: "21"
-  supportsES6: "true"
-  withInterfaces: "true"
-  apiModulePrefix: AuthBasic
-  fileNaming: kebab-case

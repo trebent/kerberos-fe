@@ -7,7 +7,9 @@
     "build": "ng build",
     "lint": "ng lint",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "codegen-admin": "openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/api/admin --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case,serviceFileSuffix=.admin,serviceSuffix=Admin",
+    "codegen-auth-basic": "openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/api/auth-basic --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case,serviceFileSuffix=.auth-basic,serviceSuffix=AuthBasic"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -43,7 +45,6 @@
     "npm": ">=11.17.0"
   },
   "allowScripts": {
-    "@openapitools/openapi-generator-cli@2.39.0": true,
     "@parcel/watcher@2.5.6": true,
     "lmdb@3.5.1": true,
     "msgpackr-extract@3.0.4": true,

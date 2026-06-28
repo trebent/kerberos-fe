@@ -1,4 +1,3 @@
-export * from './default.service';
-import { DefaultService } from './default.service';
-export * from './default.serviceInterface';
-export const APIS = [DefaultService];
+export * from './default.auth-basic';
+import { DefaultAuthBasic } from './default.auth-basic';
+export const APIS = [DefaultAuthBasic];

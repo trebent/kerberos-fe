@@ -1,4 +1,3 @@
-export * from './default.service';
-import { DefaultService } from './default.service';
-export * from './default.serviceInterface';
-export const APIS = [DefaultService];
+export * from './default.admin';
+import { DefaultAdmin } from './default.admin';
+export const APIS = [DefaultAdmin];

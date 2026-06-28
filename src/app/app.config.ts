@@ -8,14 +8,17 @@ import { sessionInterceptor } from './core/interceptors/session.interceptor';
 import { BASE_PATH as ADMIN_BASE_PATH } from './api/admin/variables';
 import { BASE_PATH as AUTH_BASIC_BASE_PATH } from './api/auth-basic/variables';
 import { environment } from '../environments/environment';
+import { provideApi as provideAdminAPI } from './api/admin/provide-api';
+import { provideApi as provideAuthBasicAPI } from './api/auth-basic/provide-api';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimationsAsync(),
+    provideAdminAPI(environment.apiBaseUrl),
+    provideAuthBasicAPI(environment.apiBaseUrl),
     provideHttpClient(withInterceptors([sessionInterceptor])),
-    { provide: ADMIN_BASE_PATH, useValue: environment.apiBaseUrl },
-    { provide: AUTH_BASIC_BASE_PATH, useValue: environment.apiBaseUrl },
   ],
 };

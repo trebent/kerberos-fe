@@ -11,10 +11,10 @@
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams,
-         HttpResponse, HttpEvent, HttpParameterCodec, HttpContext 
+         HttpResponse, HttpEvent, HttpContext 
         }       from '@angular/common/http';
-import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
+import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
 import { APIErrorResponse } from '../model/api-error-response';
@@ -51,26 +51,25 @@ import { User } from '../model/user';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
-import {
-    DefaultServiceInterface
-} from './default.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class DefaultService extends BaseService implements DefaultServiceInterface {
+export class DefaultAdmin extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
+     * @endpoint put /api/admin/users/{userID}/password
      * @param userID 
      * @param changeUserPasswordRequest Request body for changing a user\&#39;s password.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -130,16 +129,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/groups
      * @param createGroupRequest Request body for creating a group.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public createGroup(createGroupRequest: CreateGroupRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Group>;
     public createGroup(createGroupRequest: CreateGroupRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Group>>;
@@ -196,16 +197,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/users
      * @param createUserRequest Request body for creating a user.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public createUser(createUserRequest: CreateUserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<User>;
     public createUser(createUserRequest: CreateUserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<User>>;
@@ -262,17 +265,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint delete /api/admin/debug/{backend}/sessions/{sessionId}
      * @param backend 
      * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public deleteDebugSession(backend: string, sessionId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public deleteDebugSession(backend: string, sessionId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -322,16 +327,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint delete /api/admin/groups/{groupID}
      * @param groupID 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public deleteGroup(groupID: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public deleteGroup(groupID: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -378,16 +385,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint delete /api/admin/users/{userID}
      * @param userID 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public deleteUser(userID: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public deleteUser(userID: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -434,18 +443,20 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint put /api/admin/debug/{backend}/sessions/{sessionId}
      * @param backend 
      * @param sessionId 
      * @param extendDebugSessionRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public extendDebugSession(backend: string, sessionId: number, extendDebugSessionRequest: ExtendDebugSessionRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DebugSession>;
     public extendDebugSession(backend: string, sessionId: number, extendDebugSessionRequest: ExtendDebugSessionRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DebugSession>>;
@@ -508,16 +519,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/oas/{backend}
      * @param backend 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getBackendOAS(backend: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/yaml' | 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<{ [key: string]: any; }>;
     public getBackendOAS(backend: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/yaml' | 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<{ [key: string]: any; }>>;
@@ -565,17 +578,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/debug/{backend}/sessions/{sessionId}
      * @param backend 
      * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getDebugSession(backend: string, sessionId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DebugSession>;
     public getDebugSession(backend: string, sessionId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DebugSession>>;
@@ -625,18 +640,20 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/debug/{backend}/sessions/{sessionId}/calls/{callId}
      * @param backend 
      * @param sessionId 
      * @param callId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getDebugSessionCall(backend: string, sessionId: number, callId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DebugSessionCall>;
     public getDebugSessionCall(backend: string, sessionId: number, callId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DebugSessionCall>>;
@@ -689,15 +706,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/flow
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getFlow(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<FlowMeta>>;
     public getFlow(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<FlowMeta>>>;
@@ -741,16 +760,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/groups/{groupID}
      * @param groupID 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getGroup(groupID: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Group>;
     public getGroup(groupID: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Group>>;
@@ -797,15 +818,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/groups
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getGroups(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<Group>>;
     public getGroups(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<Group>>>;
@@ -849,15 +872,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/permissions
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getPermissions(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<Permission>>;
     public getPermissions(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<Permission>>>;
@@ -901,16 +926,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/users/{userID}
      * @param userID 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getUser(userID: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<User>;
     public getUser(userID: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<User>>;
@@ -957,15 +984,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/users
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public getUsers(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<User>>;
     public getUsers(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<User>>>;
@@ -1009,18 +1038,20 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/debug/{backend}/sessions/{sessionId}/calls
      * @param backend 
      * @param sessionId 
      * @param includeTransitions 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public listDebugSessionCalls(backend: string, sessionId: number, includeTransitions: boolean, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<DebugSessionCall>>;
     public listDebugSessionCalls(backend: string, sessionId: number, includeTransitions: boolean, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<DebugSessionCall>>>;
@@ -1036,9 +1067,16 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             throw new Error('Required parameter includeTransitions was null or undefined when calling listDebugSessionCalls.');
         }
 
-        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
-        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
-          <any>includeTransitions, 'includeTransitions');
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'includeTransitions',
+            <any>includeTransitions,
+            QueryParamStyle.Form,
+            true,
+        );
+
 
         let localVarHeaders = this.defaultHeaders;
 
@@ -1073,21 +1111,23 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         return this.httpClient.request<Array<DebugSessionCall>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                params: localVarQueryParameters,
+                params: localVarQueryParameters.toHttpParams(),
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint get /api/admin/debug/{backend}/sessions
      * @param backend 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public listDebugSessions(backend: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<DebugSession>>;
     public listDebugSessions(backend: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<DebugSession>>>;
@@ -1134,16 +1174,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/login
      * @param createUserRequest Request body for logging a user in.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public login(createUserRequest: CreateUserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public login(createUserRequest: CreateUserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1197,16 +1239,18 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/superuser/login
      * @param loginSuperuserRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public loginSuperuser(loginSuperuserRequest: LoginSuperuserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public loginSuperuser(loginSuperuserRequest: LoginSuperuserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1260,15 +1304,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/logout
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public logout(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public logout(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1312,15 +1358,17 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/superuser/logout
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public logoutSuperuser(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public logoutSuperuser(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1364,17 +1412,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/debug/{backend}/sessions
      * @param backend 
      * @param startDebugSessionRequest Request body for starting a debug session for a backend.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public startDebugSession(backend: string, startDebugSessionRequest?: StartDebugSessionRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DebugSession>;
     public startDebugSession(backend: string, startDebugSessionRequest?: StartDebugSessionRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DebugSession>>;
@@ -1431,17 +1481,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint post /api/admin/debug/{backend}/sessions/{sessionId}
      * @param backend 
      * @param sessionId 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public stopDebugSession(backend: string, sessionId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public stopDebugSession(backend: string, sessionId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1491,17 +1543,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint put /api/admin/groups/{groupID}
      * @param groupID 
      * @param createGroupRequest Request body for updating a group.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public updateGroup(groupID: number, createGroupRequest: CreateGroupRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public updateGroup(groupID: number, createGroupRequest: CreateGroupRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1561,17 +1615,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint put /api/admin/users/{userID}
      * @param userID 
      * @param updateUserRequest Request body for updating a user.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public updateUser(userID: number, updateUserRequest: UpdateUserRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public updateUser(userID: number, updateUserRequest: UpdateUserRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1631,17 +1687,19 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
     }
 
     /**
+     * @endpoint put /api/admin/users/{userID}/groups
      * @param userID 
      * @param updateUserGroupsRequest Request body for updating a user\&#39;s groups.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
+     * @param options additional options
      */
     public updateUserGroups(userID: number, updateUserGroupsRequest: UpdateUserGroupsRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
     public updateUserGroups(userID: number, updateUserGroupsRequest: UpdateUserGroupsRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
@@ -1701,7 +1759,7 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
                 observe: observe,
-                transferCache: localVarTransferCache,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
                 reportProgress: reportProgress
             }
         );
