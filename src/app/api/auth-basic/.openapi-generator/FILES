@@ -1,7 +1,9 @@
 .gitignore
 api.base.service.ts
 api/api.ts
-api/default.auth-basic.ts
+api/groups.service.ts
+api/organisations.service.ts
+api/users.service.ts
 configuration.ts
 encoder.ts
 model/api-error-response.ts

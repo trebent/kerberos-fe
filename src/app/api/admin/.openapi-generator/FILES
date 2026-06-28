@@ -1,7 +1,10 @@
 .gitignore
 api.base.service.ts
 api/api.ts
-api/default.admin.ts
+api/debug.service.ts
+api/flow.service.ts
+api/oas.service.ts
+api/users.service.ts
 configuration.ts
 encoder.ts
 model/api-error-response.ts

@@ -8,8 +8,8 @@
     "lint": "ng lint",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "codegen-admin": "openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/api/admin --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case,serviceFileSuffix=.admin,serviceSuffix=Admin",
-    "codegen-auth-basic": "openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/api/auth-basic --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case,serviceFileSuffix=.auth-basic,serviceSuffix=AuthBasic"
+    "codegen-admin": "npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/api/admin --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case",
+    "codegen-auth-basic": "npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/api/auth-basic --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
@@ -31,7 +31,7 @@
     "@angular/cli": "^21.2.17",
     "@angular/compiler-cli": "^21.2.0",
     "@eslint/js": "^10.0.1",
-    "@openapitools/openapi-generator-cli": "^2.39.0",
+    "@openapitools/openapi-generator-cli": "2.39.0",
     "angular-eslint": "21.4.0",
     "eslint": "^10.3.0",
     "jsdom": "^28.0.0",
@@ -49,6 +49,7 @@
     "lmdb@3.5.1": true,
     "msgpackr-extract@3.0.4": true,
     "esbuild@0.27.7": true,
-    "esbuild@0.28.1": true
+    "esbuild@0.28.1": true,
+    "@openapitools/openapi-generator-cli@2.39.0": true
   }
 }
