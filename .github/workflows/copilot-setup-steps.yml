@@ -2,11 +2,6 @@ name: Copilot setup steps
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
-      - package.json
-      - package-lock.json
 
 permissions:
   contents: read

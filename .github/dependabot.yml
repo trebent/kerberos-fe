@@ -7,12 +7,16 @@ updates:
       interval: weekly
       day: monday
     groups:
-      minor:
+      npm-minor/patch-versions:
+        applies-to: version-updates
         update-types:
-          - minor
-      patches:
+          - "minor"
+          - "patch"
+      npm-minor/patch-security-versions:
+        applies-to: security-updates
         update-types:
-          - patch
+          - "minor"
+          - "patch"
 
   - package-ecosystem: github-actions
     directory: /
@@ -20,9 +24,13 @@ updates:
       interval: weekly
       day: tuesday
     groups:
-      minor:
+      action-minor/patch-versions:
+        applies-to: version-updates
         update-types:
-          - minor
-      patches:
+          - "minor"
+          - "patch"
+      action-minor/patch-security-versions:
+        applies-to: security-updates
         update-types:
-          - patch
+          - "minor"
+          - "patch"
