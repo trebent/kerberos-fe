@@ -6,8 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../core/auth/auth.service';
-import { DefaultAdmin } from '../../api/admin/api/default.admin';
+import { UsersService } from '../../api/admin/api/users.service';
 import { CreateUserRequest } from '../../api/admin/model/create-user-request';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -31,19 +32,24 @@ export class LoginComponent {
     password: ['', [Validators.required]],
   });
 
-  private adminService = inject(DefaultAdmin);
+  private adminService = inject(UsersService);
 
   submit(): void {
     if (this.form.invalid) return;
     const { username, password } = this.form.getRawValue();
 
-    this.adminService.login({ username: username, password: password }).subscribe({
-      next: (response) => {
+    this.adminService.login({ username: username, password: password }, 'response').subscribe({
+      next: (response: HttpResponse<any>) => {
         console.debug(response)
-        this.auth.setSession('session', username);
-        this.router.navigate(['/']);
+        const sessionID = response.headers.get("x-krb-session")
+        if (sessionID == null) {
+          console.error("No session ID returned from server");
+        } else {
+          this.auth.setSession(sessionID, username);
+          this.router.navigate(['/']);
+        }
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error(error);
       },
       complete: () => {
