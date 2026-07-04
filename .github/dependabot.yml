@@ -7,13 +7,7 @@ updates:
       interval: weekly
       day: monday
     groups:
-      npm-minor/patch-versions:
-        applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
-      npm-minor/patch-security-versions:
-        applies-to: security-updates
+      npm-updates:
         update-types:
           - "minor"
           - "patch"
@@ -24,13 +18,7 @@ updates:
       interval: weekly
       day: tuesday
     groups:
-      action-minor/patch-versions:
-        applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
-      action-minor/patch-security-versions:
-        applies-to: security-updates
+      action-updates:
         update-types:
           - "minor"
           - "patch"
