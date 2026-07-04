@@ -5,8 +5,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { routes } from './app.routes';
 import { sessionInterceptor } from './core/interceptors/session.interceptor';
-import { BASE_PATH as ADMIN_BASE_PATH } from './api/admin/variables';
-import { BASE_PATH as AUTH_BASIC_BASE_PATH } from './api/auth-basic/variables';
 import { environment } from '../environments/environment';
 import { provideApi as provideAdminAPI } from './api/admin/provide-api';
 import { provideApi as provideAuthBasicAPI } from './api/auth-basic/provide-api';

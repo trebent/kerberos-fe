@@ -7,7 +7,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../core/auth/auth.service';
 import { UsersService } from '../../api/admin/api/users.service';
-import { CreateUserRequest } from '../../api/admin/model/create-user-request';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -39,7 +38,7 @@ export class LoginComponent {
     const { username, password } = this.form.getRawValue();
 
     this.adminService.login({ username: username, password: password }, 'response').subscribe({
-      next: (response: HttpResponse<any>) => {
+      next: (response: HttpResponse<null>) => {
         console.debug(response)
         const sessionID = response.headers.get("x-krb-session")
         if (sessionID == null) {
