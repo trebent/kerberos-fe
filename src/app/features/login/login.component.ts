@@ -26,7 +26,7 @@ export class LoginComponent {
   readonly superLogin = signal(false);
 
   @HostListener('document:keydown.control.m', ['$event'])
-  onSuperLoginToggle(event: KeyboardEvent): void {
+  onSuperLoginToggle(event: Event): void {
     event.preventDefault();
     this.superLogin.update(v => !v);
   }
