@@ -29,6 +29,7 @@ model/flow-transition-result.ts
 model/flow-transition.ts
 model/group.ts
 model/login-superuser-request.ts
+model/me-response.ts
 model/models.ts
 model/permission.ts
 model/start-debug-session-request.ts
