@@ -16,7 +16,7 @@ export class AuthService {
   private readonly _isLoggedIn = signal(false);
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
 
-  login(username: string, password: string): Observable<any> {
+  login(username: string, password: string): Observable<null> {
     return this.userService.login({ username, password }).pipe(
       tap({
         next: () => {
@@ -28,7 +28,7 @@ export class AuthService {
     );
   }
 
-  logout(): Observable<any> {
+  logout(): Observable<null> {
     return this.userService.logout().pipe(
       tap({
         next: () => {
@@ -40,7 +40,7 @@ export class AuthService {
     );
   }
 
-  superLogin(clientId: string, clientSecret: string): Observable<any> {
+  superLogin(clientId: string, clientSecret: string): Observable<null> {
     return this.userService.loginSuperuser({ clientId, clientSecret }).pipe(
       tap({
         next: () => {
@@ -53,7 +53,7 @@ export class AuthService {
     );
   }
 
-  superLogout(): Observable<any> {
+  superLogout(): Observable<null> {
     return this.userService.logoutSuperuser().pipe(
       tap({
         next: () => {
