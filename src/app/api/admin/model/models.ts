@@ -20,6 +20,7 @@ export * from './flow-transition';
 export * from './flow-transition-result';
 export * from './group';
 export * from './login-superuser-request';
+export * from './me-response';
 export * from './permission';
 export * from './start-debug-session-request';
 export * from './update-user-groups-request';

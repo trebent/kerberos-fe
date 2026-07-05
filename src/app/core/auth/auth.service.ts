@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { UsersService } from '../../api/admin/api/users.service';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,15 +16,41 @@ export class AuthService {
   private readonly _isLoggedIn = signal(false);
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
 
+  private readonly _userID = signal<number | null>(null);
+  readonly userID = this._userID.asReadonly();
+
+  /**
+   * Calls GET /api/admin/me to hydrate auth state from an existing session.
+   * Always completes without error — 401 clears state, other errors are logged and swallowed.
+   */
+  checkSession(): Observable<null> {
+    return this.userService.getMe().pipe(
+      tap((response) => {
+        if (response.isSuperuser) {
+          this._isLoggedIn.set(true);
+          this._isSuperuser.set(true);
+          this._username.set('superuser');
+        } else if (response.user) {
+          this._isLoggedIn.set(true);
+          this._isSuperuser.set(false);
+          this._username.set(response.user.username);
+          this._userID.set(response.user.id);
+        }
+      }),
+      map(() => null as null),
+      catchError((err) => {
+        if (err?.status !== 401) {
+          console.error('Session check failed', err);
+        }
+        return of(null);
+      }),
+    );
+  }
+
   login(username: string, password: string): Observable<null> {
     return this.userService.login({ username, password }).pipe(
-      tap({
-        next: () => {
-          this._username.set(username);
-          this._isLoggedIn.set(true);
-        },
-        error: () => console.error('Login failed'),
-      })
+      tap({ error: () => console.error('Login failed') }),
+      switchMap(() => this.checkSession()),
     );
   }
 
@@ -34,8 +60,20 @@ export class AuthService {
         next: () => {
           this._isLoggedIn.set(false);
           this._username.set(null);
+          this._userID.set(null);
         },
         error: () => console.error('Logout failed'),
+      })
+    );
+  }
+
+  changePassword(userID: number, newPassword: string, oldPassword: string): Observable<null> {
+    return this.userService.changeUserPassword(userID, { newPassword, oldPassword }).pipe(
+      tap({
+        next: () => {
+          console.log('Password changed successfully');
+        },
+        error: () => console.error('Password change failed'),
       })
     );
   }
@@ -60,8 +98,20 @@ export class AuthService {
           this._isLoggedIn.set(false);
           this._username.set(null);
           this._isSuperuser.set(false);
+          this._userID.set(null);
         },
         error: () => console.error('Logout failed'),
+      })
+    );
+  }
+
+  superChangePassword(newPassword: string, oldPassword: string): Observable<null> {
+    return this.userService.changeSuperuserPassword({ newPassword, oldPassword }).pipe(
+      tap({
+        next: () => {
+          console.log('Password changed successfully');
+        },
+        error: () => console.error('Password change failed'),
       })
     );
   }
