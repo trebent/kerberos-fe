@@ -73,13 +73,24 @@ export class HeaderComponent {
   readonly authService = inject(AuthService);
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (error: Error) => {
-        console.error(error);
-      },
-    });
+    if (this.authService.isSuperuser()) {
+      this.authService.superLogout().subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error: Error) => {
+          console.error(error);
+        },
+      });
+    } else {
+      this.authService.logout().subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error: Error) => {
+          console.error(error);
+        },
+      });
+    }
   }
 }

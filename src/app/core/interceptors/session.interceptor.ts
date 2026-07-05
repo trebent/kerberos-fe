@@ -6,15 +6,15 @@ const getCookie = (name: string): string | null => {
 };
 
 export const csrfInterceptor: HttpInterceptorFn = (req, next) => {
-  const csrfToken = getCookie('X-KRB-CSRF-Token');
+  const csrfToken = getCookie('csrf');
   req = req.clone({
     withCredentials: true,
     ...(csrfToken
-      ? { setHeaders: { 'X-KRB-CSRF-Token': csrfToken } }
+      ? { setHeaders: { 'X-Krb-Csrf-Token': csrfToken } }
       : {}),
   });
   if (!csrfToken) {
-    console.error('CSRF token not found in cookies');
+    console.error('"csrf" cookie not found');
   }
   return next(req);
 };

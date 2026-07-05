@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -23,6 +23,14 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
+  readonly superLogin = signal(false);
+
+  @HostListener('document:keydown.control.m', ['$event'])
+  onSuperLoginToggle(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.superLogin.update(v => !v);
+  }
+
   readonly form = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required]],
@@ -34,14 +42,24 @@ export class LoginComponent {
     if (this.form.invalid) return;
     const { username, password } = this.form.getRawValue();
 
-    this.authService.login(username, password).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-      error: (error: Error) => {
-        console.error(error);
-      },
-    });
-
+    if (this.superLogin()) {
+      this.authService.superLogin(username, password).subscribe({
+        next: () => {
+          this.router.navigate(['/']);
+        },
+        error: (error: Error) => {
+          console.error(error);
+        },
+      });
+    } else {
+      this.authService.login(username, password).subscribe({
+        next: () => {
+          this.router.navigate(['/']);
+        },
+        error: (error: Error) => {
+          console.error(error);
+        },
+      });
+    }
   }
 }
