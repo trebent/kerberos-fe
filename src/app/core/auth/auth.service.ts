@@ -1,32 +1,39 @@
-import { Injectable, signal, computed } from '@angular/core';
-
-const SESSION_KEY = 'krb-session';
-const USERNAME_KEY = 'krb-username';
+import { Injectable, inject, signal } from '@angular/core';
+import { UsersService } from '../../api/admin/api/users.service';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly _sessionId = signal<string | null>(
-    sessionStorage.getItem(SESSION_KEY)
-  );
-  private readonly _username = signal<string | null>(
-    sessionStorage.getItem(USERNAME_KEY)
-  );
+  private readonly userService = inject(UsersService);
 
-  readonly sessionId = this._sessionId.asReadonly();
+  private readonly _username = signal<string | null>(null);
   readonly username = this._username.asReadonly();
-  readonly isAuthenticated = computed(() => this._sessionId() !== null);
 
-  setSession(sessionId: string, username: string): void {
-    this._sessionId.set(sessionId);
-    this._username.set(username);
-    sessionStorage.setItem(SESSION_KEY, sessionId);
-    sessionStorage.setItem(USERNAME_KEY, username);
+  private readonly _isLoggedIn = signal(false);
+  readonly isLoggedIn = this._isLoggedIn.asReadonly();
+
+  login(username: string, password: string): Observable<any> {
+    return this.userService.login({ username, password }).pipe(
+      tap({
+        next: () => {
+          this._username.set(username);
+          this._isLoggedIn.set(true);
+        },
+        error: () => console.error('Login failed'),
+      })
+    );
   }
 
-  clearSession(): void {
-    this._sessionId.set(null);
-    this._username.set(null);
-    sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(USERNAME_KEY);
+  logout(): Observable<any> {
+    return this.userService.logout().pipe(
+      tap({
+        next: () => {
+          this._isLoggedIn.set(false);
+          this._username.set(null);
+        },
+        error: () => console.error('Logout failed'),
+      })
+    );
   }
 }

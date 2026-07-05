@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
     <mat-toolbar class="app-header">
       <span class="brand">Kerberos</span>
 
-      @if (auth.isAuthenticated()) {
+      @if (authService.isLoggedIn()) {
         <nav class="nav-links">
           <a mat-button routerLink="/flow" routerLinkActive="active-nav-link">Flow</a>
           <a mat-button routerLink="/user-mgmt" routerLinkActive="active-nav-link">User Mgmt</a>
@@ -21,8 +21,8 @@ import { Router } from '@angular/router';
 
       <span class="spacer"></span>
 
-      @if (auth.isAuthenticated()) {
-        <span class="user-info">Logged in as {{ auth.username() }}</span>
+      @if (authService.isLoggedIn()) {
+        <span class="user-info">Logged in as {{ authService.username() }}</span>
         <button mat-stroked-button (click)="logout()">Logout</button>
       }
     </mat-toolbar>
@@ -69,11 +69,17 @@ import { Router } from '@angular/router';
   ],
 })
 export class HeaderComponent {
-  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
 
   logout(): void {
-    this.auth.clearSession();
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (error: Error) => {
+        console.error(error);
+      },
+    });
   }
 }

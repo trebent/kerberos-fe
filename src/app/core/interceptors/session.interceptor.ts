@@ -1,13 +1,20 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../auth/auth.service';
 
-export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
-  const sessionId = inject(AuthService).sessionId();
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+};
 
-  if (sessionId) {
-    return next(req.clone({ setHeaders: { 'x-krb-session': sessionId } }));
+export const csrfInterceptor: HttpInterceptorFn = (req, next) => {
+  const csrfToken = getCookie('X-KRB-CSRF-Token');
+  req = req.clone({
+    withCredentials: true,
+    ...(csrfToken
+      ? { setHeaders: { 'X-KRB-CSRF-Token': csrfToken } }
+      : {}),
+  });
+  if (!csrfToken) {
+    console.error('CSRF token not found in cookies');
   }
-
   return next(req);
 };

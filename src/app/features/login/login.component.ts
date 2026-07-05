@@ -6,8 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../core/auth/auth.service';
-import { UsersService } from '../../api/admin/api/users.service';
-import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +21,6 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly form = this.fb.nonNullable.group({
@@ -31,29 +28,19 @@ export class LoginComponent {
     password: ['', [Validators.required]],
   });
 
-  private adminService = inject(UsersService);
+  private authService = inject(AuthService);
 
   submit(): void {
     if (this.form.invalid) return;
     const { username, password } = this.form.getRawValue();
 
-    this.adminService.login({ username: username, password: password }, 'response').subscribe({
-      next: (response: HttpResponse<null>) => {
-        console.debug(response)
-        const sessionID = response.headers.get("x-krb-session")
-        if (sessionID == null) {
-          console.error("No session ID returned from server");
-        } else {
-          this.auth.setSession(sessionID, username);
-          this.router.navigate(['/']);
-        }
+    this.authService.login(username, password).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
       },
       error: (error: Error) => {
         console.error(error);
       },
-      complete: () => {
-        console.log('Login request completed');
-      }
     });
 
   }
