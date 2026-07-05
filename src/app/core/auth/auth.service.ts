@@ -67,6 +67,22 @@ export class AuthService {
     );
   }
 
+  updateUsername(newUsername: string): Observable<null> {
+    const userID = this._userID();
+    if (userID === null) {
+      return new Observable(observer => { observer.error(new Error('No user ID available')); });
+    }
+    return this.userService.updateUser(userID, { username: newUsername }).pipe(
+      tap({
+        next: () => {
+          this._username.set(newUsername);
+        },
+        error: () => console.error('Username update failed'),
+      }),
+      map(() => null as null),
+    );
+  }
+
   changePassword(userID: number, newPassword: string, oldPassword: string): Observable<null> {
     return this.userService.changeUserPassword(userID, { newPassword, oldPassword }).pipe(
       tap({
