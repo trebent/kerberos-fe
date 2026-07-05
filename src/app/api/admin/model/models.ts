@@ -1,5 +1,5 @@
 export * from './api-error-response';
-export * from './change-user-password-request';
+export * from './change-superuser-password-request';
 export * from './create-group-request';
 export * from './create-user-request';
 export * from './debug-session';

@@ -8,7 +8,7 @@ api/users.service.ts
 configuration.ts
 encoder.ts
 model/api-error-response.ts
-model/change-user-password-request.ts
+model/change-superuser-password-request.ts
 model/create-group-request.ts
 model/create-user-request.ts
 model/debug-session-call.ts

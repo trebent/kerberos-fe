@@ -19,7 +19,7 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 // @ts-ignore
 import { APIErrorResponse } from '../model/api-error-response';
 // @ts-ignore
-import { ChangeUserPasswordRequest } from '../model/change-user-password-request';
+import { ChangeSuperuserPasswordRequest } from '../model/change-superuser-password-request';
 // @ts-ignore
 import { CreateGroupRequest } from '../model/create-group-request';
 // @ts-ignore
@@ -54,28 +54,94 @@ export class UsersService extends BaseService {
     }
 
     /**
-     * @endpoint put /api/admin/users/{userID}/password
-     * @param userID 
-     * @param changeUserPasswordRequest Request body for changing a user\&#39;s password.
+     * @endpoint put /api/admin/superuser/password
+     * @param changeSuperuserPasswordRequest Request body for changing a user\&#39;s password.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
-    public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
-    public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
-    public changeUserPassword(userID: number, changeUserPasswordRequest: ChangeUserPasswordRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (userID === null || userID === undefined) {
-            throw new Error('Required parameter userID was null or undefined when calling changeUserPassword.');
-        }
-        if (changeUserPasswordRequest === null || changeUserPasswordRequest === undefined) {
-            throw new Error('Required parameter changeUserPasswordRequest was null or undefined when calling changeUserPassword.');
+    public changeSuperuserPassword(changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public changeSuperuserPassword(changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public changeSuperuserPassword(changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public changeSuperuserPassword(changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (changeSuperuserPasswordRequest === null || changeSuperuserPasswordRequest === undefined) {
+            throw new Error('Required parameter changeSuperuserPasswordRequest was null or undefined when calling changeSuperuserPassword.');
         }
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/api/admin/superuser/password`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<any>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: changeSuperuserPasswordRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * @endpoint put /api/admin/users/{userID}/password
+     * @param userID 
+     * @param changeSuperuserPasswordRequest Request body for changing a user\&#39;s password.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public changeUserPassword(userID: number, changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public changeUserPassword(userID: number, changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public changeUserPassword(userID: number, changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public changeUserPassword(userID: number, changeSuperuserPasswordRequest: ChangeSuperuserPasswordRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (userID === null || userID === undefined) {
+            throw new Error('Required parameter userID was null or undefined when calling changeUserPassword.');
+        }
+        if (changeSuperuserPasswordRequest === null || changeSuperuserPasswordRequest === undefined) {
+            throw new Error('Required parameter changeSuperuserPasswordRequest was null or undefined when calling changeUserPassword.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -114,7 +180,7 @@ export class UsersService extends BaseService {
         return this.httpClient.request<any>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: changeUserPasswordRequest,
+                body: changeSuperuserPasswordRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -142,8 +208,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -210,8 +275,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -278,8 +342,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -336,8 +399,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -394,8 +456,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -448,8 +509,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -502,8 +562,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -560,8 +619,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -614,8 +672,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -798,8 +855,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -852,8 +908,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -914,8 +969,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -986,8 +1040,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -1058,8 +1111,7 @@ export class UsersService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

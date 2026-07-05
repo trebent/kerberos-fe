@@ -92,13 +92,13 @@ constructor({ accessToken, apiKeys, basePath, credentials, encodeParam, encoder,
         this.encodeParam = encodeParam ?? (param => this.defaultEncodeParam(param));
         this.credentials = credentials ?? {};
 
-        // init default sessionid credential
-        if (!this.credentials['sessionid']) {
-            this.credentials['sessionid'] = () => {
+        // init default cookieAuth credential
+        if (!this.credentials['cookieAuth']) {
+            this.credentials['cookieAuth'] = () => {
                 if (this.apiKeys === null || this.apiKeys === undefined) {
                     return undefined;
                 } else {
-                    return this.apiKeys['sessionid'] || this.apiKeys['x-krb-session'];
+                    return this.apiKeys['cookieAuth'] || this.apiKeys['session'];
                 }
             };
         }
