@@ -73,13 +73,10 @@ import { OrganisationDetailComponent } from '../organisation-detail/organisation
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let o">
             <button
-              mat-icon-button
+              mat-stroked-button
               [color]="selectedOrgId() === o.id ? 'primary' : ''"
               (click)="toggleManage(o)"
-              aria-label="Manage organisation"
-            >
-              <mat-icon>manage_accounts</mat-icon>
-            </button>
+            >Manage</button>
             <button mat-icon-button (click)="openEdit(o)" aria-label="Edit organisation">
               <mat-icon>edit</mat-icon>
             </button>

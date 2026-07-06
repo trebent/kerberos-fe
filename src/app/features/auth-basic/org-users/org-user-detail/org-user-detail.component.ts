@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 import { GroupsService } from '../../../../api/auth-basic/api/groups.service';
 import { UsersService } from '../../../../api/auth-basic/api/users.service';
+import { Group } from '../../../../api/auth-basic/model/group';
 import { User } from '../../../../api/auth-basic/model/user';
 import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
 
@@ -54,9 +55,9 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
       @if (!groupsLoading() && availableGroups().length) {
         <fieldset class="groups-fieldset">
           <legend>Select groups</legend>
-          @for (g of availableGroups(); track g) {
-            <mat-checkbox [checked]="selectedGroups().includes(g)" (change)="toggleGroup(g)">
-              {{ g }}
+          @for (g of availableGroups(); track g.id) {
+            <mat-checkbox [checked]="selectedGroupIds().has(g.id)" (change)="toggleGroup(g)">
+              {{ g.name }}
             </mat-checkbox>
           }
         </fieldset>
@@ -167,8 +168,8 @@ export class OrgUserDetailComponent implements OnInit {
   readonly nameSuccess = signal(false);
 
   readonly groupsLoading = signal(false);
-  readonly availableGroups = signal<string[]>([]);
-  readonly selectedGroups = signal<string[]>([]);
+  readonly availableGroups = signal<Group[]>([]);
+  readonly selectedGroupIds = signal<Set<number>>(new Set());
   readonly groupErrors = signal<string[]>([]);
   readonly groupSuccess = signal(false);
 
@@ -202,8 +203,8 @@ export class OrgUserDetailComponent implements OnInit {
       this.usersService.getUserGroups(orgId, userId),
     ]).subscribe({
       next: ([groups, userGroups]) => {
-        this.availableGroups.set(groups.map(g => g.name));
-        this.selectedGroups.set(userGroups);
+        this.availableGroups.set(groups);
+        this.selectedGroupIds.set(new Set(userGroups.map(g => g.id)));
         this.groupsLoading.set(false);
       },
       error: () => {
@@ -213,13 +214,14 @@ export class OrgUserDetailComponent implements OnInit {
     });
   }
 
-  toggleGroup(groupName: string): void {
-    const current = this.selectedGroups();
-    if (current.includes(groupName)) {
-      this.selectedGroups.set(current.filter(n => n !== groupName));
+  toggleGroup(group: Group): void {
+    const ids = new Set(this.selectedGroupIds());
+    if (ids.has(group.id)) {
+      ids.delete(group.id);
     } else {
-      this.selectedGroups.set([...current, groupName]);
+      ids.add(group.id);
     }
+    this.selectedGroupIds.set(ids);
   }
 
   saveName(): void {
@@ -240,7 +242,8 @@ export class OrgUserDetailComponent implements OnInit {
   saveGroups(): void {
     this.groupErrors.set([]);
     this.groupSuccess.set(false);
-    this.usersService.updateUserGroups(this.orgId(), this.user().id, this.selectedGroups()).subscribe({
+    const groups = this.availableGroups().filter(g => this.selectedGroupIds().has(g.id));
+    this.usersService.updateUserGroups(this.orgId(), this.user().id, groups).subscribe({
       next: () => this.groupSuccess.set(true),
       error: () => this.groupErrors.set(['Failed to update groups. Please try again.']),
     });

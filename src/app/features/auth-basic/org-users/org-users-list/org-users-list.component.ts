@@ -67,6 +67,10 @@ import { OrgUserDetailComponent } from '../org-user-detail/org-user-detail.compo
             <th mat-header-cell *matHeaderCellDef>Name</th>
             <td mat-cell *matCellDef="let u">{{ u.name }}</td>
           </ng-container>
+          <ng-container matColumnDef="groups">
+            <th mat-header-cell *matHeaderCellDef>Groups</th>
+            <td mat-cell *matCellDef="let u">{{ u.groups?.length ? u.groups!.map(g => g.name).join(', ') : '—' }}</td>
+          </ng-container>
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let u">
@@ -143,7 +147,7 @@ export class OrgUsersListComponent {
 
   readonly orgId = input.required<number | null>();
 
-  readonly displayedColumns = ['id', 'name', 'actions'];
+  readonly displayedColumns = ['id', 'name', 'groups', 'actions'];
 
   readonly usersResource = rxResource({
     params: () => this.orgId(),
