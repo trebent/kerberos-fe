@@ -115,7 +115,7 @@ export class GroupDetailComponent implements OnInit {
   ngOnInit(): void {
     const g = this.group();
     this.editForm.reset({ name: g.name });
-    this.selectedPermissionIds.set(g.permissions.map(p => p.id));
+    this.selectedPermissionIds.set(g.permissions!.map(p => p.id));
   }
 
   isSelected(permissionId: number): boolean {
