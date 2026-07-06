@@ -1,9 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, computed, input, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FlowService } from '../../../api/admin/api/flow.service';
+import { FlowMeta } from '../../../api/admin/model/flow-meta';
 import { FlowMetaDataRouter } from '../../../api/admin/model/flow-meta-data-router';
 import { FlowMetaDataRouterBackend } from '../../../api/admin/model/flow-meta-data-router-backend';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
@@ -11,18 +10,18 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
 @Component({
   selector: 'app-flow-pipeline',
   template: `
-    @if (flowResource.isLoading()) {
+    @if (isLoading()) {
       <mat-spinner diameter="32" />
     }
-    @if (flowResource.error()) {
+    @if (hasError()) {
       <app-error-display [errors]="['Failed to load flow pipeline.']" />
     }
-    @if (flowResource.hasValue()) {
+    @if (hasValue()) {
       <div class="flow-card">
         <div class="flow-section">
           <h3 class="section-heading">Flow</h3>
           <div class="pipeline">
-            @for (comp of flowResource.value()!; track comp.name; let last = $last; let i = $index) {
+            @for (comp of flowMetas()!; track comp.name; let last = $last; let i = $index) {
               <div
                 class="flow-box"
                 [class.involved]="hoveredBackend() !== null && !isComponentDimmed(comp.name)"
@@ -173,14 +172,14 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
   ],
 })
 export class FlowPipelineComponent {
-  private readonly flowService = inject(FlowService);
+  readonly flowMetas = input<FlowMeta[] | null>(null);
+  readonly isLoading = input<boolean>(false);
+  readonly hasError = input<boolean>(false);
 
-  readonly flowResource = rxResource({
-    stream: () => this.flowService.getFlow(),
-  });
+  readonly hasValue = computed(() => this.flowMetas() != null);
 
   readonly backends = computed<FlowMetaDataRouterBackend[]>(() => {
-    const flow = this.flowResource.value();
+    const flow = this.flowMetas();
     if (!flow) return [];
     const router = flow.find(c => c.name === 'router');
     if (!router) return [];
@@ -192,7 +191,7 @@ export class FlowPipelineComponent {
   private static readonly ALWAYS_INVOLVED = new Set(['observability', 'router', 'forwarder']);
 
   readonly involvedMap = computed<Map<string, Set<string>>>(() => {
-    const flow = this.flowResource.value();
+    const flow = this.flowMetas();
     if (!flow) return new Map();
 
     const map = new Map<string, Set<string>>();
@@ -216,7 +215,7 @@ export class FlowPipelineComponent {
   }
 
   isArrowDimmed(index: number): boolean {
-    const flow = this.flowResource.value();
+    const flow = this.flowMetas();
     if (!flow) return false;
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
