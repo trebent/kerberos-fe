@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { EMPTY, from, switchMap } from 'rxjs';
+import { catchError, from, switchMap, tap, throwError } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -236,13 +236,15 @@ export class FlowComponent {
   readonly selectedBackend = signal<string | null>(null);
 
   readonly oasResource = rxResource({
-    stream: () => {
-      const backend = this.selectedBackend();
-      if (!backend) return EMPTY;
-      return this.oasService.getBackendOAS(backend).pipe(
-        switchMap(result => from((result as unknown as Blob).text())),
+    params: () => this.selectedBackend() ?? undefined,
+    stream: ({ params: backend }) => {
+      return this.oasService.getBackendOAS(backend, 'body', false, { httpHeaderAccept: 'application/yaml' }).pipe(
+        tap(response => console.debug('[oasResource] raw response', response)),
+        switchMap(response => from((response as unknown as Blob).text())),
+        tap(text => console.debug('[oasResource] parsed text', text)),
+        catchError(err => { console.debug('[oasResource] error', err); return throwError(() => err); }),
       );
-    },
+    }
   });
 
   toggleDrawer(): void {
