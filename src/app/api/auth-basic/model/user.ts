@@ -7,10 +7,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Group } from './group';
 
 
 export interface User { 
     id: number;
     name: string;
+    groups?: Array<Group>;
 }
 
