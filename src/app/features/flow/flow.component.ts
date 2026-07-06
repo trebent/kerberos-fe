@@ -53,7 +53,6 @@ export class FlowComponent {
 
   closeOverlay(): void {
     this.selectedBackend.set(null);
-    this.drawerOpen.set(false);
   }
 
   onDebugClick(): void {

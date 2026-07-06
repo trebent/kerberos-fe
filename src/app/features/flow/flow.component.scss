@@ -94,6 +94,9 @@
   min-width: 280px;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--mat-sys-outline-variant);
+  border-right: 1px solid var(--mat-sys-outline-variant);
   overflow: hidden;
+}
+.oas-panel.no-drawer {
+  padding-top: 56px;
 }

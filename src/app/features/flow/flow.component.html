@@ -24,15 +24,15 @@
   </div>
 </div>
 
+@if (selectedBackend(); as backend) {
+<div class="oas-panel" [class.no-drawer]="!drawerOpen()">
+  <app-oas [backend]="backend" (closed)="closeOverlay()" />
+</div>
+}
+
 <div class="content-area">
   <div class="pipeline-area">
     <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
       [hasError]="!!flowResource.error()" />
   </div>
-
-  @if (selectedBackend(); as backend) {
-  <div class="oas-panel">
-    <app-oas [backend]="backend" (closed)="closeOverlay()" />
-  </div>
-  }
 </div>
