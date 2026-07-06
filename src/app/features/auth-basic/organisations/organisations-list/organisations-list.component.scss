@@ -1,0 +1,41 @@
+.action-bar {
+  margin-bottom: 16px;
+}
+.form-section {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+}
+h4 {
+  margin: 0 0 12px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+mat-form-field {
+  width: 320px;
+}
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.credentials-box {
+  margin: 16px 0;
+  padding: 16px;
+  border: 2px solid var(--mat-sys-primary);
+  border-radius: 8px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+.credentials-box p {
+  margin: 8px 0;
+}
+code {
+  font-family: monospace;
+  font-size: 0.95em;
+}

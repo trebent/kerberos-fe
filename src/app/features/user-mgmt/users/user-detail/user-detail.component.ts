@@ -13,76 +13,8 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
 
 @Component({
   selector: 'app-user-detail',
-  template: `
-    <section class="detail-section">
-      <h4>Edit User</h4>
-      @if (saveErrors().length) {
-        <app-error-display [errors]="saveErrors()" />
-      }
-      <form [formGroup]="editForm" (ngSubmit)="save()">
-        <mat-form-field appearance="outline">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" autocomplete="username" />
-        </mat-form-field>
-
-        @if (groupsResource.isLoading()) {
-          <mat-spinner diameter="24" />
-        }
-        @if (groupsResource.hasValue()) {
-          <fieldset class="groups-fieldset">
-            <legend>Groups</legend>
-            @for (g of groupsResource.value()!; track g.id) {
-              <mat-checkbox [checked]="isSelected(g.id)" (change)="toggleGroup(g.id)">
-                {{ g.name }}
-              </mat-checkbox>
-            }
-          </fieldset>
-        }
-
-        <div class="form-actions">
-          <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-        </div>
-      </form>
-    </section>
-  `,
-  styles: [`
-    .detail-section {
-      margin: 16px 0;
-      padding: 16px;
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 8px;
-    }
-    h4 {
-      margin: 0 0 12px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    mat-form-field {
-      width: 320px;
-    }
-    .groups-fieldset {
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 4px;
-      padding: 8px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .groups-fieldset legend {
-      font: var(--mat-sys-label-medium);
-      padding: 0 4px;
-    }
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-  `],
+  templateUrl: './user-detail.component.html',
+  styleUrl: './user-detail.component.scss',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,

@@ -1,0 +1,18 @@
+<mat-toolbar class="app-header">
+  <span class="brand">Kerberos</span>
+
+  @if (authService.isLoggedIn()) {
+    <nav class="nav-links">
+      <a mat-button routerLink="/flow" routerLinkActive="active-nav-link">Flow</a>
+      <a mat-button routerLink="/user-mgmt" routerLinkActive="active-nav-link">User Mgmt</a>
+      <a mat-button routerLink="/auth-basic" routerLinkActive="active-nav-link">Basic Authentication</a>
+    </nav>
+  }
+
+  <span class="spacer"></span>
+
+  @if (authService.isLoggedIn()) {
+    <span class="user-info">Logged in as {{ authService.username() }}</span>
+    <button mat-stroked-button (click)="logout()">Logout</button>
+  }
+</mat-toolbar>

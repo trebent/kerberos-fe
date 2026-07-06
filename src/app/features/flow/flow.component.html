@@ -1,0 +1,47 @@
+<button mat-icon-button class="menu-toggle" (click)="toggleDrawer()" aria-label="Toggle menu">
+  <mat-icon>menu</mat-icon>
+</button>
+
+<div class="side-drawer" [class.open]="drawerOpen()">
+  <div
+    class="drawer-item"
+    [class.disabled]="oasBackends().length === 0"
+    (click)="toggleOasSection()"
+  >
+    <span>OAS</span>
+    @if (oasBackends().length > 0) {
+      <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+    }
+  </div>
+  @if (oasExpanded()) {
+    @for (backend of oasBackends(); track backend) {
+      <div
+        class="drawer-subitem"
+        [class.active]="selectedBackend() === backend"
+        (click)="selectBackend(backend)"
+      >
+        {{ backend }}
+      </div>
+    }
+  }
+
+  <div class="drawer-item" (click)="onDebugClick()">
+    <span>Debug</span>
+  </div>
+</div>
+
+<div class="content-area">
+  <div class="pipeline-area">
+    <app-flow-pipeline
+      [flowMetas]="flowResource.value() ?? null"
+      [isLoading]="flowResource.isLoading()"
+      [hasError]="!!flowResource.error()"
+    />
+  </div>
+
+  @if (selectedBackend(); as backend) {
+    <div class="oas-panel">
+      <app-oas [backend]="backend" (closed)="closeOverlay()" />
+    </div>
+  }
+</div>

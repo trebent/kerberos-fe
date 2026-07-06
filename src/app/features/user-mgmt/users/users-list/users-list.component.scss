@@ -1,0 +1,26 @@
+.action-bar {
+  margin-bottom: 16px;
+}
+.form-section {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+}
+h4 {
+  margin: 0 0 12px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+mat-form-field {
+  width: 320px;
+}
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}

@@ -1,0 +1,63 @@
+<section class="profile-section">
+  <h3>Profile</h3>
+
+  <p class="profile-info">
+    <mat-icon class="profile-icon">account_circle</mat-icon>
+    <span>{{ authService.isSuperuser() ? 'Superuser' : authService.username() }}</span>
+  </p>
+
+  @if (!authService.isSuperuser()) {
+    <h4>Change Username</h4>
+
+    @if (usernameErrors().length) {
+      <app-error-display [errors]="usernameErrors()" />
+    }
+    @if (usernameSuccess()) {
+      <p class="success-message">Username updated successfully.</p>
+    }
+
+    <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+      <mat-form-field appearance="outline">
+        <mat-label>New username</mat-label>
+        <input matInput formControlName="newUsername" autocomplete="username" />
+      </mat-form-field>
+
+      <button mat-flat-button type="submit" [disabled]="usernameForm.invalid">
+        Update username
+      </button>
+    </form>
+  }
+
+  <h4>Change Password</h4>
+
+  @if (passwordErrors().length) {
+    <app-error-display [errors]="passwordErrors()" />
+  }
+  @if (passwordSuccess()) {
+    <p class="success-message">Password changed successfully.</p>
+  }
+
+  <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+    <mat-form-field appearance="outline">
+      <mat-label>Current password</mat-label>
+      <input matInput type="password" formControlName="oldPassword" autocomplete="current-password" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>New password</mat-label>
+      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Confirm new password</mat-label>
+      <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+      @if (passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched) {
+        <mat-error>Passwords do not match.</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-flat-button type="submit" [disabled]="passwordForm.invalid">
+      Change password
+    </button>
+  </form>
+</section>

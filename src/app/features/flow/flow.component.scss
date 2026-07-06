@@ -1,0 +1,99 @@
+:host {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.menu-toggle {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 30;
+}
+.side-drawer {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container-low);
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  flex-direction: column;
+  padding-top: 56px;
+  transition: width 200ms ease;
+}
+.side-drawer.open {
+  width: 220px;
+}
+.drawer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface);
+  user-select: none;
+  border-radius: 4px;
+  margin: 2px 8px;
+  white-space: nowrap;
+}
+.drawer-item:hover:not(.disabled) {
+  background: var(--mat-sys-surface-container-high);
+}
+.drawer-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.drawer-chevron {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  transition: transform 150ms ease;
+  color: var(--mat-sys-on-surface-variant);
+}
+.drawer-chevron.expanded {
+  transform: rotate(90deg);
+}
+.drawer-subitem {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px 8px 28px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+  user-select: none;
+  border-radius: 4px;
+  margin: 1px 8px;
+  white-space: nowrap;
+}
+.drawer-subitem:hover {
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+}
+.drawer-subitem.active {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+.content-area {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+.pipeline-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+}
+.oas-panel {
+  width: 45%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
+}

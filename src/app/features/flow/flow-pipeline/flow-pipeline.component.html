@@ -1,0 +1,50 @@
+@if (isLoading()) {
+  <mat-spinner diameter="32" />
+}
+@if (hasError()) {
+  <app-error-display [errors]="['Failed to load flow pipeline.']" />
+}
+@if (hasValue()) {
+  <div class="flow-card">
+    <div class="flow-section">
+      <h3 class="section-heading">Flow</h3>
+      <div class="pipeline">
+        @for (comp of flowMetas()!; track comp.name; let last = $last; let i = $index) {
+          <div
+            class="flow-box"
+            [class.involved]="hoveredBackend() !== null && !isComponentDimmed(comp.name)"
+            [class.dimmed]="isComponentDimmed(comp.name)"
+            [matTooltip]="formatData(comp.data)"
+            matTooltipClass="flow-meta-tooltip"
+          >
+            {{ comp.name }}
+          </div>
+          @if (!last) {
+            <mat-icon class="arrow" [class.dimmed]="isArrowDimmed(i)">arrow_forward</mat-icon>
+          }
+        }
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="backends-section">
+      <h3 class="section-heading">Backends</h3>
+      @if (backends().length === 0) {
+        <span class="no-backends">No backends</span>
+      } @else {
+        <div class="backends-stack">
+          @for (backend of backends(); track backend.name) {
+            <div
+              class="backend-box"
+              [matTooltip]="formatBackend(backend)"
+              matTooltipClass="flow-meta-tooltip"
+              (mouseenter)="hoveredBackend.set(backend.name)"
+              (mouseleave)="hoveredBackend.set(null)"
+            >
+              {{ backend.name }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

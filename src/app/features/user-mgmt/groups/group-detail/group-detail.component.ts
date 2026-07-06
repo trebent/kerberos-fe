@@ -12,76 +12,8 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
 
 @Component({
   selector: 'app-group-detail',
-  template: `
-    <section class="detail-section">
-      <h4>Edit Group</h4>
-      @if (saveErrors().length) {
-        <app-error-display [errors]="saveErrors()" />
-      }
-      <form [formGroup]="editForm" (ngSubmit)="save()">
-        <mat-form-field appearance="outline">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" />
-        </mat-form-field>
-
-        @if (permissionsResource.isLoading()) {
-          <mat-spinner diameter="24" />
-        }
-        @if (permissionsResource.hasValue()) {
-          <fieldset class="permissions-fieldset">
-            <legend>Permissions</legend>
-            @for (p of permissionsResource.value()!; track p.id) {
-              <mat-checkbox [checked]="isSelected(p.id)" (change)="togglePermission(p.id)">
-                {{ p.name }}
-              </mat-checkbox>
-            }
-          </fieldset>
-        }
-
-        <div class="form-actions">
-          <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
-          <button mat-button type="button" (click)="cancel()">Cancel</button>
-        </div>
-      </form>
-    </section>
-  `,
-  styles: [`
-    .detail-section {
-      margin: 16px 0;
-      padding: 16px;
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 8px;
-    }
-    h4 {
-      margin: 0 0 12px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    mat-form-field {
-      width: 320px;
-    }
-    .permissions-fieldset {
-      border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 4px;
-      padding: 8px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .permissions-fieldset legend {
-      font: var(--mat-sys-label-medium);
-      padding: 0 4px;
-    }
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-  `],
+  templateUrl: './group-detail.component.html',
+  styleUrl: './group-detail.component.scss',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,

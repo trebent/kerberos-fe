@@ -1,0 +1,8 @@
+<div class="error-display" role="alert">
+  <mat-icon class="error-icon">error_outline</mat-icon>
+  <div class="error-content">
+    @for (msg of errors(); track msg) {
+      <p class="error-message">{{ msg }}</p>
+    }
+  </div>
+</div>

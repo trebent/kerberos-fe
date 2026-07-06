@@ -1,0 +1,31 @@
+<section class="detail-section">
+  <h4>Edit User</h4>
+  @if (saveErrors().length) {
+    <app-error-display [errors]="saveErrors()" />
+  }
+  <form [formGroup]="editForm" (ngSubmit)="save()">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="username" />
+    </mat-form-field>
+
+    @if (groupsResource.isLoading()) {
+      <mat-spinner diameter="24" />
+    }
+    @if (groupsResource.hasValue()) {
+      <fieldset class="groups-fieldset">
+        <legend>Groups</legend>
+        @for (g of groupsResource.value()!; track g.id) {
+          <mat-checkbox [checked]="isSelected(g.id)" (change)="toggleGroup(g.id)">
+            {{ g.name }}
+          </mat-checkbox>
+        }
+      </fieldset>
+    }
+
+    <div class="form-actions">
+      <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
+    </div>
+  </form>
+</section>

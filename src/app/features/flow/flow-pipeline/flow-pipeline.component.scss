@@ -1,0 +1,101 @@
+:host {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.flow-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+  padding: 20px;
+}
+.flow-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-right: 20px;
+}
+.divider {
+  width: 1px;
+  background: var(--mat-sys-outline-variant);
+  align-self: stretch;
+}
+.backends-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 20px;
+  flex-shrink: 0;
+}
+.section-heading {
+  margin: 0 0 12px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mat-sys-on-surface-variant);
+}
+.pipeline {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.flow-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+  font-weight: 500;
+  cursor: default;
+  white-space: nowrap;
+  transition: opacity 200ms ease, filter 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+.flow-box.involved {
+  border-color: var(--mat-sys-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
+}
+.flow-box.dimmed {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+.arrow {
+  color: var(--mat-sys-outline);
+  flex-shrink: 0;
+  transition: opacity 200ms ease, filter 200ms ease;
+}
+.arrow.dimmed {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+.backends-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.backend-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-high);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.no-backends {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
