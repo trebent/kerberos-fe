@@ -199,7 +199,6 @@ export class UsersListComponent {
     }
     this.usersService.deleteUser(userId).subscribe({
       next: () => this.usersResource.reload(),
-      error: () => {},
     });
   }
 }

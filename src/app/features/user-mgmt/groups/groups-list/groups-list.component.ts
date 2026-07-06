@@ -233,7 +233,6 @@ export class GroupsListComponent {
     }
     this.usersService.deleteGroup(groupId).subscribe({
       next: () => this.groupsResource.reload(),
-      error: () => {},
     });
   }
 }
