@@ -1,0 +1,135 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+.debug-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  flex-shrink: 0;
+}
+
+.debug-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface);
+}
+
+.debug-body {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.debug-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.backend-select {
+  width: 100%;
+}
+
+.session-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.session-actions button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.session-loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+.session-meta {
+  background: var(--mat-sys-surface-container);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  align-items: baseline;
+}
+
+.meta-label {
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+  min-width: 72px;
+  flex-shrink: 0;
+}
+
+.meta-value {
+  color: var(--mat-sys-on-surface);
+  word-break: break-all;
+}
+
+.calls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.refetch-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calls-empty {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+.calls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.call-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-low);
+  font-size: 0.82rem;
+}
+
+.call-method {
+  font-weight: 600;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  min-width: 52px;
+  color: var(--mat-sys-primary);
+  flex-shrink: 0;
+}
+
+.call-url {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  color: var(--mat-sys-on-surface);
+  word-break: break-all;
+}

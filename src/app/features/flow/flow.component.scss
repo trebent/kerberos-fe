@@ -89,6 +89,10 @@
   min-width: 0;
   overflow: hidden;
 }
+.drawer-item.active {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
 .oas-panel {
   width: 45%;
   min-width: 280px;
@@ -98,5 +102,16 @@
   overflow: hidden;
 }
 .oas-panel.no-drawer {
+  padding-top: 56px;
+}
+.debug-panel {
+  width: 45%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
+}
+.debug-panel.no-drawer {
   padding-top: 56px;
 }

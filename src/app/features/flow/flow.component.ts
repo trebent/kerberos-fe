@@ -4,6 +4,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FlowService } from '../../api/admin/api/flow.service';
 import { FlowMetaDataOAS } from '../../api/admin/model/flow-meta-data-oas';
+import { FlowMetaDataRouter } from '../../api/admin/model/flow-meta-data-router';
+import { DebugComponent } from './debug/debug.component';
 import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
 import { OasComponent } from './oas/oas.component';
 
@@ -14,6 +16,7 @@ import { OasComponent } from './oas/oas.component';
   imports: [
     MatButtonModule,
     MatIconModule,
+    DebugComponent,
     FlowPipelineComponent,
     OasComponent,
   ],
@@ -33,9 +36,18 @@ export class FlowComponent {
     return (oasComp.data as unknown as FlowMetaDataOAS).backends ?? [];
   });
 
+  readonly routerBackends = computed<string[]>(() => {
+    const flow = this.flowResource.value();
+    if (!flow) return [];
+    const routerComp = flow.find(c => c.name === 'router');
+    if (!routerComp) return [];
+    return (routerComp.data as unknown as FlowMetaDataRouter).backends?.map(b => b.name) ?? [];
+  });
+
   readonly drawerOpen = signal(false);
   readonly oasExpanded = signal(false);
   readonly selectedBackend = signal<string | null>(null);
+  readonly debugOpen = signal(false);
 
   toggleDrawer(): void {
     this.drawerOpen.update(open => !open);
@@ -48,6 +60,7 @@ export class FlowComponent {
 
   selectBackend(backend: string): void {
     this.selectedBackend.set(backend);
+    this.debugOpen.set(false);
     this.drawerOpen.set(true);
   }
 
@@ -57,6 +70,11 @@ export class FlowComponent {
 
   onDebugClick(): void {
     this.selectedBackend.set(null);
+    this.debugOpen.update(open => !open);
+  }
+
+  closeDebug(): void {
+    this.debugOpen.set(false);
   }
 }
 

@@ -19,7 +19,8 @@
   }
   }
 
-  <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button">
+  <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button"
+    [class.active]="debugOpen()">
     <span>Debug</span>
   </div>
 </div>
@@ -27,6 +28,12 @@
 @if (selectedBackend(); as backend) {
 <div class="oas-panel" [class.no-drawer]="!drawerOpen()">
   <app-oas [backend]="backend" (closed)="closeOverlay()" />
+</div>
+}
+
+@if (debugOpen()) {
+<div class="debug-panel" [class.no-drawer]="!drawerOpen()">
+  <app-debug [backends]="routerBackends()" (closed)="closeDebug()" />
 </div>
 }
 
