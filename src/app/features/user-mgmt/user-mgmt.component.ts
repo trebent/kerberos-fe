@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ProfileComponent } from './profile/profile.component';
 import { UsersListComponent } from './users/users-list/users-list.component';
 import { GroupsListComponent } from './groups/groups-list/groups-list.component';
-import { PermissionsComponent } from './permissions/permissions.component';
+import { PermissionsListComponent } from './permissions/permissions-list/permissions-list.component';
 
 @Component({
   selector: 'app-user-mgmt',
@@ -18,8 +18,8 @@ import { PermissionsComponent } from './permissions/permissions.component';
     <app-groups-list />
 
     <h3>Permissions</h3>
-    <app-permissions />
+    <app-permissions-list />
   `,
-  imports: [ProfileComponent, UsersListComponent, GroupsListComponent, PermissionsComponent],
+  imports: [ProfileComponent, UsersListComponent, GroupsListComponent, PermissionsListComponent],
 })
 export class UserMgmtComponent {}
