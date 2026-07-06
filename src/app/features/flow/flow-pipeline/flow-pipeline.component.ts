@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -18,25 +18,28 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
       <app-error-display [errors]="['Failed to load flow pipeline.']" />
     }
     @if (flowResource.hasValue()) {
-      <div class="sections">
-        <div class="section flow-section">
+      <div class="flow-card">
+        <div class="flow-section">
           <h3 class="section-heading">Flow</h3>
           <div class="pipeline">
-            @for (comp of flowResource.value()!; track comp.name; let last = $last) {
+            @for (comp of flowResource.value()!; track comp.name; let last = $last; let i = $index) {
               <div
                 class="flow-box"
+                [class.involved]="hoveredBackend() !== null && !isComponentDimmed(comp.name)"
+                [class.dimmed]="isComponentDimmed(comp.name)"
                 [matTooltip]="formatData(comp.data)"
                 matTooltipClass="flow-meta-tooltip"
               >
                 {{ comp.name }}
               </div>
               @if (!last) {
-                <mat-icon class="arrow">arrow_forward</mat-icon>
+                <mat-icon class="arrow" [class.dimmed]="isArrowDimmed(i)">arrow_forward</mat-icon>
               }
             }
           </div>
         </div>
-        <div class="section backends-section">
+        <div class="divider"></div>
+        <div class="backends-section">
           <h3 class="section-heading">Backends</h3>
           @if (backends().length === 0) {
             <span class="no-backends">No backends</span>
@@ -47,6 +50,8 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
                   class="backend-box"
                   [matTooltip]="formatBackend(backend)"
                   matTooltipClass="flow-meta-tooltip"
+                  (mouseenter)="hoveredBackend.set(backend.name)"
+                  (mouseleave)="hoveredBackend.set(null)"
                 >
                   {{ backend.name }}
                 </div>
@@ -63,23 +68,31 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
       justify-content: center;
       width: 100%;
     }
-    .sections {
+    .flow-card {
       display: flex;
       flex-direction: row;
-      align-items: flex-start;
-      justify-content: space-between;
-      width: 100%;
-      gap: 24px;
+      align-items: stretch;
+      border: 1px solid var(--mat-sys-outline-variant);
+      border-radius: 12px;
+      background: var(--mat-sys-surface-container);
+      padding: 20px;
     }
-    .section {
+    .flow-section {
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-right: 20px;
     }
-    .flow-section {
-      flex: 1;
+    .divider {
+      width: 1px;
+      background: var(--mat-sys-outline-variant);
+      align-self: stretch;
     }
     .backends-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-left: 20px;
       flex-shrink: 0;
     }
     .section-heading {
@@ -91,6 +104,7 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
       color: var(--mat-sys-on-surface-variant);
     }
     .pipeline {
+      flex: 1;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -105,14 +119,28 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
       padding: 12px 20px;
       border: 1px solid var(--mat-sys-outline-variant);
       border-radius: 8px;
-      background: var(--mat-sys-surface-container);
+      background: var(--mat-sys-surface-container-high);
       font-weight: 500;
       cursor: default;
       white-space: nowrap;
+      transition: opacity 200ms ease, filter 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    }
+    .flow-box.involved {
+      border-color: var(--mat-sys-primary);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
+    }
+    .flow-box.dimmed {
+      opacity: 0.35;
+      filter: grayscale(1);
     }
     .arrow {
       color: var(--mat-sys-outline);
       flex-shrink: 0;
+      transition: opacity 200ms ease, filter 200ms ease;
+    }
+    .arrow.dimmed {
+      opacity: 0.35;
+      filter: grayscale(1);
     }
     .backends-stack {
       display: flex;
@@ -126,9 +154,9 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
       padding: 10px 16px;
       border: 1px solid var(--mat-sys-outline-variant);
       border-radius: 8px;
-      background: var(--mat-sys-surface-container);
+      background: var(--mat-sys-surface-container-high);
       font-weight: 500;
-      cursor: default;
+      cursor: pointer;
       white-space: nowrap;
     }
     .no-backends {
@@ -158,6 +186,53 @@ export class FlowPipelineComponent {
     if (!router) return [];
     return ((router.data as unknown as FlowMetaDataRouter).backends) ?? [];
   });
+
+  readonly hoveredBackend = signal<string | null>(null);
+
+  private static readonly ALWAYS_INVOLVED = new Set(['observability', 'router', 'forwarder']);
+
+  readonly involvedMap = computed<Map<string, Set<string>>>(() => {
+    const flow = this.flowResource.value();
+    if (!flow) return new Map();
+
+    const map = new Map<string, Set<string>>();
+    for (const backend of this.backends()) {
+      const involved = new Set<string>();
+      for (const comp of flow) {
+        if (FlowPipelineComponent.ALWAYS_INVOLVED.has(comp.name) ||
+            this.hasBackendInTree(comp.data, backend.name)) {
+          involved.add(comp.name);
+        }
+      }
+      map.set(backend.name, involved);
+    }
+    return map;
+  });
+
+  isComponentDimmed(compName: string): boolean {
+    const hovered = this.hoveredBackend();
+    if (!hovered) return false;
+    return !(this.involvedMap().get(hovered)?.has(compName) ?? false);
+  }
+
+  isArrowDimmed(index: number): boolean {
+    const flow = this.flowResource.value();
+    if (!flow) return false;
+    return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
+  }
+
+  private hasBackendInTree(data: unknown, name: string): boolean {
+    if (data === null || data === undefined || typeof data !== 'object') return false;
+    if (Array.isArray(data)) {
+      return data.some(item => this.hasBackendInTree(item, name));
+    }
+    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+      if (key === 'backend' && value === name) return true;
+      if (key === 'backends' && Array.isArray(value) && value.includes(name)) return true;
+      if (this.hasBackendInTree(value, name)) return true;
+    }
+    return false;
+  }
 
   formatBackend(backend: FlowMetaDataRouterBackend): string {
     return `host: ${backend.host}\nport: ${backend.port}`;
