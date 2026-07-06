@@ -1,7 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { UsersService } from '../../api/admin/api/users.service';
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+
+type StoredCredentials =
+  | { type: 'user'; username: string; password: string }
+  | { type: 'superuser'; clientId: string; clientSecret: string };
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -18,6 +22,34 @@ export class AuthService {
 
   private readonly _userID = signal<number | null>(null);
   readonly userID = this._userID.asReadonly();
+
+  private _credentials: StoredCredentials | null = null;
+  private _reloginObs: Observable<null> | null = null;
+
+  hasStoredCredentials(): boolean {
+    return this._credentials !== null;
+  }
+
+  relogin(): Observable<null> {
+    if (!this._credentials) {
+      return throwError(() => new Error('No stored credentials for re-login'));
+    }
+
+    if (this._reloginObs) {
+      return this._reloginObs;
+    }
+
+    const creds = this._credentials;
+    this._reloginObs = (creds.type === 'user'
+      ? this.login(creds.username, creds.password)
+      : this.superLogin(creds.clientId, creds.clientSecret)
+    ).pipe(
+      finalize(() => { this._reloginObs = null; }),
+      shareReplay(1),
+    );
+
+    return this._reloginObs;
+  }
 
   /**
    * Calls GET /api/admin/me to hydrate auth state from an existing session.
@@ -48,6 +80,7 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<null> {
+    this._credentials = { type: 'user', username, password };
     return this.userService.login({ username, password }).pipe(
       tap({ error: () => console.error('Login failed') }),
       switchMap(() => this.checkSession()),
@@ -61,6 +94,7 @@ export class AuthService {
           this._isLoggedIn.set(false);
           this._username.set(null);
           this._userID.set(null);
+          this._credentials = null;
         },
         error: () => console.error('Logout failed'),
       })
@@ -76,6 +110,9 @@ export class AuthService {
       tap({
         next: () => {
           this._username.set(newUsername);
+          if (this._credentials?.type === 'user') {
+            this._credentials = { ...this._credentials, username: newUsername };
+          }
         },
         error: () => console.error('Username update failed'),
       }),
@@ -87,7 +124,9 @@ export class AuthService {
     return this.userService.changeUserPassword(userID, { newPassword, oldPassword }).pipe(
       tap({
         next: () => {
-          console.log('Password changed successfully');
+          if (this._credentials?.type === 'user') {
+            this._credentials = { ...this._credentials, password: newPassword };
+          }
         },
         error: () => console.error('Password change failed'),
       })
@@ -95,6 +134,7 @@ export class AuthService {
   }
 
   superLogin(clientId: string, clientSecret: string): Observable<null> {
+    this._credentials = { type: 'superuser', clientId, clientSecret };
     return this.userService.loginSuperuser({ clientId, clientSecret }).pipe(
       tap({
         next: () => {
@@ -115,6 +155,7 @@ export class AuthService {
           this._username.set(null);
           this._isSuperuser.set(false);
           this._userID.set(null);
+          this._credentials = null;
         },
         error: () => console.error('Logout failed'),
       })
@@ -125,7 +166,9 @@ export class AuthService {
     return this.userService.changeSuperuserPassword({ newPassword, oldPassword }).pipe(
       tap({
         next: () => {
-          console.log('Password changed successfully');
+          if (this._credentials?.type === 'superuser') {
+            this._credentials = { ...this._credentials, clientSecret: newPassword };
+          }
         },
         error: () => console.error('Password change failed'),
       })

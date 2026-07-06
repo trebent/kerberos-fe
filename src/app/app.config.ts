@@ -5,7 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
-import { csrfInterceptor } from './core/interceptors/session.interceptor';
+import { csrfInterceptor, autoReloginInterceptor } from './core/interceptors/session.interceptor';
 import { environment } from '../environments/environment';
 import { provideApi as provideAdminAPI } from './api/admin/provide-api';
 import { provideApi as provideAuthBasicAPI } from './api/auth-basic/provide-api';
@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideAdminAPI(environment.apiBaseUrl),
     provideAuthBasicAPI(environment.apiBaseUrl),
-    provideHttpClient(withInterceptors([csrfInterceptor])),
+    provideHttpClient(withInterceptors([autoReloginInterceptor, csrfInterceptor])),
     provideAppInitializer(() => {
       const authService = inject(AuthService);
       return firstValueFrom(authService.checkSession());
