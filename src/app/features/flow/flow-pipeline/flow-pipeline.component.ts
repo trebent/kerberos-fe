@@ -33,10 +33,16 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
     }
   `,
   styles: [`
+    :host {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
     .pipeline {
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: center;
       flex-wrap: wrap;
       gap: 8px;
     }
@@ -72,6 +78,15 @@ export class FlowPipelineComponent {
   });
 
   formatData(data: unknown): string {
-    return JSON.stringify(data, null, 2);
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      return String(data ?? '');
+    }
+    return Object.entries(data as Record<string, unknown>)
+      .map(([k, v]) => {
+        const val =
+          typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '');
+        return `${k}: ${val}`;
+      })
+      .join('\n');
   }
 }
