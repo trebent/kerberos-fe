@@ -3,45 +3,36 @@
 </button>
 
 <div class="side-drawer" [class.open]="drawerOpen()">
-  <div
-    class="drawer-item"
-    [class.disabled]="oasBackends().length === 0"
-    (click)="toggleOasSection()"
-  >
+  <div class="drawer-item" [class.disabled]="oasBackends().length === 0" (click)="toggleOasSection()"
+    (keyup.enter)="toggleOasSection()" tabindex="0" role="button">
     <span>OAS</span>
     @if (oasBackends().length > 0) {
-      <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+    <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
     }
   </div>
   @if (oasExpanded()) {
-    @for (backend of oasBackends(); track backend) {
-      <div
-        class="drawer-subitem"
-        [class.active]="selectedBackend() === backend"
-        (click)="selectBackend(backend)"
-      >
-        {{ backend }}
-      </div>
-    }
+  @for (backend of oasBackends(); track backend) {
+  <div class="drawer-subitem" [class.active]="selectedBackend() === backend" (click)="selectBackend(backend)"
+    (keyup.enter)="selectBackend(backend)" tabindex="0" role="button">
+    {{ backend }}
+  </div>
+  }
   }
 
-  <div class="drawer-item" (click)="onDebugClick()">
+  <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button">
     <span>Debug</span>
   </div>
 </div>
 
 <div class="content-area">
   <div class="pipeline-area">
-    <app-flow-pipeline
-      [flowMetas]="flowResource.value() ?? null"
-      [isLoading]="flowResource.isLoading()"
-      [hasError]="!!flowResource.error()"
-    />
+    <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
+      [hasError]="!!flowResource.error()" />
   </div>
 
   @if (selectedBackend(); as backend) {
-    <div class="oas-panel">
-      <app-oas [backend]="backend" (closed)="closeOverlay()" />
-    </div>
+  <div class="oas-panel">
+    <app-oas [backend]="backend" (closed)="closeOverlay()" />
+  </div>
   }
 </div>
