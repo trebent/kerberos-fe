@@ -1,14 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { catchError, from, switchMap, tap, throwError } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FlowService } from '../../api/admin/api/flow.service';
-import { OasService } from '../../api/admin/api/oas.service';
 import { FlowMetaDataOAS } from '../../api/admin/model/flow-meta-data-oas';
-import { ErrorDisplayComponent } from '../../shared/components/error-display/error-display.component';
 import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
+import { OasComponent } from './oas/oas.component';
 
 @Component({
   selector: 'app-flow',
@@ -45,34 +42,18 @@ import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
       </div>
     </div>
 
-    <div class="pipeline-area">
-      <app-flow-pipeline
-        [flowMetas]="flowResource.value() ?? null"
-        [isLoading]="flowResource.isLoading()"
-        [hasError]="!!flowResource.error()"
-      />
+    <div class="content-area">
+      <div class="pipeline-area">
+        <app-flow-pipeline
+          [flowMetas]="flowResource.value() ?? null"
+          [isLoading]="flowResource.isLoading()"
+          [hasError]="!!flowResource.error()"
+        />
+      </div>
 
-      @if (selectedBackend()) {
-        <div class="oas-overlay">
-          <div class="oas-overlay-header">
-            <span class="oas-overlay-title">{{ selectedBackend() }}</span>
-            <button mat-icon-button (click)="closeOverlay()" aria-label="Close OAS viewer">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-          <div class="oas-overlay-body">
-            @if (oasResource.isLoading()) {
-              <div class="oas-loading">
-                <mat-spinner diameter="32" />
-              </div>
-            }
-            @if (oasResource.error() && !oasResource.isLoading()) {
-              <app-error-display [errors]="['Failed to load OAS spec.']" />
-            }
-            @if (oasResource.hasValue()) {
-              <pre class="oas-pre">{{ oasResource.value() }}</pre>
-            }
-          </div>
+      @if (selectedBackend(); as backend) {
+        <div class="oas-panel">
+          <app-oas [backend]="backend" (closed)="closeOverlay()" />
         </div>
       }
     </div>
@@ -91,23 +72,18 @@ import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
       z-index: 30;
     }
     .side-drawer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 220px;
-      z-index: 20;
+      width: 0;
+      flex-shrink: 0;
+      overflow: hidden;
       background: var(--mat-sys-surface-container-low);
       border-right: 1px solid var(--mat-sys-outline-variant);
       display: flex;
       flex-direction: column;
       padding-top: 56px;
-      transform: translateX(-100%);
-      transition: transform 200ms ease;
-      overflow-y: auto;
+      transition: width 200ms ease;
     }
     .side-drawer.open {
-      transform: translateX(0);
+      width: 220px;
     }
     .drawer-item {
       display: flex;
@@ -121,6 +97,7 @@ import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
       user-select: none;
       border-radius: 4px;
       margin: 2px 8px;
+      white-space: nowrap;
     }
     .drawer-item:hover:not(.disabled) {
       background: var(--mat-sys-surface-container-high);
@@ -149,6 +126,7 @@ import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
       user-select: none;
       border-radius: 4px;
       margin: 1px 8px;
+      white-space: nowrap;
     }
     .drawer-subitem:hover {
       background: var(--mat-sys-surface-container-high);
@@ -158,66 +136,38 @@ import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
       background: var(--mat-sys-secondary-container);
       color: var(--mat-sys-on-secondary-container);
     }
+    .content-area {
+      flex: 1;
+      display: flex;
+      min-width: 0;
+      overflow: hidden;
+    }
     .pipeline-area {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      min-width: 0;
       overflow: hidden;
     }
-    .oas-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      background: var(--mat-sys-surface);
+    .oas-panel {
+      width: 45%;
+      min-width: 280px;
       display: flex;
       flex-direction: column;
+      border-left: 1px solid var(--mat-sys-outline-variant);
       overflow: hidden;
-    }
-    .oas-overlay-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 8px 8px 16px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      flex-shrink: 0;
-    }
-    .oas-overlay-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--mat-sys-on-surface);
-    }
-    .oas-overlay-body {
-      flex: 1;
-      overflow: auto;
-      padding: 16px;
-    }
-    .oas-loading {
-      display: flex;
-      justify-content: center;
-      padding: 32px;
-    }
-    .oas-pre {
-      margin: 0;
-      font-family: 'Roboto Mono', 'Courier New', monospace;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      white-space: pre;
-      color: var(--mat-sys-on-surface);
     }
   `],
   imports: [
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     FlowPipelineComponent,
-    ErrorDisplayComponent,
+    OasComponent,
   ],
 })
 export class FlowComponent {
   private readonly flowService = inject(FlowService);
-  private readonly oasService = inject(OasService);
 
   readonly flowResource = rxResource({
     stream: () => this.flowService.getFlow(),
@@ -235,18 +185,6 @@ export class FlowComponent {
   readonly oasExpanded = signal(false);
   readonly selectedBackend = signal<string | null>(null);
 
-  readonly oasResource = rxResource({
-    params: () => this.selectedBackend() ?? undefined,
-    stream: ({ params: backend }) => {
-      return this.oasService.getBackendOAS(backend, 'body', false, { httpHeaderAccept: 'application/yaml' }).pipe(
-        tap(response => console.debug('[oasResource] raw response', response)),
-        switchMap(response => from((response as unknown as Blob).text())),
-        tap(text => console.debug('[oasResource] parsed text', text)),
-        catchError(err => { console.debug('[oasResource] error', err); return throwError(() => err); }),
-      );
-    }
-  });
-
   toggleDrawer(): void {
     this.drawerOpen.update(open => !open);
   }
@@ -258,14 +196,17 @@ export class FlowComponent {
 
   selectBackend(backend: string): void {
     this.selectedBackend.set(backend);
+    this.drawerOpen.set(true);
   }
 
   closeOverlay(): void {
     this.selectedBackend.set(null);
+    this.drawerOpen.set(false);
   }
 
   onDebugClick(): void {
     this.selectedBackend.set(null);
   }
 }
+
 
