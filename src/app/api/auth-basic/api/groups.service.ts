@@ -19,7 +19,7 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 // @ts-ignore
 import { APIErrorResponse } from '../model/api-error-response';
 // @ts-ignore
-import { CreateGroupRequest } from '../model/create-group-request';
+import { CreateOrganisationRequest } from '../model/create-organisation-request';
 // @ts-ignore
 import { Group } from '../model/group';
 
@@ -42,20 +42,20 @@ export class GroupsService extends BaseService {
     /**
      * @endpoint post /api/auth/basic/organisations/{orgID}/groups
      * @param orgID An organisation ID.
-     * @param createGroupRequest 
+     * @param createOrganisationRequest A request to create a new group.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public createGroup(orgID: number, createGroupRequest: CreateGroupRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Group>;
-    public createGroup(orgID: number, createGroupRequest: CreateGroupRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Group>>;
-    public createGroup(orgID: number, createGroupRequest: CreateGroupRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Group>>;
-    public createGroup(orgID: number, createGroupRequest: CreateGroupRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public createGroup(orgID: number, createOrganisationRequest: CreateOrganisationRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Group>;
+    public createGroup(orgID: number, createOrganisationRequest: CreateOrganisationRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Group>>;
+    public createGroup(orgID: number, createOrganisationRequest: CreateOrganisationRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Group>>;
+    public createGroup(orgID: number, createOrganisationRequest: CreateOrganisationRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (orgID === null || orgID === undefined) {
             throw new Error('Required parameter orgID was null or undefined when calling createGroup.');
         }
-        if (createGroupRequest === null || createGroupRequest === undefined) {
-            throw new Error('Required parameter createGroupRequest was null or undefined when calling createGroup.');
+        if (createOrganisationRequest === null || createOrganisationRequest === undefined) {
+            throw new Error('Required parameter createOrganisationRequest was null or undefined when calling createGroup.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -99,7 +99,7 @@ export class GroupsService extends BaseService {
         return this.httpClient.request<Group>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: createGroupRequest,
+                body: createOrganisationRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

@@ -13,6 +13,9 @@ import { Permission } from './permission';
 export interface Group { 
     id: number;
     name: string;
-    permissions: Array<Permission>;
+    /**
+     * The permissions that the group has. This may or may not be set depending on the endpoint. 
+     */
+    permissions?: Array<Permission>;
 }
 
