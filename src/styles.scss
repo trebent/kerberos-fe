@@ -42,4 +42,11 @@ body {
   white-space: pre-wrap;
   font-family: monospace;
   font-size: 12px;
+  text-align: left;
+
+  .mdc-tooltip__surface {
+    font-family: monospace;
+    font-size: 12px;
+    text-align: left;
+  }
 }
