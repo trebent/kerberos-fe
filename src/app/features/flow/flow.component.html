@@ -33,13 +33,13 @@
 
 @if (debugOpen()) {
 <div class="debug-panel" [class.no-drawer]="!drawerOpen()">
-  <app-debug [backends]="routerBackends()" (closed)="closeDebug()" />
+  <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
 </div>
 }
 
 <div class="content-area">
   <div class="pipeline-area">
     <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
-      [hasError]="!!flowResource.error()" />
+      [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
   </div>
 </div>

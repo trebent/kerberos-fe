@@ -3,6 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FlowService } from '../../api/admin/api/flow.service';
+import { DebugSessionCall } from '../../api/admin/model/debug-session-call';
 import { FlowMetaDataOAS } from '../../api/admin/model/flow-meta-data-oas';
 import { FlowMetaDataRouter } from '../../api/admin/model/flow-meta-data-router';
 import { DebugComponent } from './debug/debug.component';
@@ -48,6 +49,7 @@ export class FlowComponent {
   readonly oasExpanded = signal(false);
   readonly selectedBackend = signal<string | null>(null);
   readonly debugOpen = signal(false);
+  readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
 
   toggleDrawer(): void {
     this.drawerOpen.update(open => !open);
@@ -75,6 +77,11 @@ export class FlowComponent {
 
   closeDebug(): void {
     this.debugOpen.set(false);
+    this.selectedDebugCall.set(null);
+  }
+
+  onDebugCallSelected(call: DebugSessionCall | null): void {
+    this.selectedDebugCall.set(call);
   }
 }
 

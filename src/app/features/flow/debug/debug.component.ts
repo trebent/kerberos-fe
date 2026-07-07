@@ -10,6 +10,7 @@ import { DebugService } from '../../../api/admin/api/debug.service';
 import { DebugSession } from '../../../api/admin/model/debug-session';
 import { DebugSessionCall } from '../../../api/admin/model/debug-session-call';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-debug',
@@ -31,6 +32,7 @@ export class DebugComponent {
 
   readonly backends = input.required<string[]>();
   readonly closed = output<void>();
+  readonly callSelected = output<DebugSessionCall | null>();
 
   readonly selectedBackend = signal<string | null>(null);
   readonly activeSession = signal<DebugSession | null>(null);
@@ -41,6 +43,11 @@ export class DebugComponent {
   readonly callsFetched = signal(false);
   readonly isFetchingCalls = signal(false);
   readonly callsFetchError = signal(false);
+  readonly selectedCallId = signal<number | null>(null);
+  readonly isFetchingCallDetail = signal(false);
+  readonly callDetailError = signal(false);
+
+  private callDetailSub: Subscription | null = null;
 
   readonly isSessionRunning = computed(() => {
     const session = this.activeSession();
@@ -54,6 +61,12 @@ export class DebugComponent {
       this.calls.set([]);
       this.callsFetched.set(false);
       this.callsFetchError.set(false);
+      this.selectedCallId.set(null);
+      this.isFetchingCallDetail.set(false);
+      this.callDetailError.set(false);
+      this.callDetailSub?.unsubscribe();
+      this.callDetailSub = null;
+      this.callSelected.emit(null);
 
       if (!backend) return;
 
@@ -130,5 +143,41 @@ export class DebugComponent {
           this.isFetchingCalls.set(false);
         },
       });
+  }
+
+  onCallClick(call: DebugSessionCall): void {
+    const session = this.activeSession();
+    const backend = this.selectedBackend();
+    if (!session || !backend || this.isFetchingCallDetail()) return;
+
+    if (this.selectedCallId() === call.id) {
+      this.selectedCallId.set(null);
+      this.callSelected.emit(null);
+      return;
+    }
+
+    this.selectedCallId.set(call.id);
+    this.isFetchingCallDetail.set(true);
+    this.callDetailError.set(false);
+    this.callDetailSub?.unsubscribe();
+
+    this.callDetailSub = this.debugService.getDebugSessionCall(backend, session.id, call.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: fullCall => {
+          this.isFetchingCallDetail.set(false);
+          this.callSelected.emit(fullCall);
+        },
+        error: () => {
+          this.isFetchingCallDetail.set(false);
+          this.callDetailError.set(true);
+          this.selectedCallId.set(null);
+          this.callSelected.emit(null);
+        },
+      });
+  }
+
+  statusClass(code: number): string {
+    return code >= 200 && code < 300 ? 'status-ok' : 'status-err';
   }
 }

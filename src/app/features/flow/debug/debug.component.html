@@ -87,15 +87,31 @@
         <app-error-display [errors]="['Failed to load session calls.']" />
       }
 
+      @if (callDetailError()) {
+        <app-error-display [errors]="['Failed to load call details.']" />
+      }
+
       @if (callsFetched() && !callsFetchError()) {
         @if (calls().length === 0) {
           <p class="calls-empty">No calls recorded yet.</p>
         } @else {
           <div class="calls-list">
             @for (call of calls(); track call.id) {
-              <div class="call-row">
+              <div
+                class="call-row"
+                [class.selected]="selectedCallId() === call.id"
+                (click)="onCallClick(call)"
+                (keyup.enter)="onCallClick(call)"
+                tabindex="0"
+                role="button"
+                [attr.aria-pressed]="selectedCallId() === call.id"
+              >
                 <span class="call-method">{{ call.method }}</span>
+                <span [class]="'call-status ' + statusClass(call.statusCode)">{{ call.statusCode }}</span>
                 <span class="call-url">{{ call.url }}</span>
+                @if (selectedCallId() === call.id && isFetchingCallDetail()) {
+                  <mat-spinner diameter="14" class="call-detail-spinner" />
+                }
               </div>
             }
           </div>

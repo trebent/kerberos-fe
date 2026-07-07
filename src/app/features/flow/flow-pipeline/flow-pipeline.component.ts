@@ -1,10 +1,13 @@
+import { DatePipe } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DebugSessionCall } from '../../../api/admin/model/debug-session-call';
 import { FlowMeta } from '../../../api/admin/model/flow-meta';
 import { FlowMetaDataRouter } from '../../../api/admin/model/flow-meta-data-router';
 import { FlowMetaDataRouterBackend } from '../../../api/admin/model/flow-meta-data-router-backend';
+import { FlowTransition } from '../../../api/admin/model/flow-transition';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
 
 @Component({
@@ -12,6 +15,7 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
   templateUrl: './flow-pipeline.component.html',
   styleUrl: './flow-pipeline.component.scss',
   imports: [
+    DatePipe,
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
@@ -22,6 +26,7 @@ export class FlowPipelineComponent {
   readonly flowMetas = input<FlowMeta[] | null>(null);
   readonly isLoading = input<boolean>(false);
   readonly hasError = input<boolean>(false);
+  readonly selectedCall = input<DebugSessionCall | null>(null);
 
   readonly hasValue = computed(() => this.flowMetas() != null);
 
@@ -36,6 +41,25 @@ export class FlowPipelineComponent {
   readonly hoveredBackend = signal<string | null>(null);
 
   private static readonly ALWAYS_INVOLVED = new Set(['observability', 'router', 'forwarder']);
+
+  readonly transitionsByComponent = computed<Map<string, { inbound: FlowTransition[], outbound: FlowTransition[] }>>(() => {
+    const call = this.selectedCall();
+    const map = new Map<string, { inbound: FlowTransition[], outbound: FlowTransition[] }>();
+    if (!call) return map;
+
+    for (const t of call.flowTransitions) {
+      if (!map.has(t.component)) {
+        map.set(t.component, { inbound: [], outbound: [] });
+      }
+      const entry = map.get(t.component)!;
+      if (t.direction === FlowTransition.DirectionEnum.Inbound) {
+        entry.inbound.push(t);
+      } else {
+        entry.outbound.push(t);
+      }
+    }
+    return map;
+  });
 
   readonly involvedMap = computed<Map<string, Set<string>>>(() => {
     const flow = this.flowMetas();
@@ -65,6 +89,23 @@ export class FlowPipelineComponent {
     const flow = this.flowMetas();
     if (!flow) return false;
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
+  }
+
+  getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
+    const entry = this.transitionsByComponent().get(compName);
+    return entry ? entry[direction] : [];
+  }
+
+  formatTransitionTooltip(t: FlowTransition): string {
+    const fmt = (iso: string) => new Date(iso).toLocaleString();
+    const lines = [
+      `Started:  ${fmt(t.startedAt)}`,
+      `Stopped:  ${fmt(t.stoppedAt)}`,
+    ];
+    if (t.result.outcome === 'failure' && t.result.cause) {
+      lines.push(`Error:    ${t.result.cause}`);
+    }
+    return lines.join('\n');
   }
 
   private hasBackendInTree(data: unknown, name: string): boolean {

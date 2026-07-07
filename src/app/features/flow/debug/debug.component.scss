@@ -118,6 +118,23 @@
   border-radius: 4px;
   background: var(--mat-sys-surface-container-low);
   font-size: 0.82rem;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &:focus-visible {
+    border-color: var(--mat-sys-primary);
+  }
+
+  &.selected {
+    background: color-mix(in srgb, var(--mat-sys-primary) 12%, var(--mat-sys-surface-container-low));
+    border-color: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+  }
 }
 
 .call-method {
@@ -132,4 +149,30 @@
   font-family: 'Roboto Mono', 'Courier New', monospace;
   color: var(--mat-sys-on-surface);
   word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.call-status {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+
+  &.status-ok {
+    color: #1a7f3c;
+    background: color-mix(in srgb, #1a7f3c 12%, transparent);
+  }
+
+  &.status-err {
+    color: #c62828;
+    background: color-mix(in srgb, #c62828 12%, transparent);
+  }
+}
+
+.call-detail-spinner {
+  flex-shrink: 0;
+  align-self: center;
 }
