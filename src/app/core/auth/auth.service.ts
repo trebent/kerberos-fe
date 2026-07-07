@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { UsersService } from '../../api/admin/api/users.service';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type StoredCredentials =
   | { type: 'user'; username: string; password: string }
@@ -69,9 +70,12 @@ export class AuthService {
           this._userID.set(response.user.id);
         }
       }),
-      map(() => null as null),
-      catchError((err) => {
-        if (err?.status !== 401) {
+      // Force null return type for consistency with other methods
+      map(() => {
+        return null as null;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status !== 401) {
           console.error('Session check failed', err);
         }
         return of(null);
