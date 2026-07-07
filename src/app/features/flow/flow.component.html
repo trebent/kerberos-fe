@@ -1,8 +1,9 @@
-<div class="side-drawer">
+<div>
   <button matIconButton class="menu-toggle" (click)="toggleDrawer()" aria-label="Toggle menu">
     <mat-icon>menu</mat-icon>
   </button>
-  <div [hidden]="drawerOpen()">
+
+  <div class="side-drawer" [class.open]="drawerOpen()">
     <div class="drawer-item" [class.disabled]="oasBackends().length === 0" (click)="toggleOasSection()"
       (keyup.enter)="toggleOasSection()" tabindex="0" role="button">
       <span>OAS</span>
@@ -27,13 +28,13 @@
 </div>
 
 @if (selectedBackend(); as backend) {
-<div class="oas-panel" [class.no-drawer]="!drawerOpen()">
+<div class="oas-panel">
   <app-oas [backend]="backend" (closed)="closeOverlay()" />
 </div>
 }
 
 @if (debugOpen()) {
-<div class="debug-panel" [class.no-drawer]="!drawerOpen()">
+<div class="debug-panel">
   <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
 </div>
 }

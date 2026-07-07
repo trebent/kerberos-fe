@@ -61,6 +61,11 @@ export class FlowComponent {
   }
 
   selectBackend(backend: string): void {
+    if (this.selectedBackend() === backend) {
+      this.selectedBackend.set(null);
+      return;
+    }
+
     this.selectedBackend.set(backend);
     this.debugOpen.set(false);
     this.drawerOpen.set(true);
