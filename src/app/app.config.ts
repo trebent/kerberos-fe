@@ -1,7 +1,6 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
@@ -16,7 +15,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideAnimationsAsync(),
     provideAdminAPI(environment.apiBaseUrl),
     provideAuthBasicAPI(environment.apiBaseUrl),
     provideHttpClient(withInterceptors([autoReloginInterceptor, csrfInterceptor])),
