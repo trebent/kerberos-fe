@@ -56,10 +56,10 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let u">
-          <button mat-icon-button (click)="openEdit(u)" aria-label="Edit user">
+          <button matIconButton (click)="openEdit(u)" aria-label="Edit user">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button (click)="deleteUser(u.id)" aria-label="Delete user">
+          <button matIconButton (click)="deleteUser(u.id)" aria-label="Delete user">
             <mat-icon>delete</mat-icon>
           </button>
         </td>

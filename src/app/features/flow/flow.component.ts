@@ -84,5 +84,3 @@ export class FlowComponent {
     this.selectedDebugCall.set(call);
   }
 }
-
-

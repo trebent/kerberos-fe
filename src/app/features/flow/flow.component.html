@@ -1,27 +1,28 @@
-<button mat-icon-button class="menu-toggle" (click)="toggleDrawer()" aria-label="Toggle menu">
-  <mat-icon>menu</mat-icon>
-</button>
-
-<div class="side-drawer" [class.open]="drawerOpen()">
-  <div class="drawer-item" [class.disabled]="oasBackends().length === 0" (click)="toggleOasSection()"
-    (keyup.enter)="toggleOasSection()" tabindex="0" role="button">
-    <span>OAS</span>
-    @if (oasBackends().length > 0) {
-    <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+<div class="side-drawer">
+  <button matIconButton class="menu-toggle" (click)="toggleDrawer()" aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <div [hidden]="drawerOpen()">
+    <div class="drawer-item" [class.disabled]="oasBackends().length === 0" (click)="toggleOasSection()"
+      (keyup.enter)="toggleOasSection()" tabindex="0" role="button">
+      <span>OAS</span>
+      @if (oasBackends().length > 0) {
+      <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+      }
+    </div>
+    @if (oasExpanded()) {
+    @for (backend of oasBackends(); track backend) {
+    <div class="drawer-subitem" [class.active]="selectedBackend() === backend" (click)="selectBackend(backend)"
+      (keyup.enter)="selectBackend(backend)" tabindex="0" role="button">
+      {{ backend }}
+    </div>
     }
-  </div>
-  @if (oasExpanded()) {
-  @for (backend of oasBackends(); track backend) {
-  <div class="drawer-subitem" [class.active]="selectedBackend() === backend" (click)="selectBackend(backend)"
-    (keyup.enter)="selectBackend(backend)" tabindex="0" role="button">
-    {{ backend }}
-  </div>
-  }
-  }
+    }
 
-  <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button"
-    [class.active]="debugOpen()">
-    <span>Debug</span>
+    <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button"
+      [class.active]="debugOpen()">
+      <span>Debug</span>
+    </div>
   </div>
 </div>
 

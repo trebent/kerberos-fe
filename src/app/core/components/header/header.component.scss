@@ -6,6 +6,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   gap: 8px;
 }
+
 .brand {
   font-size: 1.25rem;
   font-weight: 700;
@@ -13,19 +14,23 @@
   margin-right: 16px;
   white-space: nowrap;
 }
+
 .nav-links {
   display: flex;
   gap: 4px;
 }
+
 .spacer {
   flex: 1;
 }
+
 .user-info {
   font: var(--mat-sys-body-small);
   color: var(--mat-sys-on-surface-variant);
   margin-right: 8px;
   white-space: nowrap;
 }
+
 ::ng-deep .active-nav-link {
   background-color: var(--mat-sys-secondary-container) !important;
   color: var(--mat-sys-on-secondary-container) !important;

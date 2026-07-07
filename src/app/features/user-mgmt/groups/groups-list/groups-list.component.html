@@ -55,10 +55,10 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let g">
-        <button mat-icon-button (click)="openEdit(g)" aria-label="Edit group">
+        <button matIconButton (click)="openEdit(g)" aria-label="Edit group">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button (click)="deleteGroup(g.id)" aria-label="Delete group">
+        <button matIconButton (click)="deleteGroup(g.id)" aria-label="Delete group">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

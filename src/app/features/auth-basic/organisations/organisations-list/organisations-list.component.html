@@ -59,10 +59,10 @@
           [color]="selectedOrgId() === o.id ? 'primary' : ''"
           (click)="toggleManage(o)"
         >Manage</button>
-        <button mat-icon-button (click)="openEdit(o)" aria-label="Edit organisation">
+        <button matIconButton (click)="openEdit(o)" aria-label="Edit organisation">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button (click)="deleteOrg(o.id)" aria-label="Delete organisation">
+        <button matIconButton (click)="deleteOrg(o.id)" aria-label="Delete organisation">
           <mat-icon>delete</mat-icon>
         </button>
       </td>
