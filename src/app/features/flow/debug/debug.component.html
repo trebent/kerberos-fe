@@ -18,27 +18,41 @@
       }
     </mat-select>
 
-    <div class="session-actions">
-      <button
-        mat-stroked-button
-        [disabled]="!selectedBackend() || isSessionRunning() || isStarting() || isLoadingSession()"
-        (click)="startSession()"
+    <div class="session-row">
+      <mat-select
+        class="session-select"
+        placeholder="Select session"
+        [disabled]="!selectedBackend() || isLoadingSession()"
+        [ngModel]="selectedSessionId()"
+        (ngModelChange)="onSessionSelect($event)"
       >
-        @if (isStarting()) {
-          <mat-spinner diameter="16" />
+        @for (session of sessions(); track session.id) {
+          <mat-option [value]="session.id">#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option>
         }
-        Start Session
-      </button>
-      <button
-        mat-stroked-button
-        [disabled]="!isSessionRunning() || isStopping()"
-        (click)="stopSession()"
-      >
-        @if (isStopping()) {
-          <mat-spinner diameter="16" />
-        }
-        Stop Session
-      </button>
+      </mat-select>
+
+      <div class="session-buttons">
+        <button
+          mat-stroked-button
+          [disabled]="!selectedBackend() || isStarting() || isLoadingSession()"
+          (click)="startSession()"
+        >
+          @if (isStarting()) {
+            <mat-spinner diameter="16" />
+          }
+          Start
+        </button>
+        <button
+          mat-stroked-button
+          [disabled]="!isSessionRunning() || isStopping()"
+          (click)="stopSession()"
+        >
+          @if (isStopping()) {
+            <mat-spinner diameter="16" />
+          }
+          Stop
+        </button>
+      </div>
     </div>
   </div>
 
@@ -48,26 +62,45 @@
     </div>
   }
 
-  @if (!isLoadingSession() && activeSession(); as session) {
-    <div class="session-meta">
+  <div class="session-meta">
+    @if (!selectedSession()) {
+      <span class="session-empty">No session selected</span>
+    } @else {
       <div class="meta-row">
         <span class="meta-label">Session ID</span>
-        <span class="meta-value">{{ session.id }}</span>
+        <span class="meta-value">{{ selectedSession()!.id }}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Started</span>
-        <span class="meta-value">{{ session.startedAt | date: 'medium' }}</span>
+        <span class="meta-value">{{ selectedSession()!.startedAt | date: 'medium' }}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Expires</span>
-        <span class="meta-value">{{ session.expiresAt | date: 'medium' }}</span>
+        <span class="meta-value">{{ selectedSession()!.expiresAt | date: 'medium' }}</span>
       </div>
       <div class="meta-row">
         <span class="meta-label">Stopped</span>
-        <span class="meta-value">{{ session.stoppedAt ? (session.stoppedAt | date: 'medium') : '—' }}</span>
+        <span class="meta-value">{{ selectedSession()!.stoppedAt ? (selectedSession()!.stoppedAt | date: 'medium') : '—' }}</span>
       </div>
-    </div>
+      <div class="meta-actions">
+        <button
+          mat-stroked-button
+          class="delete-btn"
+          [disabled]="isDeleting()"
+          (click)="deleteSession()"
+        >
+          @if (isDeleting()) {
+            <mat-spinner diameter="16" />
+          } @else {
+            <mat-icon>delete</mat-icon>
+          }
+          Delete
+        </button>
+      </div>
+    }
+  </div>
 
+  @if (selectedSession()) {
     <div class="calls-section">
       <button
         mat-stroked-button

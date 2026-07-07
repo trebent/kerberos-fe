@@ -39,13 +39,25 @@
   width: 100%;
 }
 
-.session-actions {
+.session-row {
   display: flex;
   gap: 8px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.session-actions button {
+.session-select {
+  flex: 1;
+  min-width: 140px;
+}
+
+.session-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.session-buttons button {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -64,6 +76,22 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.session-empty {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
+.meta-actions {
+  margin-top: 4px;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .meta-row {

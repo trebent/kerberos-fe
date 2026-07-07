@@ -139,14 +139,13 @@
 
 .call-meta-box {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
+  flex-direction: column;
+  gap: 6px;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 10px;
   background: var(--mat-sys-surface-container);
   padding: 12px 20px;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
 
   .meta-row {
     display: flex;
@@ -159,6 +158,7 @@
     color: var(--mat-sys-on-surface-variant);
     font-weight: 500;
     min-width: 52px;
+    flex-shrink: 0;
   }
 
   .meta-value {

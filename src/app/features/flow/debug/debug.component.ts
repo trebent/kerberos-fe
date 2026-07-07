@@ -35,10 +35,12 @@ export class DebugComponent {
   readonly callSelected = output<DebugSessionCall | null>();
 
   readonly selectedBackend = signal<string | null>(null);
-  readonly activeSession = signal<DebugSession | null>(null);
+  readonly sessions = signal<DebugSession[]>([]);
+  readonly selectedSessionId = signal<number | null>(null);
   readonly isLoadingSession = signal(false);
   readonly isStarting = signal(false);
   readonly isStopping = signal(false);
+  readonly isDeleting = signal(false);
   readonly calls = signal<DebugSessionCall[]>([]);
   readonly callsFetched = signal(false);
   readonly isFetchingCalls = signal(false);
@@ -49,24 +51,23 @@ export class DebugComponent {
 
   private callDetailSub: Subscription | null = null;
 
+  readonly selectedSession = computed<DebugSession | null>(() => {
+    const id = this.selectedSessionId();
+    if (id === null) return null;
+    return this.sessions().find(s => s.id === id) ?? null;
+  });
+
   readonly isSessionRunning = computed(() => {
-    const session = this.activeSession();
+    const session = this.selectedSession();
     return !!session && !session.stoppedAt;
   });
 
   constructor() {
     effect(() => {
       const backend = this.selectedBackend();
-      this.activeSession.set(null);
-      this.calls.set([]);
-      this.callsFetched.set(false);
-      this.callsFetchError.set(false);
-      this.selectedCallId.set(null);
-      this.isFetchingCallDetail.set(false);
-      this.callDetailError.set(false);
-      this.callDetailSub?.unsubscribe();
-      this.callDetailSub = null;
-      this.callSelected.emit(null);
+      this.sessions.set([]);
+      this.selectedSessionId.set(null);
+      this._resetCallState();
 
       if (!backend) return;
 
@@ -75,14 +76,17 @@ export class DebugComponent {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: sessions => {
-            const now = new Date();
-            const active = sessions.find(s => !s.stoppedAt && new Date(s.expiresAt) > now) ?? null;
-            this.activeSession.set(active);
+            this.sessions.set([...sessions].sort((a, b) => a.id - b.id));
             this.isLoadingSession.set(false);
           },
           error: () => this.isLoadingSession.set(false),
         });
     });
+  }
+
+  onSessionSelect(id: number | null): void {
+    this.selectedSessionId.set(id);
+    this._resetCallState();
   }
 
   startSession(): void {
@@ -94,9 +98,9 @@ export class DebugComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: session => {
-          this.activeSession.set(session);
-          this.calls.set([]);
-          this.callsFetched.set(false);
+          this.sessions.update(list => [...list, session].sort((a, b) => a.id - b.id));
+          this.selectedSessionId.set(session.id);
+          this._resetCallState();
           this.isStarting.set(false);
         },
         error: () => this.isStarting.set(false),
@@ -104,7 +108,7 @@ export class DebugComponent {
   }
 
   stopSession(): void {
-    const session = this.activeSession();
+    const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isStopping()) return;
 
@@ -113,15 +117,35 @@ export class DebugComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.activeSession.set({ ...session, stoppedAt: new Date().toISOString() });
+          const stopped = { ...session, stoppedAt: new Date().toISOString() };
+          this.sessions.update(list => list.map(s => s.id === stopped.id ? stopped : s));
           this.isStopping.set(false);
         },
         error: () => this.isStopping.set(false),
       });
   }
 
+  deleteSession(): void {
+    const session = this.selectedSession();
+    const backend = this.selectedBackend();
+    if (!session || !backend || this.isDeleting()) return;
+
+    this.isDeleting.set(true);
+    this.debugService.deleteDebugSession(backend, session.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.sessions.update(list => list.filter(s => s.id !== session.id));
+          this.selectedSessionId.set(null);
+          this._resetCallState();
+          this.isDeleting.set(false);
+        },
+        error: () => this.isDeleting.set(false),
+      });
+  }
+
   fetchCalls(): void {
-    const session = this.activeSession();
+    const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isFetchingCalls()) return;
 
@@ -146,7 +170,7 @@ export class DebugComponent {
   }
 
   onCallClick(call: DebugSessionCall): void {
-    const session = this.activeSession();
+    const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isFetchingCallDetail()) return;
 
@@ -179,5 +203,17 @@ export class DebugComponent {
 
   statusClass(code: number): string {
     return code >= 200 && code < 300 ? 'status-ok' : 'status-err';
+  }
+
+  private _resetCallState(): void {
+    this.calls.set([]);
+    this.callsFetched.set(false);
+    this.callsFetchError.set(false);
+    this.selectedCallId.set(null);
+    this.isFetchingCallDetail.set(false);
+    this.callDetailError.set(false);
+    this.callDetailSub?.unsubscribe();
+    this.callDetailSub = null;
+    this.callSelected.emit(null);
   }
 }
