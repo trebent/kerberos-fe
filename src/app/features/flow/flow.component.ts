@@ -2,6 +2,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 import { FlowService } from '../../api/admin/api/flow.service';
 import { DebugSessionCall } from '../../api/admin/model/debug-session-call';
 import { FlowMetaDataOAS } from '../../api/admin/model/flow-meta-data-oas';
@@ -16,6 +18,8 @@ import { OasComponent } from './oas/oas.component';
   styleUrl: './flow.component.scss',
   imports: [
     MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
     MatIconModule,
     DebugComponent,
     FlowPipelineComponent,

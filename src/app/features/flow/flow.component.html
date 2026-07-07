@@ -1,47 +1,50 @@
-<div>
-  <button matIconButton class="menu-toggle" (click)="toggleDrawer()" aria-label="Toggle menu">
-    <mat-icon>menu</mat-icon>
-  </button>
+<button matIconButton (click)="sidenav.toggle()">
+  <mat-icon>menu</mat-icon>
+</button>
 
-  <div class="side-drawer" [class.open]="drawerOpen()">
-    <div class="drawer-item" [class.disabled]="oasBackends().length === 0" (click)="toggleOasSection()"
-      (keyup.enter)="toggleOasSection()" tabindex="0" role="button">
-      <span>OAS</span>
-      @if (oasBackends().length > 0) {
-      <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="side">
+    <mat-action-list>
+      <button mat-list-item (click)="toggleOasSection()">
+        <span matListItemTitle>OAS</span>
+        @if (oasBackends().length > 0) {
+        <div matListItemMeta>
+          <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+        </div>
+        }
+      </button>
+      @if (oasExpanded()) {
+      <div class="oas-submenu">
+        @for (backend of oasBackends(); track backend) {
+        <button mat-list-item (click)="selectBackend(backend)" [class.active]="selectedBackend() === backend">
+          {{ backend }}
+        </button>
+        }
+      </div>
       }
-    </div>
-    @if (oasExpanded()) {
-    @for (backend of oasBackends(); track backend) {
-    <div class="drawer-subitem" [class.active]="selectedBackend() === backend" (click)="selectBackend(backend)"
-      (keyup.enter)="selectBackend(backend)" tabindex="0" role="button">
-      {{ backend }}
+      <button mat-list-item (click)="onDebugClick()" [class.active]="debugOpen()">Debug</button>
+    </mat-action-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content tabindex="-1">
+    @if (selectedBackend(); as backend) {
+    <div class="oas-panel">
+      <app-oas [backend]="backend" (closed)="closeOverlay()" />
     </div>
     }
+
+    @if (debugOpen()) {
+    <div class="debug-panel">
+      <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
+    </div>
     }
 
-    <div class="drawer-item" (click)="onDebugClick()" (keyup.enter)="onDebugClick()" tabindex="0" role="button"
-      [class.active]="debugOpen()">
-      <span>Debug</span>
+    <div class="content-area">
+      <div class="pipeline-area">
+        <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
+          [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
+      </div>
     </div>
-  </div>
-</div>
 
-@if (selectedBackend(); as backend) {
-<div class="oas-panel">
-  <app-oas [backend]="backend" (closed)="closeOverlay()" />
-</div>
-}
-
-@if (debugOpen()) {
-<div class="debug-panel">
-  <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
-</div>
-}
-
-<div class="content-area">
-  <div class="pipeline-area">
-    <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
-      [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
-  </div>
-</div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
