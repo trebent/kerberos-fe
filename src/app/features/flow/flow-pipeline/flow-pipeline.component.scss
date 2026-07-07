@@ -2,8 +2,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  min-width: min-content;
   gap: 16px;
+  margin: auto;
 }
 .flow-card {
   display: flex;
@@ -46,7 +47,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 .flow-col {
@@ -145,7 +146,6 @@
   border-radius: 10px;
   background: var(--mat-sys-surface-container);
   padding: 12px 20px;
-  width: 100%;
 
   .meta-row {
     display: flex;

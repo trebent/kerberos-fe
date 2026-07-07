@@ -84,10 +84,9 @@
 .pipeline-area {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-width: 0;
-  overflow: hidden;
+  overflow: auto;
+  padding: 24px;
 }
 .drawer-item.active {
   background: var(--mat-sys-secondary-container);
