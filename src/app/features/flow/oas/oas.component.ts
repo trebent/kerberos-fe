@@ -28,9 +28,7 @@ export class OasComponent {
     params: () => this.backend(),
     stream: ({ params: backend }) => {
       return this.oasService.getBackendOAS(backend, 'body', false, { httpHeaderAccept: 'application/yaml' }).pipe(
-        tap(response => console.debug('[oasResource] raw response', response)),
         switchMap(response => from((response as unknown as Blob).text())),
-        tap(text => console.debug('[oasResource] parsed text', text)),
         catchError(err => { console.debug('[oasResource] error', err); return throwError(() => err); }),
       );
     }
