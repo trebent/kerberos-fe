@@ -5,28 +5,22 @@
   border: 1px solid var(--mat-sys-outline-variant);
   background: var(--mat-sys-surface-container);
   border-radius: 0.75rem;
+  min-width: 32rem;
 }
 
 .debug-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 8px 8px 16px;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--mat-sys-outline-variant);
-  flex-shrink: 0;
-}
-
-.debug-title {
-  font-weight: 600;
 }
 
 .debug-body {
-  flex: 1;
-  overflow: auto;
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  overflow: auto;
+  padding: 1rem;
 }
 
 .debug-controls {
@@ -35,32 +29,21 @@
   gap: 12px;
 }
 
-.backend-select {
-  width: 100%;
+.session-ctrl-header {
+  font-weight: 600;
+  margin-top: 1rem;
 }
 
-.session-row {
+.session-controls {
   display: flex;
-  gap: 8px;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-}
 
-.session-select {
-  flex: 1;
-  min-width: 140px;
-}
-
-.session-buttons {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.session-buttons button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  button {
+    margin-left: 1rem;
+  }
 }
 
 .session-loading {
@@ -70,28 +53,23 @@
 }
 
 .session-meta {
-  background: var(--mat-sys-surface-container);
-  border-radius: 8px;
-  padding: 12px 16px;
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
 
-.session-empty {
-  font-size: 0.82rem;
-  color: var(--mat-sys-on-surface-variant);
-  font-style: italic;
-}
+  .session-empty {
+    color: var(--mat-sys-on-surface-variant);
+    font-style: italic;
+  }
 
-.meta-actions {
-  margin-top: 4px;
-}
-
-.delete-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  .meta-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
 }
 
 .meta-row {
@@ -116,14 +94,7 @@
 .calls-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.refetch-btn {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  margin-top: 1rem;
 }
 
 .calls-empty {

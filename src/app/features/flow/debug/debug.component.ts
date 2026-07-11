@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { DebugService } from '../../../api/admin/api/debug.service';
@@ -21,6 +22,7 @@ import { Subscription } from 'rxjs';
     FormsModule,
     MatButtonModule,
     MatIconModule,
+    MatDividerModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     ErrorDisplayComponent,
@@ -59,7 +61,7 @@ export class DebugComponent {
 
   readonly isSessionRunning = computed(() => {
     const session = this.selectedSession();
-    return !!session && !session.stoppedAt;
+    return !!session && !session.stoppedAt && new Date(session.expiresAt) > new Date();
   });
 
   constructor() {
