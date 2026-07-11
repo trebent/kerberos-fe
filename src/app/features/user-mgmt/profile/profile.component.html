@@ -1,4 +1,4 @@
-<section class="profile-section">
+<section>
   <h3>Profile</h3>
 
   <p class="profile-info">
@@ -7,34 +7,34 @@
   </p>
 
   @if (!authService.isSuperuser()) {
-    <h4>Change Username</h4>
+  <h4>Change Username</h4>
 
-    @if (usernameErrors().length) {
-      <app-error-display [errors]="usernameErrors()" />
-    }
-    @if (usernameSuccess()) {
-      <p class="success-message">Username updated successfully.</p>
-    }
+  @if (usernameErrors().length) {
+  <app-error-display [errors]="usernameErrors()" />
+  }
+  @if (usernameSuccess()) {
+  <p class="success-message">Username updated successfully.</p>
+  }
 
-    <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
-      <mat-form-field appearance="outline">
-        <mat-label>New username</mat-label>
-        <input matInput formControlName="newUsername" autocomplete="username" />
-      </mat-form-field>
+  <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+    <mat-form-field appearance="outline">
+      <mat-label>New username</mat-label>
+      <input matInput formControlName="newUsername" autocomplete="username" />
+    </mat-form-field>
 
-      <button mat-flat-button type="submit" [disabled]="usernameForm.invalid">
-        Update username
-      </button>
-    </form>
+    <button mat-flat-button type="submit" [disabled]="usernameForm.invalid">
+      Update username
+    </button>
+  </form>
   }
 
   <h4>Change Password</h4>
 
   @if (passwordErrors().length) {
-    <app-error-display [errors]="passwordErrors()" />
+  <app-error-display [errors]="passwordErrors()" />
   }
   @if (passwordSuccess()) {
-    <p class="success-message">Password changed successfully.</p>
+  <p class="success-message">Password changed successfully.</p>
   }
 
   <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
@@ -50,9 +50,10 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Confirm new password</mat-label>
-      <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+      <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password"
+        [errorStateMatcher]="mismatchMatcher" />
       @if (passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched) {
-        <mat-error>Passwords do not match.</mat-error>
+      <mat-error>Passwords do not match.</mat-error>
       }
     </mat-form-field>
 

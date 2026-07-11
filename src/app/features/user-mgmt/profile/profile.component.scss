@@ -1,28 +1,42 @@
-.profile-section {
-  margin-bottom: 32px;
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
 }
+
 .profile-info {
   display: flex;
   align-items: center;
-  gap: 8px;
   font: var(--mat-sys-body-large);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
 }
+
 .profile-icon {
   color: var(--mat-sys-primary);
 }
+
 form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
+
 mat-form-field {
-  width: 320px;
+  margin-bottom: 0.5rem;
+  min-width: 20rem;
 }
+
 .success-message {
   color: var(--mat-sys-primary);
   font: var(--mat-sys-body-medium);
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }

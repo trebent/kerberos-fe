@@ -7,6 +7,7 @@ import { PermissionsListComponent } from './permissions/permissions-list.compone
 @Component({
   selector: 'app-user-mgmt',
   templateUrl: './user-mgmt.component.html',
+  styleUrl: './user-mgmt.component.scss',
   imports: [ProfileComponent, UsersListComponent, GroupsListComponent, PermissionsListComponent],
 })
-export class UserMgmtComponent {}
+export class UserMgmtComponent { }
