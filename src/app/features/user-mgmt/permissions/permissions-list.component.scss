@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+}

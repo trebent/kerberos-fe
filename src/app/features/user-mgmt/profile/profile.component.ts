@@ -4,6 +4,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
@@ -29,6 +30,7 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatDividerModule,
     MatButtonModule,
     MatIconModule,
     ErrorDisplayComponent,

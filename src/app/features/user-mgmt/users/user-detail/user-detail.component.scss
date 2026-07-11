@@ -4,18 +4,22 @@
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
 }
+
 h4 {
   margin: 0 0 12px;
 }
+
 form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
 }
+
 mat-form-field {
   width: 320px;
 }
+
 .groups-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 4px;
@@ -24,10 +28,12 @@ mat-form-field {
   flex-direction: column;
   gap: 4px;
 }
+
 .groups-fieldset legend {
   font: var(--mat-sys-label-medium);
   padding: 0 4px;
 }
+
 .form-actions {
   display: flex;
   gap: 8px;

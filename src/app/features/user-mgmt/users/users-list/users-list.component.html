@@ -1,75 +1,73 @@
+<h3>Users</h3>
+
 @if (usersResource.isLoading()) {
-  <mat-spinner diameter="32" />
+<mat-spinner diameter="32" />
 }
 @if (usersResource.error()) {
-  <app-error-display [errors]="['Failed to load users.']" />
+<app-error-display [errors]="['Failed to load users.']" />
 }
 
 <div class="action-bar">
   @if (!showCreate()) {
-    <button mat-flat-button (click)="openCreate()">
-      <mat-icon>add</mat-icon> Create User
-    </button>
+  <button mat-flat-button (click)="openCreate()">
+    <mat-icon>add</mat-icon> Create User
+  </button>
   }
 </div>
 
 @if (showCreate()) {
-  <section class="form-section">
-    <h4>Create User</h4>
-    @if (createErrors().length) {
-      <app-error-display [errors]="createErrors()" />
-    }
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
-      <mat-form-field appearance="outline">
-        <mat-label>Username</mat-label>
-        <input matInput formControlName="username" autocomplete="username" />
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" formControlName="password" autocomplete="new-password" />
-      </mat-form-field>
-      <div class="form-actions">
-        <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
-        <button mat-button type="button" (click)="cancelCreate()">Cancel</button>
-      </div>
-    </form>
-  </section>
+<section class="form-section">
+  <h4>Create User</h4>
+  @if (createErrors().length) {
+  <app-error-display [errors]="createErrors()" />
+  }
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="username" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password" autocomplete="new-password" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
+      <button mat-button type="button" (click)="cancelCreate()">Cancel</button>
+    </div>
+  </form>
+</section>
 }
 
 @if (usersResource.hasValue()) {
-  <table mat-table [dataSource]="usersResource.value()!">
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let u">{{ u.id }}</td>
-    </ng-container>
-    <ng-container matColumnDef="username">
-      <th mat-header-cell *matHeaderCellDef>Username</th>
-      <td mat-cell *matCellDef="let u">{{ u.username }}</td>
-    </ng-container>
-    <ng-container matColumnDef="groups">
-      <th mat-header-cell *matHeaderCellDef>Groups</th>
-      <td mat-cell *matCellDef="let u">{{ u.groups?.length ? u.groups!.map(groupName).join(', ') : '—' }}</td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let u">
-        <button matIconButton (click)="openEdit(u)" aria-label="Edit user">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button matIconButton (click)="deleteUser(u.id)" aria-label="Delete user">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+<table mat-table [dataSource]="usersResource.value()!">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let u">{{ u.id }}</td>
+  </ng-container>
+  <ng-container matColumnDef="username">
+    <th mat-header-cell *matHeaderCellDef>Username</th>
+    <td mat-cell *matCellDef="let u">{{ u.username }}</td>
+  </ng-container>
+  <ng-container matColumnDef="groups">
+    <th mat-header-cell *matHeaderCellDef>Groups</th>
+    <td mat-cell *matCellDef="let u">{{ u.groups?.length ? u.groups!.map(groupName).join(', ') : '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let u">
+      <button matIconButton (click)="openEdit(u)" aria-label="Edit user">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button matIconButton (click)="deleteUser(u.id)" aria-label="Delete user">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
 }
 
 @if (selectedUser()) {
-  <app-user-detail
-    [user]="selectedUser()!"
-    (saved)="onDetailSaved()"
-    (cancelled)="onDetailCancelled()"
-  />
+<app-user-detail [user]="selectedUser()!" (saved)="onDetailSaved()" (cancelled)="onDetailCancelled()" />
 }

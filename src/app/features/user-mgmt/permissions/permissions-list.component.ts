@@ -8,6 +8,7 @@ import { ErrorDisplayComponent } from '../../../shared/components/error-display/
 @Component({
   selector: 'app-permissions-list',
   templateUrl: './permissions-list.component.html',
+  styleUrl: './permissions-list.component.scss',
   imports: [MatTableModule, MatProgressSpinnerModule, ErrorDisplayComponent],
 })
 export class PermissionsListComponent {
