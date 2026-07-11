@@ -14,32 +14,49 @@ form {
 
   .form-actions {
     display: flex;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-
-    :first-child {
-      margin-right: 0.5rem;
-    }
   }
 }
 
-.form-actions {
+.org-actions-container {
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  :not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+
+
+form mat-form-field {
+  min-width: 30rem;
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
   margin-bottom: 1rem;
 }
 
-mat-form-field {
-  min-width: 30rem;
+td.mat-column-actions,
+th.mat-column-actions {
+  background: var(--mat-sys-surface-container);
+}
+
+.mat-column-name {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 mat-divider {
   margin: 0.5rem 0;
 }
-
-table {
-  margin-bottom: 1rem;
-}
-
 .credentials-box {
   margin: 0.5rem 0 1rem;
   padding: 1rem;

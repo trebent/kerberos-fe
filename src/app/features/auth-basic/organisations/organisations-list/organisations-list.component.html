@@ -4,7 +4,7 @@
 <div class="card-content">
   <h4>Create Organisation</h4>
   @if (createErrors().length) {
-    <app-error-display [errors]="createErrors()" />
+  <app-error-display [errors]="createErrors()" />
   }
   <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
@@ -17,59 +17,61 @@
   </form>
 
   @if (newOrgCredentials()) {
-    <section class="credentials-box">
-      <strong>Organisation created — save these admin credentials now, they will not be shown again.</strong>
-      <p>Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code></p>
-      <p>Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code></p>
-      <button mat-button (click)="dismissCredentials()">Dismiss</button>
-    </section>
+  <section class="credentials-box">
+    <strong>Organisation created — save these admin credentials now, they will not be shown again.</strong>
+    <p>Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code></p>
+    <p>Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code></p>
+    <button mat-button (click)="dismissCredentials()">Dismiss</button>
+  </section>
   }
 
   <mat-divider></mat-divider>
   <h4>All organisations</h4>
 
   @if (orgsResource.error()) {
-    <app-error-display [errors]="['Failed to load organisations.']" />
+  <app-error-display [errors]="['Failed to load organisations.']" />
   }
   @if (orgsResource.isLoading()) {
-    <mat-spinner diameter="32" />
+  <mat-spinner diameter="32" />
   }
   @if (orgsResource.hasValue()) {
-    <table mat-table [dataSource]="orgsResource.value()!">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let o">{{ o.id }}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let o">{{ o.name }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let o">
-          <button
-            mat-stroked-button
-            [color]="selectedOrgId() === o.id ? 'primary' : ''"
-            (click)="toggleManage(o)"
-          >Manage</button>
+  <mat-form-field class="filter-field">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. my-org" #input>
+  </mat-form-field>
+  <div class="table-wrapper">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let o">{{ o.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let o">{{ o.name }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions" stickyEnd>
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let o">
+        <div class="org-actions-container">
+          <button mat-stroked-button [matButton]="selectedOrgId() === o.id ? 'filled' : 'outlined'"
+            (click)="toggleManage(o)">Select</button>
           <button matIconButton (click)="openEdit(o)" aria-label="Edit organisation">
             <mat-icon>edit</mat-icon>
           </button>
           <button matIconButton (click)="deleteOrg(o.id)" aria-label="Delete organisation">
             <mat-icon>delete</mat-icon>
           </button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        </div>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  </div>
   }
 
   @if (selectedOrg()) {
-    <app-organisation-detail
-      [organisation]="selectedOrg()!"
-      (saved)="onDetailSaved()"
-      (cancelled)="onDetailCancelled()"
-    />
+  <app-organisation-detail [organisation]="selectedOrg()!" (saved)="onDetailSaved()"
+    (cancelled)="onDetailCancelled()" />
   }
 </div>

@@ -26,10 +26,31 @@ mat-divider {
   margin: 0.5rem 0;
 }
 
-mat-form-field {
+form mat-form-field {
   min-width: 30rem;
 }
 
+.filter-field {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+td.mat-column-actions,
+th.mat-column-actions {
+  background: var(--mat-sys-surface-container);
+}
+
+.mat-column-name,
+.mat-column-permissions {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 0.25rem;
@@ -41,8 +62,4 @@ mat-form-field {
 .permissions-fieldset legend {
   font: var(--mat-sys-label-medium);
   padding: 0 0.25rem;
-}
-
-table {
-  margin-bottom: 1rem;
 }

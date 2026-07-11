@@ -22,14 +22,32 @@ form {
   }
 }
 
-mat-form-field {
+form mat-form-field {
   min-width: 30rem;
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+td.mat-column-actions,
+th.mat-column-actions {
+  background: var(--mat-sys-surface-container);
+}
+
+.mat-column-name,
+.mat-column-groups {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 mat-divider {
   margin: 0.5rem 0;
-}
-
-table {
-  margin-bottom: 1rem;
 }
