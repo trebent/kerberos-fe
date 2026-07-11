@@ -1,11 +1,11 @@
-<div class="debug-header">
-  <span style="font-weight: 600;">Debug</span>
+<div class="card-header-container">
+  <h3>Debug</h3>
   <button matIconButton (click)="closed.emit()">
     <mat-icon>close</mat-icon>
   </button>
 </div>
 
-<div class="debug-body">
+<div class="card-content">
   <div class="debug-controls">
     <mat-form-field>
       <mat-label>Backend</mat-label>
@@ -26,8 +26,8 @@
       Start new debug session
     </button>
 
-    <span class="session-ctrl-header">Session controls</span>
     <mat-divider></mat-divider>
+    <h4 class="session-ctrl-header">Session controls</h4>
 
     <div class="session-controls">
       <mat-form-field>

@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,9 +12,9 @@ import { User } from '../../../../api/admin/model/user';
 import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
 
 @Component({
-  selector: 'app-user-detail',
-  templateUrl: './user-detail.component.html',
-  styleUrl: './user-detail.component.scss',
+  selector: 'app-user-edit',
+  templateUrl: './user-edit.component.html',
+  styleUrl: './user-edit.component.scss',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -25,7 +25,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     ErrorDisplayComponent,
   ],
 })
-export class UserDetailComponent implements OnInit {
+export class UserEditComponent {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
@@ -45,10 +45,12 @@ export class UserDetailComponent implements OnInit {
     username: ['', Validators.required],
   });
 
-  ngOnInit(): void {
-    const u = this.user();
-    this.editForm.reset({ username: u.username });
-    this.selectedGroupIds.set((u.groups ?? []).map(g => g.id));
+  constructor() {
+    effect(() => {
+      const u = this.user();
+      this.editForm.reset({ username: u.username });
+      this.selectedGroupIds.set((u.groups ?? []).map(g => g.id));
+    });
   }
 
   isSelected(groupId: number): boolean {

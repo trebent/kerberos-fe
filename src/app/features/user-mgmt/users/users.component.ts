@@ -6,29 +6,31 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
-import { UsersService } from '../../../../api/admin/api/users.service';
-import { User } from '../../../../api/admin/model/user';
-import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
-import { UserDetailComponent } from '../user-detail/user-detail.component';
+import { UsersService } from '../../../api/admin/api/users.service';
+import { User } from '../../../api/admin/model/user';
+import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
+import { UserEditComponent } from './user-edit/user-edit.component';
 
 @Component({
-  selector: 'app-users-list',
-  templateUrl: './users-list.component.html',
-  styleUrl: './users-list.component.scss',
+  selector: 'app-users',
+  templateUrl: './users.component.html',
+  styleUrl: './users.component.scss',
   imports: [
     ReactiveFormsModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
+    MatDividerModule,
     MatInputModule,
     MatProgressSpinnerModule,
     ErrorDisplayComponent,
-    UserDetailComponent,
+    UserEditComponent,
   ],
 })
-export class UsersListComponent {
+export class UsersComponent {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
@@ -38,14 +40,13 @@ export class UsersListComponent {
     stream: () => this.usersService.getUsers(),
   });
 
-  readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
   });
 
-  readonly selectedUser = signal<User | null>(null);
+  readonly selectedUser = signal<User | null>(null, { equal: () => false });
 
   readonly groupName = (g: { name: string }) => g.name;
 
@@ -53,11 +54,6 @@ export class UsersListComponent {
     this.createForm.reset();
     this.createErrors.set([]);
     this.selectedUser.set(null);
-    this.showCreate.set(true);
-  }
-
-  cancelCreate(): void {
-    this.showCreate.set(false);
   }
 
   submitCreate(): void {
@@ -66,7 +62,6 @@ export class UsersListComponent {
     const { username, password } = this.createForm.getRawValue();
     this.usersService.createUser({ username, password }).subscribe({
       next: () => {
-        this.showCreate.set(false);
         this.createForm.reset();
         this.usersResource.reload();
       },
@@ -77,7 +72,6 @@ export class UsersListComponent {
   }
 
   openEdit(user: User): void {
-    this.showCreate.set(false);
     this.selectedUser.set(user);
   }
 
