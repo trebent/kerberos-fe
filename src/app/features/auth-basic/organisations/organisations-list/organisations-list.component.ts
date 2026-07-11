@@ -104,7 +104,7 @@ export class OrganisationsListComponent {
     this.orgsResource.reload();
   }
 
-  onDetailCancelled(): void {
+  onDetailClosed(): void {
     this.selectedOrg.set(null);
   }
 

@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { OrganisationsService } from '../../../../api/auth-basic/api/organisations.service';
 import { Organisation } from '../../../../api/auth-basic/model/organisation';
 import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
@@ -16,6 +17,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
     ErrorDisplayComponent,
   ],
 })
@@ -26,7 +28,7 @@ export class OrganisationDetailComponent implements OnInit {
   readonly organisation = input.required<Organisation>();
 
   readonly saved = output<void>();
-  readonly cancelled = output<void>();
+  readonly closed = output<void>();
 
   readonly saveErrors = signal<string[]>([]);
 
@@ -49,7 +51,7 @@ export class OrganisationDetailComponent implements OnInit {
     });
   }
 
-  cancel(): void {
-    this.cancelled.emit();
+  close(): void {
+    this.closed.emit();
   }
 }
