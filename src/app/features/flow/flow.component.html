@@ -5,7 +5,7 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="side">
     <mat-action-list>
-      <button mat-list-item (click)="toggleOasSection()">
+      <button mat-list-item (click)="toggleOASSection()">
         <span matListItemTitle>OAS</span>
         @if (oasBackends().length > 0) {
         <div matListItemMeta>
@@ -16,7 +16,7 @@
       @if (oasExpanded()) {
       <div class="oas-submenu">
         @for (backend of oasBackends(); track backend) {
-        <button mat-list-item (click)="selectBackend(backend)">
+        <button mat-list-item (click)="selectOASBackend(backend)">
           {{ backend }}
         </button>
         }
@@ -27,8 +27,8 @@
   </mat-sidenav>
 
   <mat-sidenav-content tabindex="-1">
-    @if (selectedBackend(); as backend) {
-    <app-oas [backend]="backend" (closed)="closeOverlay()" />
+    @if (selectedOASBackend(); as backend) {
+    <app-oas [backend]="backend" (closed)="closeOAS()" />
     }
 
     @if (debugOpen()) {

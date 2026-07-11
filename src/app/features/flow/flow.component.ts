@@ -51,7 +51,7 @@ export class FlowComponent {
 
   readonly drawerOpen = signal(false);
   readonly oasExpanded = signal(false);
-  readonly selectedBackend = signal<string | null>(null);
+  readonly selectedOASBackend = signal<string | null>(null);
   readonly debugOpen = signal(false);
   readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
 
@@ -59,28 +59,28 @@ export class FlowComponent {
     this.drawerOpen.update(open => !open);
   }
 
-  toggleOasSection(): void {
+  toggleOASSection(): void {
     if (this.oasBackends().length === 0) return;
     this.oasExpanded.update(expanded => !expanded);
   }
 
-  selectBackend(backend: string): void {
-    if (this.selectedBackend() === backend) {
-      this.selectedBackend.set(null);
+  selectOASBackend(backend: string): void {
+    if (this.selectedOASBackend() === backend) {
+      this.selectedOASBackend.set(null);
       return;
     }
 
-    this.selectedBackend.set(backend);
+    this.selectedOASBackend.set(backend);
     this.debugOpen.set(false);
     this.drawerOpen.set(true);
   }
 
-  closeOverlay(): void {
-    this.selectedBackend.set(null);
+  closeOAS(): void {
+    this.selectedOASBackend.set(null);
   }
 
   onDebugClick(): void {
-    this.selectedBackend.set(null);
+    this.selectedOASBackend.set(null);
     this.debugOpen.update(open => !open);
   }
 

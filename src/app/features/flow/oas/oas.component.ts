@@ -1,5 +1,5 @@
 import { Component, inject, input, output } from '@angular/core';
-import { catchError, from, switchMap, tap, throwError } from 'rxjs';
+import { catchError, from, switchMap, throwError } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
