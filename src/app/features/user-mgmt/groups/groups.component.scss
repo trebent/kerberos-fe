@@ -20,14 +20,14 @@ form {
     display: flex;
     margin-top: 1rem;
   }
+
+  mat-form-field {
+    min-width: 15rem;
+  }
 }
 
 mat-divider {
   margin: 0.5rem 0;
-}
-
-form mat-form-field {
-  min-width: 30rem;
 }
 
 .filter-field {
@@ -45,6 +45,7 @@ th.mat-column-actions {
   white-space: nowrap;
   width: 1%;
 }
+
 .permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 0.25rem;
