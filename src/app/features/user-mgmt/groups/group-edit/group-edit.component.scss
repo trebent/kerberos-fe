@@ -15,7 +15,6 @@ form {
   flex-direction: column;
   align-items: flex-start;
 
-
   .form-actions {
     display: flex;
     margin-top: 1rem;
@@ -31,7 +30,7 @@ mat-form-field {
   min-width: 27rem;
 }
 
-.groups-fieldset {
+.permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   box-sizing: border-box;
   border-radius: 0.25rem;
@@ -40,7 +39,7 @@ mat-form-field {
   flex-direction: column;
 }
 
-.groups-fieldset legend {
+.permissions-fieldset legend {
   font: var(--mat-sys-label-medium);
   padding: 0 0.25rem;
 }

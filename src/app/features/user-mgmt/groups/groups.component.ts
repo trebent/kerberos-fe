@@ -12,7 +12,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { UsersService } from '../../../api/admin/api/users.service';
 import { Group } from '../../../api/admin/model/group';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
-import { GroupDetailComponent } from './group-detail/group-detail.component';
+import { GroupEditComponent } from './group-edit/group-edit.component';
 
 @Component({
   selector: 'app-groups',
@@ -28,7 +28,7 @@ import { GroupDetailComponent } from './group-detail/group-detail.component';
     MatProgressSpinnerModule,
     MatCheckboxModule,
     ErrorDisplayComponent,
-    GroupDetailComponent,
+    GroupEditComponent,
     MatDividerModule,
   ],
 })

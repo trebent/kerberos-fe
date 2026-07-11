@@ -74,6 +74,6 @@
   }
 
   @if (selectedGroup()) {
-  <app-group-detail [group]="selectedGroup()!" (saved)="onDetailSaved()" (cancelled)="onDetailCancelled()" />
+  <app-group-edit [group]="selectedGroup()!" (saved)="onDetailSaved()" (cancelled)="onDetailCancelled()" />
   }
 </div>

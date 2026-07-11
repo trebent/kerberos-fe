@@ -11,9 +11,9 @@ import { Group } from '../../../../api/admin/model/group';
 import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
 
 @Component({
-  selector: 'app-group-detail',
-  templateUrl: './group-detail.component.html',
-  styleUrl: './group-detail.component.scss',
+  selector: 'app-group-edit',
+  templateUrl: './group-edit.component.html',
+  styleUrl: './group-edit.component.scss',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -24,7 +24,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     ErrorDisplayComponent,
   ],
 })
-export class GroupDetailComponent {
+export class GroupEditComponent {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
