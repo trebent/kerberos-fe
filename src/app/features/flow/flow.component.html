@@ -1,4 +1,4 @@
-<button matIconButton (click)="sidenav.toggle()">
+<button class="menu-button" matIconButton (click)="sidenav.toggle()">
   <mat-icon>menu</mat-icon>
 </button>
 
@@ -9,42 +9,34 @@
         <span matListItemTitle>OAS</span>
         @if (oasBackends().length > 0) {
         <div matListItemMeta>
-          <mat-icon class="drawer-chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
+          <mat-icon class="chevron" [class.expanded]="oasExpanded()">chevron_right</mat-icon>
         </div>
         }
       </button>
       @if (oasExpanded()) {
       <div class="oas-submenu">
         @for (backend of oasBackends(); track backend) {
-        <button mat-list-item (click)="selectBackend(backend)" [class.active]="selectedBackend() === backend">
+        <button mat-list-item (click)="selectBackend(backend)">
           {{ backend }}
         </button>
         }
       </div>
       }
-      <button mat-list-item (click)="onDebugClick()" [class.active]="debugOpen()">Debug</button>
+      <button mat-list-item (click)="onDebugClick()">Debug</button>
     </mat-action-list>
   </mat-sidenav>
 
   <mat-sidenav-content tabindex="-1">
     @if (selectedBackend(); as backend) {
-    <div class="oas-panel">
-      <app-oas [backend]="backend" (closed)="closeOverlay()" />
-    </div>
+    <app-oas [backend]="backend" (closed)="closeOverlay()" />
     }
 
     @if (debugOpen()) {
-    <div class="debug-panel">
-      <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
-    </div>
+    <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
     }
 
-    <div class="content-area">
-      <div class="pipeline-area">
-        <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
-          [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
-      </div>
-    </div>
+    <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
+      [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
 
   </mat-sidenav-content>
 </mat-sidenav-container>

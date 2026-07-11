@@ -6,23 +6,49 @@
   flex-direction: column;
 }
 
-
-.menu-toggle {
-  height: 2.5rem;
+.menu-button {
+  margin-bottom: 1rem
 }
 
-.drawer-chevron {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+mat-action-list {
+  >* {
+    margin: 0.7rem 0rem;
+  }
+}
+
+.chevron {
   transition: transform 150ms ease;
-  color: var(--mat-sys-on-surface-variant);
 }
 
-.drawer-chevron.expanded {
+.chevron.expanded {
   transform: rotate(90deg);
 }
 
 .oas-submenu>* {
   padding-left: 32px;
+}
+
+mat-sidenav-container {
+  height: 100%;
+  width: 100%;
+}
+
+mat-sidenav-container mat-sidenav {
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+mat-sidenav-container mat-sidenav-content {
+  display: flex;
+  flex-direction: row;
+}
+
+mat-sidenav-container mat-sidenav-content>* {
+  margin-left: 1rem;
+}
+
+mat-sidenav-container mat-sidenav-content app-flow-pipeline {
+  flex: 1;
 }

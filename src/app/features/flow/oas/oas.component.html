@@ -1,19 +1,19 @@
 <div class="oas-header">
-  <span class="oas-title">{{ backend() }}</span>
+  <span class="oas-title">OpenAPI specification - {{ backend() }}</span>
   <button matIconButton (click)="closed.emit()" aria-label="Close OAS viewer">
     <mat-icon>close</mat-icon>
   </button>
 </div>
 <div class="oas-body">
   @if (oasResource.isLoading()) {
-    <div class="oas-loading">
-      <mat-spinner diameter="32" />
-    </div>
+  <div class="oas-loading">
+    <mat-spinner diameter="32" />
+  </div>
   }
   @if (oasResource.error() && !oasResource.isLoading()) {
-    <app-error-display [errors]="['Failed to load OAS spec.']" />
+  <app-error-display [errors]="['Failed to load OAS spec.']" />
   }
   @if (oasResource.hasValue()) {
-    <pre class="oas-pre">{{ oasResource.value() }}</pre>
+  <pre class="oas-pre">{{ oasResource.value() }}</pre>
   }
 </div>
