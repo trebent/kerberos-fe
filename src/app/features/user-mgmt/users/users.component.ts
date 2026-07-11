@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { UsersService } from '../../../api/admin/api/users.service';
 import { User } from '../../../api/admin/model/user';
 import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
@@ -40,6 +40,14 @@ export class UsersComponent {
     stream: () => this.usersService.getUsers(),
   });
 
+  readonly dataSource = new MatTableDataSource<User>();
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.usersResource.value() ?? [];
+    });
+  }
+
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
@@ -49,6 +57,10 @@ export class UsersComponent {
   readonly selectedUser = signal<User | null>(null, { equal: () => false });
 
   readonly groupName = (g: { name: string }) => g.name;
+
+  applyFilter(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
 
   openCreate(): void {
     this.createForm.reset();

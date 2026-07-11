@@ -33,7 +33,11 @@
   }
 
   @if (usersResource.hasValue()) {
-  <table mat-table [dataSource]="usersResource.value()!">
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. admin" #input>
+  </mat-form-field>
+  <table mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef>ID</th>
       <td mat-cell *matCellDef="let u">{{ u.id }}</td>
