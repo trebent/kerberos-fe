@@ -1,7 +1,8 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { GroupsService } from '../../../../api/auth-basic/api/groups.service';
 import { Group } from '../../../../api/auth-basic/model/group';
@@ -15,19 +16,20 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     ReactiveFormsModule,
     MatButtonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     ErrorDisplayComponent,
   ],
 })
-export class OrgGroupDetailComponent implements OnInit {
+export class OrgGroupDetailComponent {
   private readonly groupsService = inject(GroupsService);
   private readonly fb = inject(FormBuilder);
 
   readonly orgId = input.required<number>();
   readonly group = input.required<Group>();
 
-  readonly saved = output<void>();
-  readonly cancelled = output<void>();
+  readonly closed = output<void>();
+  readonly dataChanged = output<void>();
 
   readonly saveErrors = signal<string[]>([]);
 
@@ -35,8 +37,10 @@ export class OrgGroupDetailComponent implements OnInit {
     name: ['', Validators.required],
   });
 
-  ngOnInit(): void {
-    this.editForm.reset({ name: this.group().name });
+  constructor() {
+    effect(() => {
+      this.editForm.reset({ name: this.group().name });
+    });
   }
 
   save(): void {
@@ -45,12 +49,12 @@ export class OrgGroupDetailComponent implements OnInit {
     const { name } = this.editForm.getRawValue();
     const g = this.group();
     this.groupsService.updateGroup(this.orgId(), g.id, { id: g.id, name }).subscribe({
-      next: () => this.saved.emit(),
+      next: () => this.dataChanged.emit(),
       error: () => this.saveErrors.set(['Failed to save. Please try again.']),
     });
   }
 
-  cancel(): void {
-    this.cancelled.emit();
+  close(): void {
+    this.closed.emit();
   }
 }

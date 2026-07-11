@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { of } from 'rxjs';
 import { GroupsService } from '../../../../api/auth-basic/api/groups.service';
 import { Group } from '../../../../api/auth-basic/model/group';
@@ -49,12 +49,24 @@ export class OrgGroupsListComponent {
     },
   });
 
+  readonly dataSource = new MatTableDataSource<Group>();
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.groupsResource.value() ?? [];
+    });
+  }
+
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
-  readonly selectedGroup = signal<Group | null>(null);
+  readonly selectedGroup = signal<Group | null>(null, { equal: () => false });
+
+  applyFilter(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
 
   submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
@@ -75,12 +87,11 @@ export class OrgGroupsListComponent {
     this.selectedGroup.set(group);
   }
 
-  onDetailSaved(): void {
-    this.selectedGroup.set(null);
+  onDataChanged(): void {
     this.groupsResource.reload();
   }
 
-  onDetailCancelled(): void {
+  onDetailClosed(): void {
     this.selectedGroup.set(null);
   }
 

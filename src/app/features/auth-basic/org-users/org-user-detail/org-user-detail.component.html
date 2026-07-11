@@ -1,4 +1,9 @@
-<h4>Edit User</h4>
+<div class="edit-header">
+  <h4>Edit User</h4>
+  <button mat-icon-button type="button" (click)="close()" aria-label="Close edit panel">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
 <h5>Name</h5>
 @if (nameErrors().length) {
@@ -14,7 +19,6 @@
   </mat-form-field>
   <div class="form-actions">
     <button mat-flat-button type="submit" [disabled]="nameForm.invalid">Save name</button>
-    <button mat-button type="button" (click)="cancel()">Cancel</button>
   </div>
 </form>
 

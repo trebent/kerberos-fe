@@ -10,6 +10,13 @@
   margin-bottom: 1rem;
 }
 
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
 h5 {
   margin: 1rem 0 0.5rem;
   font: var(--mat-sys-label-large);
@@ -23,12 +30,6 @@ form {
 
   .form-actions {
     display: flex;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-
-    :first-child {
-      margin-right: 0.5rem;
-    }
   }
 }
 
@@ -50,15 +51,6 @@ mat-form-field {
 .groups-fieldset legend {
   font: var(--mat-sys-label-medium);
   padding: 0 0.25rem;
-}
-
-.form-actions {
-  display: flex;
-  margin-bottom: 0.5rem;
-
-  :first-child {
-    margin-right: 0.5rem;
-  }
 }
 
 .success-message {

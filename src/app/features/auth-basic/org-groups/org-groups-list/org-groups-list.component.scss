@@ -19,18 +19,7 @@ form {
 
   .form-actions {
     display: flex;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-
-    :first-child {
-      margin-right: 0.5rem;
-    }
   }
-}
-
-.form-actions {
-  display: flex;
-  margin-bottom: 1rem;
 }
 
 mat-form-field {

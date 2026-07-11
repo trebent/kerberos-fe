@@ -1,8 +1,9 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
@@ -27,12 +28,13 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
     ErrorDisplayComponent,
   ],
 })
-export class OrgUserDetailComponent implements OnInit {
+export class OrgUserDetailComponent {
   private readonly usersService = inject(UsersService);
   private readonly groupsService = inject(GroupsService);
   private readonly fb = inject(FormBuilder);
@@ -40,8 +42,8 @@ export class OrgUserDetailComponent implements OnInit {
   readonly orgId = input.required<number>();
   readonly user = input.required<User>();
 
-  readonly saved = output<void>();
-  readonly cancelled = output<void>();
+  readonly closed = output<void>();
+  readonly dataChanged = output<void>();
 
   readonly nameErrors = signal<string[]>([]);
   readonly nameSuccess = signal(false);
@@ -68,9 +70,11 @@ export class OrgUserDetailComponent implements OnInit {
     { validators: passwordsMatchValidator },
   );
 
-  ngOnInit(): void {
-    this.nameForm.reset({ name: this.user().name });
-    this.loadGroups();
+  constructor() {
+    effect(() => {
+      this.nameForm.reset({ name: this.user().name });
+      this.loadGroups();
+    });
   }
 
   private loadGroups(): void {
@@ -112,7 +116,7 @@ export class OrgUserDetailComponent implements OnInit {
     this.usersService.updateUser(this.orgId(), u.id, { id: u.id, name }).subscribe({
       next: () => {
         this.nameSuccess.set(true);
-        this.saved.emit();
+        this.dataChanged.emit();
       },
       error: () => this.nameErrors.set(['Failed to update name. Please try again.']),
     });
@@ -123,7 +127,10 @@ export class OrgUserDetailComponent implements OnInit {
     this.groupSuccess.set(false);
     const groups = this.availableGroups().filter(g => this.selectedGroupIds().has(g.id));
     this.usersService.updateUserGroups(this.orgId(), this.user().id, groups).subscribe({
-      next: () => this.groupSuccess.set(true),
+      next: () => {
+        this.groupSuccess.set(true);
+        this.dataChanged.emit();
+      },
       error: () => this.groupErrors.set(['Failed to update groups. Please try again.']),
     });
   }
@@ -142,7 +149,7 @@ export class OrgUserDetailComponent implements OnInit {
     });
   }
 
-  cancel(): void {
-    this.cancelled.emit();
+  close(): void {
+    this.closed.emit();
   }
 }

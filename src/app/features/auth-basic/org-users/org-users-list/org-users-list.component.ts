@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { of } from 'rxjs';
 import { UsersService } from '../../../../api/auth-basic/api/users.service';
 import { User } from '../../../../api/auth-basic/model/user';
@@ -49,13 +49,25 @@ export class OrgUsersListComponent {
     },
   });
 
+  readonly dataSource = new MatTableDataSource<User>();
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.usersResource.value() ?? [];
+    });
+  }
+
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
     password: ['', Validators.required],
   });
 
-  readonly selectedUser = signal<User | null>(null);
+  readonly selectedUser = signal<User | null>(null, { equal: () => false });
+
+  applyFilter(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
 
   submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
@@ -76,12 +88,11 @@ export class OrgUsersListComponent {
     this.selectedUser.set(user);
   }
 
-  onDetailSaved(): void {
-    this.selectedUser.set(null);
+  onDataChanged(): void {
     this.usersResource.reload();
   }
 
-  onDetailCancelled(): void {
+  onDetailClosed(): void {
     this.selectedUser.set(null);
   }
 

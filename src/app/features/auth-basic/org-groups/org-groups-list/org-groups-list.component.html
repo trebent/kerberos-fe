@@ -1,67 +1,67 @@
 <div class="card-header-container">
-  <h3>Organisation Groups</h3>
+  <h3>Groups</h3>
 </div>
 <div class="card-content">
   @if (orgId() === null) {
-    <p class="prompt-message">Select an organisation to manage its groups.</p>
+  <p class="prompt-message"><i>Select an organisation to manage its groups.</i></p>
   } @else {
-    @if (groupsResource.isLoading()) {
-      <mat-spinner diameter="32" />
-    }
-    @if (groupsResource.error()) {
-      <app-error-display [errors]="['Failed to load groups.']" />
-    }
+  @if (groupsResource.isLoading()) {
+  <mat-spinner diameter="32" />
+  }
+  @if (groupsResource.error()) {
+  <app-error-display [errors]="['Failed to load groups.']" />
+  }
 
-    <h4>Create Group</h4>
-    @if (createErrors().length) {
-      <app-error-display [errors]="createErrors()" />
-    }
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
-      <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" />
-      </mat-form-field>
-      <div class="form-actions">
-        <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
-      </div>
-    </form>
+  <h4>Create Group</h4>
+  @if (createErrors().length) {
+  <app-error-display [errors]="createErrors()" />
+  }
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
+    </div>
+  </form>
 
-    <mat-divider></mat-divider>
-    <h4>All groups</h4>
+  <mat-divider></mat-divider>
+  <h4>All groups</h4>
 
-    @if (groupsResource.hasValue()) {
-      <table mat-table [dataSource]="groupsResource.value()!">
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>ID</th>
-          <td mat-cell *matCellDef="let g">{{ g.id }}</td>
-        </ng-container>
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let g">{{ g.name }}</td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let g">
-            <button matIconButton (click)="openEdit(g)" aria-label="Edit group">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button matIconButton (click)="deleteGroup(g.id)" aria-label="Delete group">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    }
+  @if (groupsResource.hasValue()) {
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. admins" #input>
+  </mat-form-field>
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let g">{{ g.id }}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let g">{{ g.name }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let g">
+        <button matIconButton (click)="openEdit(g)" aria-label="Edit group">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button matIconButton (click)="deleteGroup(g.id)" aria-label="Delete group">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  }
 
-    @if (selectedGroup() && orgId() !== null) {
-      <app-org-group-detail
-        [orgId]="orgId()!"
-        [group]="selectedGroup()!"
-        (saved)="onDetailSaved()"
-        (cancelled)="onDetailCancelled()"
-      />
-    }
+  @if (selectedGroup() && orgId() !== null) {
+  <app-org-group-detail [orgId]="orgId()!" [group]="selectedGroup()!" (dataChanged)="onDataChanged()"
+    (closed)="onDetailClosed()" />
+  }
   }
 </div>

@@ -1,4 +1,9 @@
-<h4>Edit Group</h4>
+<div class="edit-header">
+  <h4>Edit Group</h4>
+  <button mat-icon-button type="button" (click)="close()" aria-label="Close edit panel">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 @if (saveErrors().length) {
   <app-error-display [errors]="saveErrors()" />
 }
@@ -9,6 +14,5 @@
   </mat-form-field>
   <div class="form-actions">
     <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
-    <button mat-button type="button" (click)="cancel()">Cancel</button>
   </div>
 </form>
