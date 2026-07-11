@@ -41,15 +41,7 @@ form mat-form-field {
 
 td.mat-column-actions,
 th.mat-column-actions {
-  background: var(--mat-sys-surface-container);
-}
-
-.mat-column-name,
-.mat-column-permissions {
-  max-width: 22ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  background: var(--mat-table-background-color, var(--mat-sys-surface));
 }
 .permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
