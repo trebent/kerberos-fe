@@ -43,7 +43,8 @@ td.mat-column-actions,
 th.mat-column-actions {
   background: var(--mat-table-background-color, var(--mat-sys-surface));
   white-space: nowrap;
-  width: 1%;
+  text-align: center;
+  width: 10rem;
 }
 
 .permissions-fieldset {
