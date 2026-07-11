@@ -2,6 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +26,7 @@ import { OrgUserDetailComponent } from '../org-user-detail/org-user-detail.compo
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatDividerModule,
     ErrorDisplayComponent,
     OrgUserDetailComponent,
   ],
@@ -47,7 +49,6 @@ export class OrgUsersListComponent {
     },
   });
 
-  readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -56,24 +57,12 @@ export class OrgUsersListComponent {
 
   readonly selectedUser = signal<User | null>(null);
 
-  openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.selectedUser.set(null);
-    this.showCreate.set(true);
-  }
-
-  cancelCreate(): void {
-    this.showCreate.set(false);
-  }
-
   submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
     this.createErrors.set([]);
     const { name, password } = this.createForm.getRawValue();
     this.usersService.createUser(this.orgId()!, { name, password }).subscribe({
       next: () => {
-        this.showCreate.set(false);
         this.createForm.reset();
         this.usersResource.reload();
       },
@@ -84,7 +73,6 @@ export class OrgUsersListComponent {
   }
 
   openEdit(user: User): void {
-    this.showCreate.set(false);
     this.selectedUser.set(user);
   }
 

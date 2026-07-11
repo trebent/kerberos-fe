@@ -1,16 +1,14 @@
-<section class="detail-section">
-  <h4>Edit Organisation</h4>
-  @if (saveErrors().length) {
-    <app-error-display [errors]="saveErrors()" />
-  }
-  <form [formGroup]="editForm" (ngSubmit)="save()">
-    <mat-form-field appearance="outline">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
-    <div class="form-actions">
-      <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
-      <button mat-button type="button" (click)="cancel()">Cancel</button>
-    </div>
-  </form>
-</section>
+<h4>Edit Organisation</h4>
+@if (saveErrors().length) {
+  <app-error-display [errors]="saveErrors()" />
+}
+<form [formGroup]="editForm" (ngSubmit)="save()">
+  <mat-form-field appearance="outline">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
+  </mat-form-field>
+  <div class="form-actions">
+    <button mat-flat-button type="submit" [disabled]="editForm.invalid">Save</button>
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>

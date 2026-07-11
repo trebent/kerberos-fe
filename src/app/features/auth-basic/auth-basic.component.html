@@ -1,10 +1,5 @@
-<h2>Basic Authentication</h2>
-
-<h3>Organisations</h3>
-<app-organisations-list (orgSelected)="selectedOrgId.set($event)" />
-
-<h3>Organisation Users</h3>
-<app-org-users-list [orgId]="selectedOrgId()" />
-
-<h3>Organisation Groups</h3>
-<app-org-groups-list [orgId]="selectedOrgId()" />
+<div class="subsection-container">
+  <app-organisations-list (orgSelected)="selectedOrgId.set($event)" />
+  <app-org-users-list [orgId]="selectedOrgId()" />
+  <app-org-groups-list [orgId]="selectedOrgId()" />
+</div>

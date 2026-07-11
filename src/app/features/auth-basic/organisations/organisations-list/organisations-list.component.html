@@ -1,81 +1,75 @@
-@if (orgsResource.isLoading()) {
-  <mat-spinner diameter="32" />
-}
-@if (orgsResource.error()) {
-  <app-error-display [errors]="['Failed to load organisations.']" />
-}
+<div class="card-header-container">
+  <h3>Organisations</h3>
+</div>
+<div class="card-content">
+  <h4>Create Organisation</h4>
+  @if (createErrors().length) {
+    <app-error-display [errors]="createErrors()" />
+  }
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
+    </div>
+  </form>
 
-<div class="action-bar">
-  @if (!showCreate()) {
-    <button mat-flat-button (click)="openCreate()">
-      <mat-icon>add</mat-icon> Create Organisation
-    </button>
+  @if (newOrgCredentials()) {
+    <section class="credentials-box">
+      <strong>Organisation created — save these admin credentials now, they will not be shown again.</strong>
+      <p>Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code></p>
+      <p>Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code></p>
+      <button mat-button (click)="dismissCredentials()">Dismiss</button>
+    </section>
+  }
+
+  <mat-divider></mat-divider>
+  <h4>All organisations</h4>
+
+  @if (orgsResource.error()) {
+    <app-error-display [errors]="['Failed to load organisations.']" />
+  }
+  @if (orgsResource.isLoading()) {
+    <mat-spinner diameter="32" />
+  }
+  @if (orgsResource.hasValue()) {
+    <table mat-table [dataSource]="orgsResource.value()!">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let o">{{ o.id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let o">{{ o.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let o">
+          <button
+            mat-stroked-button
+            [color]="selectedOrgId() === o.id ? 'primary' : ''"
+            (click)="toggleManage(o)"
+          >Manage</button>
+          <button matIconButton (click)="openEdit(o)" aria-label="Edit organisation">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button matIconButton (click)="deleteOrg(o.id)" aria-label="Delete organisation">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+
+  @if (selectedOrg()) {
+    <app-organisation-detail
+      [organisation]="selectedOrg()!"
+      (saved)="onDetailSaved()"
+      (cancelled)="onDetailCancelled()"
+    />
   }
 </div>
-
-@if (showCreate()) {
-  <section class="form-section">
-    <h4>Create Organisation</h4>
-    @if (createErrors().length) {
-      <app-error-display [errors]="createErrors()" />
-    }
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
-      <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" />
-      </mat-form-field>
-      <div class="form-actions">
-        <button mat-flat-button type="submit" [disabled]="createForm.invalid">Create</button>
-        <button mat-button type="button" (click)="cancelCreate()">Cancel</button>
-      </div>
-    </form>
-  </section>
-}
-
-@if (newOrgCredentials()) {
-  <section class="credentials-box">
-    <strong>Organisation created — save these admin credentials now, they will not be shown again.</strong>
-    <p>Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code></p>
-    <p>Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code></p>
-    <button mat-button (click)="dismissCredentials()">Dismiss</button>
-  </section>
-}
-
-@if (orgsResource.hasValue()) {
-  <table mat-table [dataSource]="orgsResource.value()!">
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let o">{{ o.id }}</td>
-    </ng-container>
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
-      <td mat-cell *matCellDef="let o">{{ o.name }}</td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let o">
-        <button
-          mat-stroked-button
-          [color]="selectedOrgId() === o.id ? 'primary' : ''"
-          (click)="toggleManage(o)"
-        >Manage</button>
-        <button matIconButton (click)="openEdit(o)" aria-label="Edit organisation">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button matIconButton (click)="deleteOrg(o.id)" aria-label="Delete organisation">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-}
-
-@if (selectedOrg()) {
-  <app-organisation-detail
-    [organisation]="selectedOrg()!"
-    (saved)="onDetailSaved()"
-    (cancelled)="onDetailCancelled()"
-  />
-}

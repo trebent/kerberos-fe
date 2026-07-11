@@ -1,40 +1,58 @@
-.action-bar {
-  margin-bottom: 16px;
-}
-.form-section {
-  margin: 16px 0;
-  padding: 16px;
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 0.75rem;
 }
-h4 {
-  margin: 0 0 12px;
-}
+
 form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+
+  .form-actions {
+    display: flex;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    :first-child {
+      margin-right: 0.5rem;
+    }
+  }
 }
-mat-form-field {
-  width: 320px;
-}
+
 .form-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  margin-bottom: 1rem;
 }
+
+mat-form-field {
+  min-width: 30rem;
+}
+
+mat-divider {
+  margin: 0.5rem 0;
+}
+
+table {
+  margin-bottom: 1rem;
+}
+
 .credentials-box {
-  margin: 16px 0;
-  padding: 16px;
+  margin: 0.5rem 0 1rem;
+  padding: 1rem;
   border: 2px solid var(--mat-sys-primary);
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background: var(--mat-sys-primary-container);
   color: var(--mat-sys-on-primary-container);
 }
+
 .credentials-box p {
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
+
 code {
   font-family: monospace;
   font-size: 0.95em;

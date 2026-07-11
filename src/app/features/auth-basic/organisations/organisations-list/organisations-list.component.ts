@@ -2,6 +2,7 @@ import { Component, inject, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +26,7 @@ import { OrganisationDetailComponent } from '../organisation-detail/organisation
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatDividerModule,
     ErrorDisplayComponent,
     OrganisationDetailComponent,
   ],
@@ -41,7 +43,6 @@ export class OrganisationsListComponent {
     stream: () => this.orgsService.listOrganisations(),
   });
 
-  readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -51,24 +52,12 @@ export class OrganisationsListComponent {
   readonly selectedOrg = signal<Organisation | null>(null);
   readonly selectedOrgId = signal<number | null>(null);
 
-  openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.selectedOrg.set(null);
-    this.showCreate.set(true);
-  }
-
-  cancelCreate(): void {
-    this.showCreate.set(false);
-  }
-
   submitCreate(): void {
     if (this.createForm.invalid) return;
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
     this.orgsService.createOrganisation({ name }).subscribe({
       next: (resp) => {
-        this.showCreate.set(false);
         this.createForm.reset();
         this.newOrgCredentials.set(resp);
         this.orgsResource.reload();
@@ -95,7 +84,6 @@ export class OrganisationsListComponent {
   }
 
   openEdit(org: Organisation): void {
-    this.showCreate.set(false);
     this.selectedOrg.set(org);
   }
 

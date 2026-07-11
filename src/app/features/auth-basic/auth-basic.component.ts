@@ -6,6 +6,7 @@ import { OrgUsersListComponent } from './org-users/org-users-list/org-users-list
 @Component({
   selector: 'app-auth-basic',
   templateUrl: './auth-basic.component.html',
+  styleUrl: './auth-basic.component.scss',
   imports: [OrganisationsListComponent, OrgUsersListComponent, OrgGroupsListComponent],
 })
 export class AuthBasicComponent {

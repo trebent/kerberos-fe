@@ -2,6 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +26,7 @@ import { OrgGroupDetailComponent } from '../org-group-detail/org-group-detail.co
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatDividerModule,
     ErrorDisplayComponent,
     OrgGroupDetailComponent,
   ],
@@ -47,7 +49,6 @@ export class OrgGroupsListComponent {
     },
   });
 
-  readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -55,24 +56,12 @@ export class OrgGroupsListComponent {
 
   readonly selectedGroup = signal<Group | null>(null);
 
-  openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.selectedGroup.set(null);
-    this.showCreate.set(true);
-  }
-
-  cancelCreate(): void {
-    this.showCreate.set(false);
-  }
-
   submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
     this.groupsService.createGroup(this.orgId()!, { name }).subscribe({
       next: () => {
-        this.showCreate.set(false);
         this.createForm.reset();
         this.groupsResource.reload();
       },
@@ -83,7 +72,6 @@ export class OrgGroupsListComponent {
   }
 
   openEdit(group: Group): void {
-    this.showCreate.set(false);
     this.selectedGroup.set(group);
   }
 
