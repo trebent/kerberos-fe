@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, effect, inject, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { OrganisationsService } from '../../../../api/auth-basic/api/organisations.service';
 import { CreateOrganisation201Response } from '../../../../api/auth-basic/model/create-organisation201-response';
 import { Organisation } from '../../../../api/auth-basic/model/organisation';
@@ -43,6 +43,14 @@ export class OrganisationsListComponent {
     stream: () => this.orgsService.listOrganisations(),
   });
 
+  readonly dataSource = new MatTableDataSource<Organisation>();
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.orgsResource.value() ?? [];
+    });
+  }
+
   readonly createErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -51,6 +59,10 @@ export class OrganisationsListComponent {
   readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
   readonly selectedOrg = signal<Organisation | null>(null);
   readonly selectedOrgId = signal<number | null>(null);
+
+  applyFilter(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
 
   submitCreate(): void {
     if (this.createForm.invalid) return;
