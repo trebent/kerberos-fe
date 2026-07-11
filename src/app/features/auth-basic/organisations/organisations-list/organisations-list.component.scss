@@ -15,6 +15,10 @@ form {
   .form-actions {
     display: flex;
   }
+
+  mat-form-field {
+    min-width: 15rem;
+  }
 }
 
 .org-actions-container {
@@ -28,9 +32,8 @@ form {
   }
 }
 
-
-form mat-form-field {
-  min-width: 30rem;
+mat-divider {
+  margin: 0.5rem 0;
 }
 
 .filter-field {
@@ -46,12 +49,10 @@ td.mat-column-actions,
 th.mat-column-actions {
   background: var(--mat-table-background-color, var(--mat-sys-surface));
   white-space: nowrap;
-  width: 1%;
+  text-align: center;
+  width: 10rem;
 }
 
-mat-divider {
-  margin: 0.5rem 0;
-}
 .credentials-box {
   margin: 0.5rem 0 1rem;
   padding: 1rem;

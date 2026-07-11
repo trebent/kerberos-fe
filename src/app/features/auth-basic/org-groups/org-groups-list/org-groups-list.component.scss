@@ -20,10 +20,14 @@ form {
   .form-actions {
     display: flex;
   }
+
+  mat-form-field {
+    min-width: 15rem;
+  }
 }
 
-form mat-form-field {
-  min-width: 30rem;
+mat-divider {
+  margin: 0.5rem 0;
 }
 
 .filter-field {
@@ -39,9 +43,6 @@ td.mat-column-actions,
 th.mat-column-actions {
   background: var(--mat-table-background-color, var(--mat-sys-surface));
   white-space: nowrap;
-  width: 1%;
-}
-
-mat-divider {
-  margin: 0.5rem 0;
+  text-align: center;
+  width: 10rem;
 }
