@@ -1,23 +1,23 @@
-.login-page {
+:host {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--mat-sys-surface-container-low);
+}
+
+mat-card mat-card-header {
+  margin-bottom: 1rem;
+}
+
+mat-slide-toggle {
+  margin-bottom: 1rem;
 }
 
 .login-card {
-  width: 100%;
-  max-width: 400px;
-  padding: 8px;
-}
-
-.login-card.super-login {
-  border: 2px solid var(--mat-sys-tertiary);
+  min-width: 20rem;
 }
 
 .full-width {
-  width: 100%;
-  margin-bottom: 8px;
   display: block;
+  width: 100%;
 }
