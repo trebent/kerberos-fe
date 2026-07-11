@@ -14,10 +14,6 @@ form {
 
   .form-actions {
     display: flex;
-
-    :first-child {
-      margin-right: 0.5rem;
-    }
   }
 }
 
@@ -28,8 +24,6 @@ mat-form-field {
 table {
   margin-bottom: 1rem;
 }
-
-
 
 mat-divider {
   margin: 0.5rem 0;

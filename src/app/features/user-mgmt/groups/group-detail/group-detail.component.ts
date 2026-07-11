@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +24,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     ErrorDisplayComponent,
   ],
 })
-export class GroupDetailComponent implements OnInit {
+export class GroupDetailComponent {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
@@ -44,10 +44,12 @@ export class GroupDetailComponent implements OnInit {
     name: ['', Validators.required],
   });
 
-  ngOnInit(): void {
-    const g = this.group();
-    this.editForm.reset({ name: g.name });
-    this.selectedPermissionIds.set(g.permissions!.map(p => p.id));
+  constructor() {
+    effect(() => {
+      const g = this.group();
+      this.editForm.reset({ name: g.name });
+      this.selectedPermissionIds.set(g.permissions!.map(p => p.id));
+    });
   }
 
   isSelected(permissionId: number): boolean {

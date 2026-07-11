@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,17 +6,18 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
-import { UsersService } from '../../../../api/admin/api/users.service';
-import { Group } from '../../../../api/admin/model/group';
-import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
-import { GroupDetailComponent } from '../group-detail/group-detail.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { UsersService } from '../../../api/admin/api/users.service';
+import { Group } from '../../../api/admin/model/group';
+import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
+import { GroupDetailComponent } from './group-detail/group-detail.component';
 
 @Component({
-  selector: 'app-groups-list',
-  templateUrl: './groups-list.component.html',
-  styleUrl: './groups-list.component.scss',
+  selector: 'app-groups',
+  templateUrl: './groups.component.html',
+  styleUrl: './groups.component.scss',
   imports: [
     ReactiveFormsModule,
     MatTableModule,
@@ -28,17 +29,26 @@ import { GroupDetailComponent } from '../group-detail/group-detail.component';
     MatCheckboxModule,
     ErrorDisplayComponent,
     GroupDetailComponent,
+    MatDividerModule,
   ],
 })
-export class GroupsListComponent {
+export class GroupsComponent {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
-  readonly displayedColumns = ['id', 'name', 'actions'];
+  readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
 
   readonly groupsResource = rxResource({
     stream: () => this.usersService.getGroups(),
   });
+
+  readonly dataSource = new MatTableDataSource<Group>();
+
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.groupsResource.value() ?? [];
+    });
+  }
 
   readonly permissionsResource = rxResource({
     stream: () => this.usersService.getPermissions(),
@@ -52,10 +62,18 @@ export class GroupsListComponent {
     name: ['', Validators.required],
   });
 
-  readonly selectedGroup = signal<Group | null>(null);
+  readonly selectedGroup = signal<Group | null>(null, { equal: () => false });
+
+  applyFilter(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  }
 
   isCreateSelected(permissionId: number): boolean {
     return this.createSelectedPermissionIds().includes(permissionId);
+  }
+
+  getPermissionIDs(group: Group): string {
+    return (group.permissions ?? []).map(p => p.id).join(', ');
   }
 
   toggleCreatePermission(permissionId: number): void {

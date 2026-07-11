@@ -5,51 +5,44 @@
   border: 1px solid var(--mat-sys-outline-variant);
   background: var(--mat-sys-surface-container);
   border-radius: 0.75rem;
-  padding: 0.5rem 1rem;
 }
 
 .action-bar {
   margin-bottom: 16px;
 }
 
-.form-section {
-  margin: 16px 0;
-  padding: 16px;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
-}
-
-h4 {
-  margin: 0 0 12px;
-}
-
 form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+
+  .form-actions {
+    display: flex;
+    margin-top: 1rem;
+  }
+}
+
+mat-divider {
+  margin: 0.5rem 0;
 }
 
 mat-form-field {
-  width: 320px;
+  min-width: 30rem;
 }
 
 .permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .permissions-fieldset legend {
   font: var(--mat-sys-label-medium);
-  padding: 0 4px;
+  padding: 0 0.25rem;
 }
 
-.form-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
+table {
+  margin-bottom: 1rem;
 }

@@ -3,10 +3,6 @@
 </div>
 <div class="card-content">
 
-  @if (usersResource.isLoading()) {
-  <mat-spinner diameter="32" />
-  }
-
   <h4>Create User</h4>
   @if (createErrors().length) {
   <app-error-display [errors]="createErrors()" />
@@ -30,6 +26,10 @@
 
   @if (usersResource.error()) {
   <app-error-display [errors]="['Failed to load users.']" />
+  }
+
+  @if (usersResource.isLoading()) {
+  <mat-spinner diameter="32" />
   }
 
   @if (usersResource.hasValue()) {

@@ -38,4 +38,8 @@ mat-form-field {
   display: flex;
   margin-top: 1rem;
   margin-bottom: 1rem;
+
+  :first-child {
+    margin-right: 0.5rem;
+  }
 }
