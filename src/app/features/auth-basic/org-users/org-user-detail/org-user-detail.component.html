@@ -7,10 +7,10 @@
 
 <h5>Name</h5>
 @if (nameErrors().length) {
-  <app-error-display [errors]="nameErrors()" />
+<app-error-display [errors]="nameErrors()" />
 }
 @if (nameSuccess()) {
-  <p class="success-message">Name updated successfully.</p>
+<p class="success-message">Name updated successfully.</p>
 }
 <form [formGroup]="nameForm" (ngSubmit)="saveName()">
   <mat-form-field appearance="outline">
@@ -24,34 +24,34 @@
 
 <h5>Groups</h5>
 @if (groupsLoading()) {
-  <mat-spinner diameter="24" />
+<mat-spinner diameter="24" />
 }
 @if (groupErrors().length) {
-  <app-error-display [errors]="groupErrors()" />
+<app-error-display [errors]="groupErrors()" />
 }
 @if (groupSuccess()) {
-  <p class="success-message">Groups updated successfully.</p>
+<p class="success-message">Groups updated successfully.</p>
 }
 @if (!groupsLoading() && availableGroups().length) {
-  <fieldset class="groups-fieldset">
-    <legend>Select groups</legend>
-    @for (g of availableGroups(); track g.id) {
-      <mat-checkbox [checked]="selectedGroupIds().has(g.id)" (change)="toggleGroup(g)">
-        {{ g.name }}
-      </mat-checkbox>
-    }
-  </fieldset>
-  <div class="form-actions">
-    <button mat-flat-button type="button" (click)="saveGroups()">Save groups</button>
-  </div>
+<fieldset class="groups-fieldset">
+  <legend>Select groups</legend>
+  @for (g of availableGroups(); track g.id) {
+  <mat-checkbox [checked]="selectedGroupIds().has(g.id)" (change)="toggleGroup(g)">
+    {{ g.name }}
+  </mat-checkbox>
+  }
+</fieldset>
+<div class="form-actions">
+  <button mat-flat-button type="button" (click)="saveGroups()">Save groups</button>
+</div>
 }
 
 <h5>Change Password</h5>
 @if (passwordErrors().length) {
-  <app-error-display [errors]="passwordErrors()" />
+<app-error-display [errors]="passwordErrors()" />
 }
 @if (passwordSuccess()) {
-  <p class="success-message">Password changed successfully.</p>
+<p class="success-message">Password changed successfully.</p>
 }
 <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
   <mat-form-field appearance="outline">
@@ -64,9 +64,10 @@
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Confirm new password</mat-label>
-    <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+    <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password"
+      [errorStateMatcher]="mismatchMatcher" />
     @if (passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched) {
-      <mat-error>Passwords do not match.</mat-error>
+    <mat-error>Passwords do not match.</mat-error>
     }
   </mat-form-field>
   <div class="form-actions">

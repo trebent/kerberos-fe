@@ -1,5 +1,6 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, FormControl, FormGroupDirective, NgForm, ValidationErrors, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +13,13 @@ import { UsersService } from '../../../../api/auth-basic/api/users.service';
 import { Group } from '../../../../api/auth-basic/model/group';
 import { User } from '../../../../api/auth-basic/model/user';
 import { ErrorDisplayComponent } from '../../../../shared/components/error-display/error-display.component';
+
+class PasswordMismatchStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return !!(control?.invalid && control.touched) ||
+      !!(form?.hasError('passwordsMismatch') && control?.touched);
+  }
+}
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const newPass = control.get('newPassword')?.value;
@@ -38,6 +46,8 @@ export class OrgUserDetailComponent {
   private readonly usersService = inject(UsersService);
   private readonly groupsService = inject(GroupsService);
   private readonly fb = inject(FormBuilder);
+
+  readonly mismatchMatcher = new PasswordMismatchStateMatcher();
 
   readonly orgId = input.required<number>();
   readonly user = input.required<User>();
@@ -117,6 +127,10 @@ export class OrgUserDetailComponent {
       next: () => {
         this.nameSuccess.set(true);
         this.dataChanged.emit();
+
+        setTimeout(() => {
+          this.nameSuccess.set(false);
+        }, 2000);
       },
       error: () => this.nameErrors.set(['Failed to update name. Please try again.']),
     });
@@ -130,6 +144,10 @@ export class OrgUserDetailComponent {
       next: () => {
         this.groupSuccess.set(true);
         this.dataChanged.emit();
+
+        setTimeout(() => {
+          this.groupSuccess.set(false);
+        }, 2000);
       },
       error: () => this.groupErrors.set(['Failed to update groups. Please try again.']),
     });
@@ -144,6 +162,10 @@ export class OrgUserDetailComponent {
       next: () => {
         this.passwordSuccess.set(true);
         this.passwordForm.reset();
+
+        setTimeout(() => {
+          this.passwordSuccess.set(false);
+        }, 2000);
       },
       error: () => this.passwordErrors.set(['Failed to change password. Please check your current password and try again.']),
     });
