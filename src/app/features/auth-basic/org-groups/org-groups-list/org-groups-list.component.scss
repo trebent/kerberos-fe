@@ -38,6 +38,8 @@ form mat-form-field {
 td.mat-column-actions,
 th.mat-column-actions {
   background: var(--mat-table-background-color, var(--mat-sys-surface));
+  white-space: nowrap;
+  width: 1%;
 }
 
 mat-divider {
