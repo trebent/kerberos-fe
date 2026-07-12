@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { UsersService } from '../../api/admin/api/users.service';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap, catchError } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -67,14 +67,15 @@ export class AuthService {
             console.debug('Superuser session refreshed successfully.');
             this.onLogin('superuser', 0, true);
           },
-          error: () => {
-            console.error('Failed to refresh superuser session.');
-            this.onLogout();
-          },
         }),
         map(() => {
           return null as null;
         }),
+        catchError((error) => {
+          console.error('Error during superuser session refresh:', error);
+          this.onLogout();
+          return of(null);
+        })
       );
     } else {
       return this.userService.refreshUserSession().pipe(
@@ -83,10 +84,11 @@ export class AuthService {
             console.debug('User session refreshed successfully.');
             this.onLogin('', 0, false);
           },
-          error: () => {
-            console.error('Failed to refresh user session.');
-            this.onLogout();
-          },
+        }),
+        catchError((error) => {
+          console.error('Error during superuser session refresh:', error);
+          this.onLogout();
+          return of(null);
         }),
         switchMap(() => this.getMe())
       );
