@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
-import { csrfInterceptor, autoReloginInterceptor } from './core/interceptors/session.interceptor';
+import { csrfInterceptor } from './core/interceptors/session.interceptor';
 import { environment } from '../environments/environment';
 import { provideApi as provideAdminAPI } from './api/admin/provide-api';
 import { provideApi as provideAuthBasicAPI } from './api/auth-basic/provide-api';
@@ -17,10 +17,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAdminAPI(environment.apiBaseUrl),
     provideAuthBasicAPI(environment.apiBaseUrl),
-    provideHttpClient(withInterceptors([autoReloginInterceptor, csrfInterceptor])),
+    provideHttpClient(withInterceptors([csrfInterceptor])),
     provideAppInitializer(() => {
       const authService = inject(AuthService);
-      return firstValueFrom(authService.checkSession());
+      return firstValueFrom(authService.init());
     }),
   ],
 };
