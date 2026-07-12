@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal, ViewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { of } from 'rxjs';
 import { GroupsService } from '../../../../api/auth-basic/api/groups.service';
@@ -23,6 +24,7 @@ import { OrgGroupDetailComponent } from '../org-group-detail/org-group-detail.co
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -50,6 +52,10 @@ export class OrgGroupsListComponent {
   });
 
   readonly dataSource = new MatTableDataSource<Group>();
+
+  @ViewChild(MatPaginator) set paginator(value: MatPaginator) {
+    this.dataSource.paginator = value ?? null;
+  }
 
   constructor() {
     effect(() => {

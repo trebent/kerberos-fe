@@ -34,7 +34,7 @@
   @if (orgsResource.isLoading()) {
   <mat-spinner diameter="32" />
   }
-  @if (orgsResource.hasValue()) {
+
   <mat-form-field class="filter-field">
     <mat-label>Filter</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ex. my-org" #input>
@@ -67,8 +67,10 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
-  }
+
 
   @if (selectedOrg()) {
   <app-organisation-detail [organisation]="selectedOrg()!" (saved)="onDetailSaved()" (closed)="onDetailClosed()" />

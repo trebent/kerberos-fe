@@ -33,7 +33,6 @@
   <mat-divider></mat-divider>
   <h4>All users</h4>
 
-  @if (usersResource.hasValue()) {
   <mat-form-field class="filter-field">
     <mat-label>Filter</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ex. admin" #input>
@@ -66,8 +65,9 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
-  }
 
   @if (selectedUser() && orgId() !== null) {
   <app-org-user-detail [orgId]="orgId()!" [user]="selectedUser()!" (dataChanged)="onDataChanged()"

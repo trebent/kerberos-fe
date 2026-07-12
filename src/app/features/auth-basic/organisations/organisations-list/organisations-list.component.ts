@@ -1,4 +1,4 @@
-import { Component, effect, inject, output, signal } from '@angular/core';
+import { Component, effect, inject, output, signal, AfterViewInit, ViewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { OrganisationsService } from '../../../../api/auth-basic/api/organisations.service';
 import { CreateOrganisation201Response } from '../../../../api/auth-basic/model/create-organisation201-response';
@@ -26,12 +27,13 @@ import { OrganisationDetailComponent } from '../organisation-detail/organisation
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatPaginatorModule,
     MatDividerModule,
     ErrorDisplayComponent,
     OrganisationDetailComponent,
   ],
 })
-export class OrganisationsListComponent {
+export class OrganisationsListComponent implements AfterViewInit {
   private readonly orgsService = inject(OrganisationsService);
   private readonly fb = inject(FormBuilder);
 
@@ -45,10 +47,16 @@ export class OrganisationsListComponent {
 
   readonly dataSource = new MatTableDataSource<Organisation>();
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   constructor() {
     effect(() => {
       this.dataSource.data = this.orgsResource.value() ?? [];
     });
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
   }
 
   readonly createErrors = signal<string[]>([]);
