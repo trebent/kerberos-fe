@@ -32,24 +32,25 @@ mat-action-list {
 mat-sidenav-container {
   height: 100%;
   width: 100%;
-}
 
-mat-sidenav-container mat-sidenav {
-  padding: 0.25rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container);
-}
+  mat-sidenav {
+    height: fit-content;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--mat-sys-outline-variant);
+    background: var(--mat-sys-surface-container);
+  }
 
-mat-sidenav-container mat-sidenav-content {
-  display: flex;
-  flex-direction: row;
-}
+  mat-sidenav-content {
+    display: flex;
+    flex-direction: row;
+  }
 
-mat-sidenav-container mat-sidenav-content>* {
-  margin-left: 1rem;
-}
+  mat-sidenav-content>* {
+    margin-left: 1rem;
+  }
 
-mat-sidenav-container mat-sidenav-content app-flow-pipeline {
-  flex: 1;
+  mat-sidenav-content app-flow-pipeline {
+    flex: 1;
+  }
 }

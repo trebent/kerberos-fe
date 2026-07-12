@@ -8,9 +8,10 @@
 <div class="card-content">
   <div class="debug-controls">
     <mat-form-field>
-      <mat-label>Backend</mat-label>
-      <mat-select placeholder="Select backend" [ngModel]="selectedBackend()"
+      <mat-label>Select backend</mat-label>
+      <mat-select placeholder="Ex. echo" canSelectNullableOptions [ngModel]="selectedBackend()"
         (ngModelChange)="selectedBackend.set($event)">
+        <mat-option [value]="null">None</mat-option>
         @for (backend of backends(); track backend) {
         <mat-option [value]="backend">{{ backend }}</mat-option>
         }
@@ -31,8 +32,8 @@
 
     <div class="session-controls">
       <mat-form-field>
-        <mat-label>Session</mat-label>
-        <mat-select placeholder="Select session" [disabled]="!selectedBackend() || isLoadingSession()"
+        <mat-label>Select session</mat-label>
+        <mat-select placeholder="Ex. #1337" [disabled]="!selectedBackend() || isLoadingSession()"
           [ngModel]="selectedSessionId()" (ngModelChange)="onSessionSelect($event)">
           @for (session of sessions(); track session.id) {
           <mat-option [value]="session.id">#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option>
