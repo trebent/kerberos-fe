@@ -11,6 +11,7 @@ import { FlowMetaDataRouter } from '../../api/admin/model/flow-meta-data-router'
 import { DebugComponent } from './debug/debug.component';
 import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
 import { OasComponent } from './oas/oas.component';
+import { ErrorDisplayComponent } from '../../shared/components/error-display/error-display.component';
 
 @Component({
   selector: 'app-flow',
@@ -23,6 +24,7 @@ import { OasComponent } from './oas/oas.component';
     MatIconModule,
     DebugComponent,
     FlowPipelineComponent,
+    ErrorDisplayComponent,
     OasComponent,
   ],
 })
@@ -34,6 +36,7 @@ export class FlowComponent {
   });
 
   readonly oasBackends = computed<string[]>(() => {
+    if (!this.flowResource.hasValue()) return [];
     const flow = this.flowResource.value();
     if (!flow) return [];
     const oasComp = flow.find(c => c.name === 'oas-validator');
@@ -42,6 +45,7 @@ export class FlowComponent {
   });
 
   readonly routerBackends = computed<string[]>(() => {
+    if (!this.flowResource.hasValue()) return [];
     const flow = this.flowResource.value();
     if (!flow) return [];
     const routerComp = flow.find(c => c.name === 'router');

@@ -50,7 +50,11 @@ export class GroupsComponent implements AfterViewInit {
 
   constructor() {
     effect(() => {
-      this.dataSource.data = this.groupsResource.value() ?? [];
+      if (this.groupsResource.hasValue()) {
+        this.dataSource.data = this.groupsResource.value();
+      } else {
+        this.dataSource.data = [];
+      }
     });
   }
 

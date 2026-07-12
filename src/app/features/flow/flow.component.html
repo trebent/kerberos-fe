@@ -35,8 +35,13 @@
     <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
     }
 
-    <app-flow-pipeline [flowMetas]="flowResource.value() ?? null" [isLoading]="flowResource.isLoading()"
+    @if (flowResource.hasValue()) {
+    <app-flow-pipeline [flowMetas]="flowResource.value()" [isLoading]="flowResource.isLoading()"
       [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
+    }
 
+    @if (flowResource.error()) {
+    <app-error-display [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']" />
+    }
   </mat-sidenav-content>
 </mat-sidenav-container>

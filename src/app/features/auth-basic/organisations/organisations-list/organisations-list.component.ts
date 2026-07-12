@@ -51,7 +51,11 @@ export class OrganisationsListComponent implements AfterViewInit {
 
   constructor() {
     effect(() => {
-      this.dataSource.data = this.orgsResource.value() ?? [];
+      if (this.orgsResource.hasValue()) {
+        this.dataSource.data = this.orgsResource.value();
+      } else {
+        this.dataSource.data = [];
+      }
     });
   }
 

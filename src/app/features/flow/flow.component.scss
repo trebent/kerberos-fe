@@ -44,6 +44,13 @@ mat-sidenav-container {
   mat-sidenav-content {
     display: flex;
     flex-direction: row;
+
+    app-error-display {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   mat-sidenav-content>* {

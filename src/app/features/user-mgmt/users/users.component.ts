@@ -48,7 +48,11 @@ export class UsersComponent implements AfterViewInit {
 
   constructor() {
     effect(() => {
-      this.dataSource.data = this.usersResource.value() ?? [];
+      if (this.usersResource.hasValue()) {
+        this.dataSource.data = this.usersResource.value();
+      } else {
+        this.dataSource.data = [];
+      }
     });
   }
 
