@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UsersService } from '../../../../api/admin/api/users.service';
@@ -21,6 +22,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatIconModule,
     ErrorDisplayComponent,
   ],
 })
@@ -31,7 +33,7 @@ export class GroupEditComponent {
   readonly group = input.required<Group>();
 
   readonly saved = output<void>();
-  readonly cancelled = output<void>();
+  readonly closed = output<void>();
 
   readonly permissionsResource = rxResource({
     stream: () => this.usersService.getPermissions(),
@@ -75,7 +77,7 @@ export class GroupEditComponent {
     });
   }
 
-  cancel(): void {
-    this.cancelled.emit();
+  close(): void {
+    this.closed.emit();
   }
 }

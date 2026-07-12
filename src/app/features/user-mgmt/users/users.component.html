@@ -69,6 +69,6 @@
   }
 
   @if (selectedUser()) {
-  <app-user-edit [user]="selectedUser()!" (saved)="onDetailSaved()" (cancelled)="onDetailCancelled()" />
+  <app-user-edit [user]="selectedUser()!" (saved)="onDetailSaved()" (closed)="onDetailClosed()" />
   }
 </div>

@@ -58,3 +58,8 @@ body {
 .card-content {
   padding: 0.5rem 1rem;
 }
+
+span.success-message {
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-body-medium);
+}

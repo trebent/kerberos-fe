@@ -5,13 +5,19 @@
   </button>
 </div>
 
-<h5>Name</h5>
+<div class="form-section-header">
+  <h5>Name</h5>
+
+  @if (nameSuccess()) {
+  <span class="success-message">Name updated successfully.</span>
+  }
+</div>
+
 @if (nameErrors().length) {
 <app-error-display [errors]="nameErrors()" />
 }
-@if (nameSuccess()) {
-<p class="success-message">Name updated successfully.</p>
-}
+
+
 <form [formGroup]="nameForm" (ngSubmit)="saveName()">
   <mat-form-field appearance="outline">
     <mat-label>Name</mat-label>
@@ -22,16 +28,26 @@
   </div>
 </form>
 
-<h5>Groups</h5>
+<div class="form-section-header">
+  <h5>Groups</h5>
+
+  @if (groupSuccess()) {
+  <span class="success-message">Groups updated successfully.</span>
+  }
+</div>
+
 @if (groupsLoading()) {
 <mat-spinner diameter="24" />
 }
+
 @if (groupErrors().length) {
 <app-error-display [errors]="groupErrors()" />
 }
+
 @if (groupSuccess()) {
 <p class="success-message">Groups updated successfully.</p>
 }
+
 @if (!groupsLoading() && availableGroups().length) {
 <fieldset class="groups-fieldset">
   <legend>Select groups</legend>
@@ -46,13 +62,18 @@
 </div>
 }
 
-<h5>Change Password</h5>
+<div class="form-section-header">
+  <h5>Change Password</h5>
+
+  @if (passwordSuccess()) {
+  <p class="success-message">Password changed successfully.</p>
+  }
+</div>
+
 @if (passwordErrors().length) {
 <app-error-display [errors]="passwordErrors()" />
 }
-@if (passwordSuccess()) {
-<p class="success-message">Password changed successfully.</p>
-}
+
 <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
   <mat-form-field appearance="outline">
     <mat-label>Current password</mat-label>

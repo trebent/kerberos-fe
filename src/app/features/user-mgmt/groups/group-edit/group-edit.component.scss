@@ -10,6 +10,13 @@
   margin-bottom: 1rem;
 }
 
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -28,12 +35,12 @@ form {
   }
 }
 
-
 .permissions-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   box-sizing: border-box;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 }

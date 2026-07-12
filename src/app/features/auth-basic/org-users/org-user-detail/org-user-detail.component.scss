@@ -17,9 +17,10 @@
   margin-bottom: 0.25rem;
 }
 
-h5 {
-  margin: 1rem 0 0.5rem;
-  font: var(--mat-sys-label-large);
+div.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 form {
@@ -37,7 +38,6 @@ form {
   }
 }
 
-
 .groups-fieldset {
   border: 1px solid var(--mat-sys-outline-variant);
   box-sizing: border-box;
@@ -52,10 +52,4 @@ form {
 .groups-fieldset legend {
   font: var(--mat-sys-label-medium);
   padding: 0 0.25rem;
-}
-
-.success-message {
-  color: var(--mat-sys-primary);
-  font: var(--mat-sys-body-medium);
-  margin-bottom: 0.5rem;
 }

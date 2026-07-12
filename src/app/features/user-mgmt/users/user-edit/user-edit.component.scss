@@ -10,11 +10,17 @@
   margin-bottom: 1rem;
 }
 
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
 
   .form-actions {
     display: flex;
@@ -25,7 +31,7 @@ form {
   }
 
   mat-form-field {
-    min-width: 27rem;
+    min-width: 15rem;
   }
 }
 
@@ -34,6 +40,7 @@ form {
   box-sizing: border-box;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 }

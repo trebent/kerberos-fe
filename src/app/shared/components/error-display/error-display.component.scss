@@ -1,20 +1,23 @@
 .error-display {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 12px 16px;
-  border-radius: 4px;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
   background-color: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);
-  margin-bottom: 16px;
-}
+  margin-bottom: 1rem;
 
-.error-icon {
-  color: var(--mat-sys-error);
-  flex-shrink: 0;
-}
+  .error-content {
 
-.error-message {
-  margin: 0;
-  font: var(--mat-sys-body-medium);
+    p.error-message {
+      margin: 0;
+      font: var(--mat-sys-body-medium);
+    }
+  }
+
+  .error-icon {
+    color: var(--mat-sys-error);
+    flex-shrink: 0;
+  }
 }

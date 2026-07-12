@@ -124,7 +124,7 @@ export class GroupsComponent {
     this.groupsResource.reload();
   }
 
-  onDetailCancelled(): void {
+  onDetailClosed(): void {
     this.selectedGroup.set(null);
   }
 

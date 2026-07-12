@@ -92,7 +92,7 @@ export class UsersComponent {
     this.usersResource.reload();
   }
 
-  onDetailCancelled(): void {
+  onDetailClosed(): void {
     this.selectedUser.set(null);
   }
 

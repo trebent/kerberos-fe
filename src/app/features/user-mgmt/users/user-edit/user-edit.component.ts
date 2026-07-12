@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 import { switchMap } from 'rxjs';
 import { UsersService } from '../../../../api/admin/api/users.service';
 import { User } from '../../../../api/admin/model/user';
@@ -22,6 +23,7 @@ import { ErrorDisplayComponent } from '../../../../shared/components/error-displ
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatIconModule,
     ErrorDisplayComponent,
   ],
 })
@@ -32,7 +34,7 @@ export class UserEditComponent {
   readonly user = input.required<User>();
 
   readonly saved = output<void>();
-  readonly cancelled = output<void>();
+  readonly closed = output<void>();
 
   readonly groupsResource = rxResource({
     stream: () => this.usersService.getGroups(),
@@ -79,7 +81,7 @@ export class UserEditComponent {
     });
   }
 
-  cancel(): void {
-    this.cancelled.emit();
+  close(): void {
+    this.closed.emit();
   }
 }

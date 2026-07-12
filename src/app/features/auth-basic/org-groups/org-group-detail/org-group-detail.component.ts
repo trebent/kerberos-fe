@@ -49,7 +49,10 @@ export class OrgGroupDetailComponent {
     const { name } = this.editForm.getRawValue();
     const g = this.group();
     this.groupsService.updateGroup(this.orgId(), g.id, { id: g.id, name }).subscribe({
-      next: () => this.dataChanged.emit(),
+      next: () => {
+        this.dataChanged.emit();
+        this.closed.emit();
+      },
       error: () => this.saveErrors.set(['Failed to save. Please try again.']),
     });
   }
