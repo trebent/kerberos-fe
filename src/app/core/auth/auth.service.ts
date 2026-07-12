@@ -61,6 +61,7 @@ export class AuthService {
     const isSuper = localStorage.getItem(this.sessionSuperLocalStorageKey) === 'true';
 
     if (isSuper) {
+      console.debug('Refreshing superuser session.');
       return this.userService.refreshSuperuserSession().pipe(
         tap({
           next: () => {
@@ -78,6 +79,7 @@ export class AuthService {
         })
       );
     } else {
+      console.debug('Refreshing user session.');
       return this.userService.refreshUserSession().pipe(
         tap({
           next: () => {
@@ -85,12 +87,12 @@ export class AuthService {
             this.onLogin('', 0, false);
           },
         }),
+        switchMap(() => this.getMe()),
         catchError((error) => {
           console.error('Error during superuser session refresh:', error);
           this.onLogout();
           return of(null);
         }),
-        switchMap(() => this.getMe())
       );
     }
   }
@@ -126,7 +128,10 @@ export class AuthService {
     return this.userService.logout().pipe(
       tap({
         next: () => this.onLogout(),
-        error: () => console.error('Logout failed'),
+        error: () => {
+          console.error('Logout failed');
+          this.onLogout();
+        },
       })
     );
   }

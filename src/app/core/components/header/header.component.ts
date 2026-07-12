@@ -23,20 +23,14 @@ export class HeaderComponent {
   logout(): void {
     if (this.authService.isSuperuser()) {
       this.authService.superLogout().subscribe({
-        next: () => {
+        complete: () => {
           this.router.navigate(['/login']);
-        },
-        error: (error: Error) => {
-          console.error(error);
         },
       });
     } else {
       this.authService.logout().subscribe({
-        next: () => {
+        complete: () => {
           this.router.navigate(['/login']);
-        },
-        error: (error: Error) => {
-          console.error(error);
         },
       });
     }
