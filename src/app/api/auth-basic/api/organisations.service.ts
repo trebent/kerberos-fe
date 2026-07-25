@@ -43,7 +43,7 @@ export class OrganisationsService extends BaseService {
 
     /**
      * @endpoint post /api/auth/basic/organisations
-     * @param createOrganisationRequest 
+     * @param createOrganisationRequest A request to create a new organisation.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
@@ -58,8 +58,7 @@ export class OrganisationsService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -126,8 +125,7 @@ export class OrganisationsService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -184,8 +182,7 @@ export class OrganisationsService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -238,8 +235,7 @@ export class OrganisationsService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'
@@ -300,8 +296,7 @@ export class OrganisationsService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

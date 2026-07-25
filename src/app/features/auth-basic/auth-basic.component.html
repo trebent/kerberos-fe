@@ -1,0 +1,5 @@
+<div class="subsection-container">
+  <app-organisations-list (orgSelected)="selectedOrgId.set($event)" />
+  <app-org-users-list [orgId]="selectedOrgId()" />
+  <app-org-groups-list [orgId]="selectedOrgId()" />
+</div>

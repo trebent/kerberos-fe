@@ -1,5 +1,5 @@
 export * from './api-error-response';
-export * from './change-user-password-request';
+export * from './change-superuser-password-request';
 export * from './create-group-request';
 export * from './create-user-request';
 export * from './debug-session';
@@ -20,6 +20,7 @@ export * from './flow-transition';
 export * from './flow-transition-result';
 export * from './group';
 export * from './login-superuser-request';
+export * from './me-response';
 export * from './permission';
 export * from './start-debug-session-request';
 export * from './update-user-groups-request';

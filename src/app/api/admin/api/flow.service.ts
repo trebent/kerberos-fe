@@ -50,8 +50,7 @@ export class FlowService extends BaseService {
 
         let localVarHeaders = this.defaultHeaders;
 
-        // authentication (sessionid) required
-        localVarHeaders = this.configuration.addCredentialToHeaders('sessionid', 'x-krb-session', localVarHeaders);
+        // authentication (cookieAuth) required
 
         const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
             'application/json'

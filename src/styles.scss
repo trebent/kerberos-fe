@@ -7,23 +7,20 @@
 
 html {
   height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+  @include mat.theme((color: (primary: mat.$cyan-palette,
+        tertiary: mat.$orange-palette,
       ),
       typography: Roboto,
       density: 0,
-    )
-  );
+    ));
+  @include mat.system-classes();
 }
 
 body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.
-  color-scheme: light;
+  color-scheme: light dark;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -36,4 +33,33 @@ body {
   margin: 0;
   height: 100%;
 }
-/* You can add global styles to this file, and also import other style files */
+
+.flow-meta-tooltip {
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 12px;
+  text-align: left;
+
+  .mdc-tooltip__surface {
+    font-family: monospace;
+    font-size: 12px;
+    text-align: left;
+  }
+}
+
+.card-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.card-content {
+  padding: 0.5rem 1rem;
+}
+
+span.success-message {
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-body-medium);
+}

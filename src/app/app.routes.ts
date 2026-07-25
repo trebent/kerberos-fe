@@ -12,6 +12,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./core/landing/landing.component').then(m => m.LandingComponent),
     canActivate: [authGuard],
+    canActivateChild: [authGuard],
     children: [
       {
         path: 'flow',

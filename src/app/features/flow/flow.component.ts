@@ -1,19 +1,99 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { FlowService } from '../../api/admin/api/flow.service';
+import { DebugSessionCall } from '../../api/admin/model/debug-session-call';
+import { FlowMetaDataOAS } from '../../api/admin/model/flow-meta-data-oas';
+import { FlowMetaDataRouter } from '../../api/admin/model/flow-meta-data-router';
 import { DebugComponent } from './debug/debug.component';
+import { FlowPipelineComponent } from './flow-pipeline/flow-pipeline.component';
 import { OasComponent } from './oas/oas.component';
+import { ErrorDisplayComponent } from '../../shared/components/error-display/error-display.component';
 
 @Component({
   selector: 'app-flow',
-  template: `
-    <h2>Flow</h2>
-    <p>Flow — not yet implemented.</p>
-
-    <h3>Debug</h3>
-    <app-debug />
-
-    <h3>OAS</h3>
-    <app-oas />
-  `,
-  imports: [DebugComponent, OasComponent],
+  templateUrl: './flow.component.html',
+  styleUrl: './flow.component.scss',
+  imports: [
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    DebugComponent,
+    FlowPipelineComponent,
+    ErrorDisplayComponent,
+    OasComponent,
+  ],
 })
-export class FlowComponent {}
+export class FlowComponent {
+  private readonly flowService = inject(FlowService);
+
+  readonly flowResource = rxResource({
+    stream: () => this.flowService.getFlow(),
+  });
+
+  readonly oasBackends = computed<string[]>(() => {
+    if (!this.flowResource.hasValue()) return [];
+    const flow = this.flowResource.value();
+    if (!flow) return [];
+    const oasComp = flow.find(c => c.name === 'oas-validator');
+    if (!oasComp) return [];
+    return (oasComp.data as unknown as FlowMetaDataOAS).backends ?? [];
+  });
+
+  readonly routerBackends = computed<string[]>(() => {
+    if (!this.flowResource.hasValue()) return [];
+    const flow = this.flowResource.value();
+    if (!flow) return [];
+    const routerComp = flow.find(c => c.name === 'router');
+    if (!routerComp) return [];
+    return (routerComp.data as unknown as FlowMetaDataRouter).backends?.map(b => b.name) ?? [];
+  });
+
+  readonly drawerOpen = signal(false);
+  readonly oasExpanded = signal(false);
+  readonly selectedOASBackend = signal<string | null>(null);
+  readonly debugOpen = signal(false);
+  readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
+
+  toggleDrawer(): void {
+    this.drawerOpen.update(open => !open);
+  }
+
+  toggleOASSection(): void {
+    if (this.oasBackends().length === 0) return;
+    this.oasExpanded.update(expanded => !expanded);
+  }
+
+  selectOASBackend(backend: string): void {
+    if (this.selectedOASBackend() === backend) {
+      this.selectedOASBackend.set(null);
+      return;
+    }
+
+    this.selectedOASBackend.set(backend);
+    this.debugOpen.set(false);
+    this.drawerOpen.set(true);
+  }
+
+  closeOAS(): void {
+    this.selectedOASBackend.set(null);
+  }
+
+  onDebugClick(): void {
+    this.selectedOASBackend.set(null);
+    this.debugOpen.update(open => !open);
+  }
+
+  closeDebug(): void {
+    this.debugOpen.set(false);
+    this.selectedDebugCall.set(null);
+  }
+
+  onDebugCallSelected(call: DebugSessionCall | null): void {
+    this.selectedDebugCall.set(call);
+  }
+}
