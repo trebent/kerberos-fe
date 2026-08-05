@@ -94,13 +94,18 @@ export class FlowPipelineComponent {
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
 
-  shouldShowSkipped(compName: string, direction: 'inbound' | 'outbound'): boolean {
+  shouldShowNA(compName: string): boolean {
+    const eb = this.effectiveBackend();
+    if (!eb) return false;
+    return !(this.involvedMap().get(eb)?.has(compName) ?? false);
+  }
+
+  shouldShowNone(compName: string, direction: 'inbound' | 'outbound'): boolean {
     const eb = this.effectiveBackend();
     if (!eb) return false;
     const involved = this.involvedMap().get(eb)?.has(compName) ?? false;
-    if (!involved) return true;
-    if (this.selectedCall() && this.getTransitions(compName, direction).length === 0) return true;
-    return false;
+    if (!involved) return false;
+    return !!(this.selectedCall() && this.getTransitions(compName, direction).length === 0);
   }
 
   getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
