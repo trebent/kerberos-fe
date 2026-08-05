@@ -35,6 +35,7 @@ export class DebugComponent {
   readonly backends = input.required<string[]>();
   readonly closed = output<void>();
   readonly callSelected = output<DebugSessionCall | null>();
+  readonly backendChange = output<string | null>();
 
   readonly selectedBackend = signal<string | null>(null);
   readonly sessions = signal<DebugSession[]>([]);
@@ -67,6 +68,7 @@ export class DebugComponent {
   constructor() {
     effect(() => {
       const backend = this.selectedBackend();
+      this.backendChange.emit(backend);
       this.sessions.set([]);
       this.selectedSessionId.set(null);
       this._resetCallState();

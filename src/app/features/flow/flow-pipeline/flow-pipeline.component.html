@@ -49,6 +49,9 @@
                   matTooltipClass="flow-meta-tooltip"
                 >{{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}</div>
               }
+              @if (shouldShowSkipped(comp.name, 'inbound')) {
+                <div class="transition-badge skipped">skipped</div>
+              }
             </div>
             <div
               class="flow-box"
@@ -68,6 +71,9 @@
                   [matTooltip]="formatTransitionTooltip(t)"
                   matTooltipClass="flow-meta-tooltip"
                 >{{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}</div>
+              }
+              @if (shouldShowSkipped(comp.name, 'outbound')) {
+                <div class="transition-badge skipped">skipped</div>
               }
             </div>
           </div>
