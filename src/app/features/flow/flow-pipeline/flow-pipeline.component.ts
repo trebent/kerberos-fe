@@ -113,6 +113,12 @@ export class FlowPipelineComponent {
     return entry ? entry[direction] : [];
   }
 
+  callDuration(call: DebugSessionCall): string {
+    if (!call.stoppedAt) return '—';
+    const ms = new Date(call.stoppedAt).getTime() - new Date(call.startedAt).getTime();
+    return `${ms}ms`;
+  }
+
   formatTransitionTooltip(t: FlowTransition): string {
     const lines = [
       `Started:  ${this.formatTimestamp(t.startedAt)}`,

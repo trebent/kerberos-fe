@@ -31,6 +31,10 @@
         <span class="meta-label">Stopped</span>
         <span class="meta-value">{{ call.stoppedAt | date: 'medium' }}</span>
       </div>
+      <div class="meta-row">
+        <span class="meta-label">Duration</span>
+        <span class="meta-value mono">{{ callDuration(call) }}</span>
+      </div>
     </div>
   }
   <div class="flow-card">
