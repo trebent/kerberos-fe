@@ -8,6 +8,12 @@
   min-width: 32rem;
 }
 
+.card-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .debug-body {
   display: flex;
   flex-direction: column;
