@@ -49,6 +49,12 @@
                   matTooltipClass="flow-meta-tooltip"
                 >{{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}</div>
               }
+              @if (shouldShowNA(comp.name)) {
+                <div class="transition-badge na">n/a</div>
+              }
+              @if (shouldShowNone(comp.name, 'inbound')) {
+                <div class="transition-badge none">none</div>
+              }
             </div>
             <div
               class="flow-box"
@@ -68,6 +74,12 @@
                   [matTooltip]="formatTransitionTooltip(t)"
                   matTooltipClass="flow-meta-tooltip"
                 >{{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}</div>
+              }
+              @if (shouldShowNA(comp.name)) {
+                <div class="transition-badge na">n/a</div>
+              }
+              @if (shouldShowNone(comp.name, 'outbound')) {
+                <div class="transition-badge none">none</div>
               }
             </div>
           </div>

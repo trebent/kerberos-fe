@@ -27,6 +27,7 @@ export class FlowPipelineComponent {
   readonly isLoading = input<boolean>(false);
   readonly hasError = input<boolean>(false);
   readonly selectedCall = input<DebugSessionCall | null>(null);
+  readonly callBackend = input<string | null>(null);
 
   readonly hasValue = computed(() => this.flowMetas() != null);
 
@@ -40,7 +41,9 @@ export class FlowPipelineComponent {
 
   readonly hoveredBackend = signal<string | null>(null);
 
-  private static readonly ALWAYS_INVOLVED = new Set(['observability', 'router', 'forwarder']);
+  readonly effectiveBackend = computed<string | null>(() => this.callBackend() ?? this.hoveredBackend());
+
+  private static readonly ALWAYS_INVOLVED = new Set(['obs', 'router', 'forwarder']);
 
   readonly transitionsByComponent = computed<Map<string, { inbound: FlowTransition[], outbound: FlowTransition[] }>>(() => {
     const call = this.selectedCall();
@@ -91,21 +94,40 @@ export class FlowPipelineComponent {
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
 
+  shouldShowNA(compName: string): boolean {
+    const eb = this.effectiveBackend();
+    if (!eb) return false;
+    return !(this.involvedMap().get(eb)?.has(compName) ?? false);
+  }
+
+  shouldShowNone(compName: string, direction: 'inbound' | 'outbound'): boolean {
+    const eb = this.effectiveBackend();
+    if (!eb) return false;
+    const involved = this.involvedMap().get(eb)?.has(compName) ?? false;
+    if (!involved) return false;
+    return !!(this.selectedCall() && this.getTransitions(compName, direction).length === 0);
+  }
+
   getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
     const entry = this.transitionsByComponent().get(compName);
     return entry ? entry[direction] : [];
   }
 
   formatTransitionTooltip(t: FlowTransition): string {
-    const fmt = (iso: string) => new Date(iso).toLocaleString();
     const lines = [
-      `Started:  ${fmt(t.startedAt)}`,
-      `Stopped:  ${fmt(t.stoppedAt)}`,
+      `Started:  ${this.formatTimestamp(t.startedAt)}`,
+      `Stopped:  ${this.formatTimestamp(t.stoppedAt)}`,
     ];
     if (t.result.outcome === 'failure' && t.result.cause) {
       lines.push(`Error:    ${t.result.cause}`);
     }
     return lines.join('\n');
+  }
+
+  private formatTimestamp(iso: string): string {
+    const match = /T(\d{2}:\d{2}:\d{2}(?:\.\d+)?)/.exec(iso);
+    const timePart = match ? match[1] : iso;
+    return `${new Date(iso).toLocaleDateString()} ${timePart}`;
   }
 
   private hasBackendInTree(data: unknown, name: string): boolean {

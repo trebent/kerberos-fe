@@ -93,6 +93,20 @@
     background: color-mix(in srgb, #c62828 14%, transparent);
     border: 1px solid color-mix(in srgb, #c62828 30%, transparent);
   }
+
+  &.none {
+    color: var(--mat-sys-on-surface-variant);
+    background: color-mix(in srgb, var(--mat-sys-on-surface-variant) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mat-sys-on-surface-variant) 20%, transparent);
+  }
+
+  &.na {
+    color: var(--mat-sys-outline);
+    background: transparent;
+    border: 1px dashed var(--mat-sys-outline-variant);
+    opacity: 0.6;
+    font-weight: 500;
+  }
 }
 
 .flow-box {

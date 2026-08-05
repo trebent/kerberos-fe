@@ -32,12 +32,12 @@
     }
 
     @if (debugOpen()) {
-    <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" />
+    <app-debug [backends]="routerBackends()" (closed)="closeDebug()" (callSelected)="onDebugCallSelected($event)" (backendChange)="selectedDebugBackend.set($event)" />
     }
 
     @if (flowResource.hasValue()) {
     <app-flow-pipeline [flowMetas]="flowResource.value()" [isLoading]="flowResource.isLoading()"
-      [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" />
+      [hasError]="!!flowResource.error()" [selectedCall]="selectedDebugCall()" [callBackend]="selectedDebugBackend()" />
     }
 
     @if (flowResource.error()) {

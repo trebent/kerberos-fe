@@ -58,6 +58,7 @@ export class FlowComponent {
   readonly selectedOASBackend = signal<string | null>(null);
   readonly debugOpen = signal(false);
   readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
+  readonly selectedDebugBackend = signal<string | null>(null);
 
   toggleDrawer(): void {
     this.drawerOpen.update(open => !open);
@@ -91,6 +92,7 @@ export class FlowComponent {
   closeDebug(): void {
     this.debugOpen.set(false);
     this.selectedDebugCall.set(null);
+    this.selectedDebugBackend.set(null);
   }
 
   onDebugCallSelected(call: DebugSessionCall | null): void {
