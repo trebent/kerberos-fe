@@ -18,3 +18,6 @@ test:
 
 run:
 	npm run start
+
+run/staging:
+	npm run start-staging
