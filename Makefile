@@ -20,4 +20,6 @@ run:
 	npm run start
 
 run/staging:
+	test/certs/make_certs.sh
+
 	npm run start-staging
