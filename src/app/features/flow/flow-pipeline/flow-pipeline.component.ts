@@ -95,6 +95,7 @@ export class FlowPipelineComponent {
   }
 
   shouldShowNA(compName: string): boolean {
+    if (!this.selectedCall()) return false;
     const eb = this.effectiveBackend();
     if (!eb) return false;
     return !(this.involvedMap().get(eb)?.has(compName) ?? false);
