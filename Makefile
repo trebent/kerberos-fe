@@ -10,8 +10,11 @@ codegen:
 lint:
 	npm run lint
 
-build:
-	npm run build
+build/dev:
+	npm run build-dev
+
+build/prod:
+	npm run build-prod
 
 test:
 	npm run test -- --watch=false

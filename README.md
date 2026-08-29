@@ -5,7 +5,7 @@ Angular SPA for the [Kerberos](https://github.com/maansaake/kerberos) API gatewa
 ## Tech stack
 
 | Concern | Choice |
-|---|---|
+| --- | --- |
 | Framework | Angular 21 (standalone components + Signals) |
 | Design system | Angular Material (Azure/Blue theme) |
 | API clients | Generated via `openapi-generator-cli` (`typescript-angular`) |
@@ -34,10 +34,11 @@ npm start
 ## Commands
 
 | Command | Description |
-|---|---|
+| --- | --- |
 | `make codegen` | Regenerate typed API clients from OAS specs |
 | `make lint` | Run ESLint |
-| `make build` | Production build |
+| `make build/dev` | Development build |
+| `make build/prod` | Production build |
 | `make test` | Run unit tests (headless) |
 
 ## API client codegen
@@ -45,7 +46,7 @@ npm start
 Typed clients are generated from the Kerberos OAS specs:
 
 | OAS spec | Output |
-|---|---|
+| --- | --- |
 | `openapi/admin.yaml` | `src/app/api/admin/` |
 | `openapi/auth_basic.yaml` | `src/app/api/auth-basic/` |
 

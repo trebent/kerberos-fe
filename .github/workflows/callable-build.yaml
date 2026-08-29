@@ -33,4 +33,4 @@ jobs:
           fi
 
       - name: Build
-        run: make build
+        run: make build/dev
