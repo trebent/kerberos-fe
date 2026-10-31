@@ -1,31 +1,40 @@
 .PHONY: codegen lint build test
 
 install:
-	npm install
+	npm ci
+
+install/cli:
+	npm install -g @angular/cli
 
 codegen:
 	npm run codegen-admin
 	npm run codegen-auth-basic
 
+format:
+	npx prettier --write .
+
+format/check:
+	npx prettier --check .
+
 lint:
-	npm run lint
+	ng lint --fix
+
+lint/ci:
+	ng lint
 
 build/dev:
-	npm run build-dev
+	ng build --configuration development
 
 build/prod:
-	npm run build-prod
+	ng build
 
 test:
-	npm run test -- --watch=false
+	ng test --watch false
 
-run:
-	npm run start
+serve:
+	ng serve
 
-run-other:
-	ng serve --port 4199
-
-run/staging:
+serve/staging:
 	test/certs/make_certs.sh
 
-	npm run start-staging
+	ng serve --configuration staging

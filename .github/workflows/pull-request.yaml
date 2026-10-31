@@ -9,9 +9,6 @@ permissions:
   contents: read
 
 jobs:
-  static-analysis:
-    uses: ./.github/workflows/callable-static-analysis.yaml
-
   build:
     uses: ./.github/workflows/callable-build.yaml
 
