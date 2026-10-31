@@ -7,8 +7,8 @@ install/cli:
 	npm install -g @angular/cli
 
 codegen:
-	npm run codegen-admin
-	npm run codegen-auth-basic
+	npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/api/admin --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case
+	npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/api/auth-basic --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case
 
 format:
 	npx prettier --write .
