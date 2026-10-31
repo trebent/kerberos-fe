@@ -1,35 +1,32 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth.guard';
+
+import { authGuard, guestGuard } from './guards/auth.guards';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'flow' },
   {
     path: 'login',
-    loadComponent: () =>
-      import('./features/login/login.component').then(m => m.LoginComponent),
+    title: 'Log in · Kerberos',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },
   {
-    path: '',
-    loadComponent: () =>
-      import('./core/landing/landing.component').then(m => m.LandingComponent),
+    path: 'flow',
+    title: 'Flow · Kerberos',
     canActivate: [authGuard],
-    canActivateChild: [authGuard],
-    children: [
-      {
-        path: 'flow',
-        loadComponent: () =>
-          import('./features/flow/flow.component').then(m => m.FlowComponent),
-      },
-      {
-        path: 'user-mgmt',
-        loadComponent: () =>
-          import('./features/user-mgmt/user-mgmt.component').then(m => m.UserMgmtComponent),
-      },
-      {
-        path: 'auth-basic',
-        loadComponent: () =>
-          import('./features/auth-basic/auth-basic.component').then(m => m.AuthBasicComponent),
-      },
-    ],
+    loadComponent: () => import('./pages/flow/flow').then((m) => m.Flow),
+  },
+  {
+    path: 'user-mgmt',
+    title: 'Users · Kerberos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/user-mgmt/user-mgmt').then((m) => m.UserMgmt),
+  },
+  {
+    path: 'auth-basic',
+    title: 'Basic authentication · Kerberos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/auth-basic/auth-basic').then((m) => m.AuthBasic),
   },
   { path: '**', redirectTo: '' },
 ];

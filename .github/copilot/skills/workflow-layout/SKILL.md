@@ -1,9 +1,9 @@
 ---
 name: workflow-layout
 description: >-
-    Documents the GitHub Actions workflow structure used in this repository:
-    how workflows are triggered, which are reusable, how they depend on each other,
-    and how other repositories can adopt the same layout.
+  Documents the GitHub Actions workflow structure used in this repository:
+  how workflows are triggered, which are reusable, how they depend on each other,
+  and how other repositories can adopt the same layout.
 user-invocable: true
 ---
 
@@ -24,11 +24,11 @@ Orchestrator workflows are the only ones that listen for real GitHub events. The
 
 Runs every time a commit lands on `main`. Jobs:
 
-| Job | Reusable workflow | `needs` |
-|-----|-------------------|---------|
-| `go` | `.github/workflows/go.yaml` | — |
-| `py` | `.github/workflows/py.yaml` | — |
-| `image` | `.github/workflows/image.yaml` (`push: false`) | `go` |
+| Job     | Reusable workflow                              | `needs` |
+| ------- | ---------------------------------------------- | ------- |
+| `go`    | `.github/workflows/go.yaml`                    | —       |
+| `py`    | `.github/workflows/py.yaml`                    | —       |
+| `image` | `.github/workflows/image.yaml` (`push: false`) | `go`    |
 
 The image is built but **not pushed** on a plain push to `main`; pushing only happens on a
 GitHub release (see `image.yaml` below).
@@ -40,11 +40,11 @@ GitHub release (see `image.yaml` below).
 Validates every PR before merge. Jobs mirror `main.yaml` exactly, with `version: "latest"`
 passed to the image workflow, and `push: false` so no image is published.
 
-| Job | Reusable workflow | `needs` |
-|-----|-------------------|---------|
-| `go` | `.github/workflows/go.yaml` | — |
-| `py` | `.github/workflows/py.yaml` | — |
-| `image` | `.github/workflows/image.yaml` (`version: "latest"`, `push: false`) | `go` |
+| Job     | Reusable workflow                                                   | `needs` |
+| ------- | ------------------------------------------------------------------- | ------- |
+| `go`    | `.github/workflows/go.yaml`                                         | —       |
+| `py`    | `.github/workflows/py.yaml`                                         | —       |
+| `image` | `.github/workflows/image.yaml` (`version: "latest"`, `push: false`) | `go`    |
 
 ## Reusable workflows (`workflow_call`)
 
@@ -75,10 +75,10 @@ orchestrators do not need to grant more than `contents: read` by default.
 
 **Inputs:**
 
-| Input | Type | Default | Description |
-|-------|------|---------|-------------|
-| `version` | string | `"latest"` | Tag to apply to the image |
-| `push` | boolean | `false` | Whether to push to `ghcr.io` |
+| Input     | Type    | Default    | Description                  |
+| --------- | ------- | ---------- | ---------------------------- |
+| `version` | string  | `"latest"` | Tag to apply to the image    |
+| `push`    | boolean | `false`    | Whether to push to `ghcr.io` |
 
 **Also triggered by:** `release: published` (directly, without an orchestrator)
 
@@ -130,12 +130,12 @@ workflow can approve and merge PRs from the `dependabot[bot]` actor.
 Dependabot runs weekly checks across four ecosystems, each grouped into `minor` and
 `patches` update groups to reduce PR noise:
 
-| Ecosystem | Directory |
-|-----------|-----------|
-| `gomod` | `/sample-go-app` |
-| `pip` | `/sample-py-app` |
-| `docker` | `/sample-go-app` |
-| `github-actions` | `/` |
+| Ecosystem        | Directory        |
+| ---------------- | ---------------- |
+| `gomod`          | `/sample-go-app` |
+| `pip`            | `/sample-py-app` |
+| `docker`         | `/sample-go-app` |
+| `github-actions` | `/`              |
 
 ## Key conventions
 

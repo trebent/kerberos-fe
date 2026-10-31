@@ -1,0 +1,61 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  border-radius: 0.75rem;
+}
+
+.action-bar {
+  margin-bottom: 16px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .form-actions {
+    display: flex;
+    margin-top: 1rem;
+  }
+
+  mat-form-field {
+    min-width: 15rem;
+  }
+}
+
+mat-divider {
+  margin: 0.5rem 0;
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+td.mat-column-actions,
+th.mat-column-actions {
+  background: var(--mat-table-background-color, var(--mat-sys-surface));
+  white-space: nowrap;
+  text-align: center;
+  width: 10rem;
+}
+
+.permissions-fieldset {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.permissions-fieldset legend {
+  font: var(--mat-sys-label-medium);
+  padding: 0 0.25rem;
+}

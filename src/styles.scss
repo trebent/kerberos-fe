@@ -1,37 +1,105 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// The whole Material 3 theme is defined here, once. Components only ever consume the
+// generated `--mat-sys-*` system variables, never hard-coded colors.
+// See https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
 html {
-  height: 100%;
-  @include mat.theme((color: (primary: mat.$cyan-palette,
+  // Follow the operating system's light/dark preference.
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$cyan-palette,
         tertiary: mat.$orange-palette,
       ),
       typography: Roboto,
       density: 0,
-    ));
+    )
+  );
   @include mat.system-classes();
+
+  // Material 3 has no "success" role; this pair keeps AA contrast on surfaces in both modes.
+  --app-success: light-dark(#1a7f3c, #7dd99a);
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light dark;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
+  margin: 0;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
+}
 
-  // Reset the user agent margin.
+a {
+  color: var(--mat-sys-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+// Page containers shared by every routed page.
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 2rem 1rem;
+}
+
+.page-narrow {
+  max-width: 30rem;
+}
+
+// Dashboards that need the full viewport width.
+.page-wide {
+  max-width: none;
+  padding-inline: 1.5rem;
+}
+
+.page-title {
+  margin: 0 0 1.5rem;
+  font: var(--mat-sys-headline-medium);
+}
+
+.section-title {
   margin: 0;
-  height: 100%;
+  font: var(--mat-sys-title-large);
+}
+
+// A vertical stack of Material form fields with a full-width submit button.
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  [type='submit'] {
+    min-height: 48px;
+    margin-block-start: 0.5rem;
+  }
+}
+
+// Section cards used by the management pages.
+.card-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.card-content {
+  padding: 0.5rem 1rem;
+}
+
+.success-message {
+  color: var(--app-success);
+  font: var(--mat-sys-body-medium);
 }
 
 .flow-meta-tooltip {
@@ -47,19 +115,11 @@ body {
   }
 }
 
-.card-header-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-}
-
-.card-content {
-  padding: 0.5rem 1rem;
-}
-
-span.success-message {
-  color: var(--mat-sys-primary);
-  font: var(--mat-sys-body-medium);
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

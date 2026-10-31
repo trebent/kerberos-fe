@@ -1,0 +1,27 @@
+<header>
+  <mat-toolbar class="toolbar">
+    <a class="brand" routerLink="/">Kerberos</a>
+
+    @if (auth.isLoggedIn()) {
+      <nav class="nav-links" aria-label="Main">
+        @for (link of links; track link.path) {
+          <a
+            matButton
+            [routerLink]="link.path"
+            routerLinkActive="active-nav-link"
+            ariaCurrentWhenActive="page"
+          >
+            {{ link.label }}
+          </a>
+        }
+      </nav>
+    }
+
+    <span class="spacer"></span>
+
+    @if (auth.isLoggedIn()) {
+      <span class="user-info">Logged in as {{ auth.username() }}</span>
+      <button matButton="outlined" type="button" (click)="logout()">Log out</button>
+    }
+  </mat-toolbar>
+</header>

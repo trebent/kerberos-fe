@@ -1,0 +1,9 @@
+<div class="page page-wide">
+  <h1 class="page-title">Basic authentication</h1>
+
+  <div class="subsection-container">
+    <app-organisations-list (orgSelected)="selectedOrgId.set($event)" />
+    <app-org-users-list [orgId]="selectedOrgId()" />
+    <app-org-groups-list [orgId]="selectedOrgId()" />
+  </div>
+</div>

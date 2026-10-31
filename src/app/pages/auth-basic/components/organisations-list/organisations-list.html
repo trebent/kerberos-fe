@@ -1,0 +1,105 @@
+<div class="card-header-container">
+  <h2 class="section-title">Organisations</h2>
+</div>
+<div class="card-content">
+  <h3>Create Organisation</h3>
+  @if (createErrors().length) {
+    <app-error-display [errors]="createErrors()" />
+  }
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button matButton="filled" type="submit" [disabled]="createForm.invalid">Create</button>
+    </div>
+  </form>
+
+  @if (newOrgCredentials()) {
+    <section class="credentials-box">
+      <strong
+        >Organisation created — save these admin credentials now, they will not be shown
+        again.</strong
+      >
+      <p>
+        Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code>
+      </p>
+      <p>
+        Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code>
+      </p>
+      <button matButton type="button" (click)="dismissCredentials()">Dismiss</button>
+    </section>
+  }
+
+  <mat-divider />
+  <h3>All organisations</h3>
+
+  @if (orgsResource.error()) {
+    <app-error-display [errors]="['Failed to load organisations.']" />
+  }
+  @if (orgsResource.isLoading()) {
+    <mat-spinner diameter="32" aria-label="Loading" />
+  }
+
+  <mat-form-field class="filter-field">
+    <mat-label>Filter</mat-label>
+    <input matInput (input)="applyFilter($event)" placeholder="Ex. my-org" />
+  </mat-form-field>
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let o">{{ o.id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let o">{{ o.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
+        <td mat-cell *matCellDef="let o">
+          <div class="org-actions-container">
+            <button
+              type="button"
+              [matButton]="selectedOrgId() === o.id ? 'filled' : 'outlined'"
+              [attr.aria-pressed]="selectedOrgId() === o.id"
+              [attr.aria-label]="'Select organisation ' + o.name"
+              (click)="toggleManage(o)"
+            >
+              Select
+            </button>
+            <button
+              matIconButton
+              type="button"
+              (click)="openEdit(o)"
+              [attr.aria-label]="'Edit organisation ' + o.name"
+            >
+              <mat-icon aria-hidden="true">edit</mat-icon>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              (click)="deleteOrg(o.id)"
+              [attr.aria-label]="'Delete organisation ' + o.name"
+            >
+              <mat-icon aria-hidden="true">delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons />
+  </div>
+
+  @if (selectedOrg()) {
+    <app-organisation-detail
+      [organisation]="selectedOrg()!"
+      (saved)="onDetailSaved()"
+      (closed)="onDetailClosed()"
+    />
+  }
+</div>

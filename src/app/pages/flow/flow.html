@@ -1,0 +1,89 @@
+<div class="page page-wide">
+  <div class="flow-heading">
+    <button
+      matIconButton
+      type="button"
+      aria-label="Toggle flow tools"
+      aria-controls="flow-tools"
+      [attr.aria-expanded]="sidenav.opened"
+      (click)="sidenav.toggle()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <h1 class="page-title">Flow</h1>
+  </div>
+
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav id="flow-tools" mode="side">
+      <mat-action-list aria-label="Flow tools">
+        <button
+          mat-list-item
+          type="button"
+          [attr.aria-expanded]="oasBackends().length > 0 ? oasExpanded() : null"
+          (click)="toggleOASSection()"
+        >
+          <span matListItemTitle>OAS</span>
+          @if (oasBackends().length > 0) {
+            <span matListItemMeta>
+              <mat-icon class="chevron" [class.expanded]="oasExpanded()" aria-hidden="true"
+                >chevron_right</mat-icon
+              >
+            </span>
+          }
+        </button>
+        @if (oasExpanded()) {
+          @for (backend of oasBackends(); track backend) {
+            <button
+              mat-list-item
+              type="button"
+              class="oas-backend"
+              [attr.aria-pressed]="selectedOASBackend() === backend"
+              (click)="selectOASBackend(backend)"
+            >
+              {{ backend }}
+            </button>
+          }
+        }
+        <button
+          mat-list-item
+          type="button"
+          [attr.aria-pressed]="debugOpen()"
+          (click)="onDebugClick()"
+        >
+          Debug
+        </button>
+      </mat-action-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      @if (selectedOASBackend(); as backend) {
+        <app-oas [backend]="backend" (closed)="closeOAS()" />
+      }
+
+      @if (debugOpen()) {
+        <app-debug
+          [backends]="routerBackends()"
+          (closed)="closeDebug()"
+          (callSelected)="onDebugCallSelected($event)"
+          (backendChange)="selectedDebugBackend.set($event)"
+        />
+      }
+
+      @if (flowResource.hasValue()) {
+        <app-flow-pipeline
+          [flowMetas]="flowResource.value()"
+          [isLoading]="flowResource.isLoading()"
+          [hasError]="!!flowResource.error()"
+          [selectedCall]="selectedDebugCall()"
+          [callBackend]="selectedDebugBackend()"
+        />
+      }
+
+      @if (flowResource.error()) {
+        <app-error-display
+          [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']"
+        />
+      }
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

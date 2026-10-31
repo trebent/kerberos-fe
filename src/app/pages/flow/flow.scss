@@ -1,0 +1,47 @@
+.flow-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .page-title {
+    margin: 0;
+  }
+}
+
+.chevron {
+  transition: transform 150ms ease;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.oas-backend {
+  padding-inline-start: 2rem;
+}
+
+mat-sidenav-container {
+  width: 100%;
+  background: transparent;
+}
+
+mat-sidenav {
+  height: fit-content;
+  padding: 0.25rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface-container);
+}
+
+mat-sidenav-content {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding-inline-start: 1rem;
+
+  app-flow-pipeline,
+  app-error-display {
+    flex: 1;
+  }
+}

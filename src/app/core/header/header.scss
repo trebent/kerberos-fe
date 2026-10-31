@@ -1,0 +1,43 @@
+.toolbar {
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  background: var(--mat-sys-surface-container);
+  border-block-end: 1px solid var(--mat-sys-outline-variant);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  margin-inline-end: 1rem;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-title-large);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.active-nav-link {
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user-info {
+  margin-inline-end: 0.5rem;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  white-space: nowrap;
+}

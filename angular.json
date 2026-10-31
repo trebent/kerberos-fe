@@ -4,9 +4,7 @@
   "cli": {
     "packageManager": "npm",
     "analytics": false,
-    "schematicCollections": [
-      "angular-eslint"
-    ]
+    "schematicCollections": ["angular-eslint"]
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -33,9 +31,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -92,9 +88,7 @@
             },
             "staging": {
               "buildTarget": "kerberos-fe:build:staging",
-              "allowedHosts": [
-                "trebent.test"
-              ],
+              "allowedHosts": ["trebent.test"],
               "ssl": true,
               "sslCert": "test/certs/krb.pem",
               "sslKey": "test/certs/krb-key.pem"
@@ -108,10 +102,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }

@@ -1,0 +1,20 @@
+# Generated OpenAPI clients: regenerate with `make codegen`, never hand-format.
+src/app/services/auth-basic/
+src/app/services/admin/
+
+# Build output and caches
+dist/
+.angular/
+coverage/
+
+package-lock.json
+
+# Vendored agent skills, managed by skills-lock.json
+.agents/
+
+# Local agent settings
+.claude/
+
+# Vendored from Kerberos: keep byte-identical with upstream
+openapi/admin.yaml
+openapi/auth_basic.yaml

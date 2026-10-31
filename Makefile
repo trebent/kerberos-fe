@@ -1,4 +1,4 @@
-.PHONY: codegen lint build test
+default: check
 
 install:
 	npm ci
@@ -7,8 +7,7 @@ install/cli:
 	npm install -g @angular/cli
 
 codegen:
-	npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/api/admin --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case
-	npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/api/auth-basic --additional-properties=ngVersion=21,supportsES6=true,fileNaming=kebab-case
+	npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/admin.yaml -o src/app/services/admin && npx @openapitools/openapi-generator-cli generate -g typescript-angular -i openapi/auth_basic.yaml -o src/app/services/auth-basic
 
 format:
 	npx prettier --write .
@@ -38,3 +37,8 @@ serve/staging:
 	test/certs/make_certs.sh
 
 	ng serve --configuration staging
+
+# Everything CI runs, in order.
+check: format/check lint/ci build/prod test
+
+.PHONY: default install install/cli codegen format format/check lint lint/ci build/dev build/prod test serve serve/staging check

@@ -9,8 +9,8 @@ updates:
     groups:
       npm-updates:
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: github-actions
     directory: /
@@ -20,5 +20,5 @@ updates:
     groups:
       action-updates:
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
