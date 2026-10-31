@@ -22,6 +22,9 @@ test:
 run:
 	npm run start
 
+run-other:
+	ng serve --port 4199
+
 run/staging:
 	test/certs/make_certs.sh
 
