@@ -9,9 +9,6 @@ coverage/
 
 package-lock.json
 
-# Vendored agent skills, managed by skills-lock.json
-.agents/
-
 # Local agent settings
 .claude/
 

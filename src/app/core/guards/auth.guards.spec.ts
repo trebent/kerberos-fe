@@ -6,7 +6,7 @@ import {
   UrlTree,
 } from '@angular/router';
 
-import { createAuthStub, provideAuthStub } from '../../testing/auth-stub';
+import { createAuthStub, provideAuthStub } from '../../../testing/auth-stub';
 import { authGuard, guestGuard } from './auth.guards';
 
 describe('auth guards', () => {

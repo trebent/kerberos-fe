@@ -11,7 +11,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
-import { csrfInterceptor } from './interceptors/csrf.interceptor';
+import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 import { provideApi as provideAdminApi } from './services/admin';
 import { provideApi as provideAuthBasicApi } from './services/auth-basic';
 import { AuthService } from './services/auth.service';
