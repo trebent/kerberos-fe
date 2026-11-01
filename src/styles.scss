@@ -4,7 +4,7 @@
 @use '@angular/material' as mat;
 
 html {
-  // Follow the operating system's light/dark preference.
+  // ThemeService overrides this with `light` or `dark` when the user picks one.
   color-scheme: light dark;
 
   @include mat.theme(

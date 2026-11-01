@@ -15,6 +15,7 @@ import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 import { provideApi as provideAdminApi } from './services/admin';
 import { provideApi as provideAuthBasicApi } from './services/auth-basic';
 import { AuthService } from './services/auth.service';
+import { ThemeService } from './services/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +27,8 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       // index.html loads Material Symbols rather than the legacy Material Icons font.
       inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined');
+      // Apply the saved light/dark preference before the first render.
+      inject(ThemeService);
     }),
     // Restore the session (refresh + current user) before the first navigation.
     provideAppInitializer(() => firstValueFrom(inject(AuthService).init())),

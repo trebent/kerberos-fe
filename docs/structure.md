@@ -7,7 +7,7 @@ their purpose and the placement rules are defined there. This page maps that lay
 ```text
 src/app/
   app.ts, app.html, app.scss   root component: skip link, header, <router-outlet>, footer
-  app.config.ts                providers: router, HTTP, API clients, session restore
+  app.config.ts                providers: router, HTTP, API clients, theme, session restore
   app.routes.ts                lazy routes and guards
   core/                        app-wide pieces, wired up once by the root files
     header/                    app shell, rendered on every page
@@ -27,6 +27,7 @@ src/app/
     error-display/
   services/                    all services, hand-written and generated
     auth.service.ts
+    theme.service.ts           light/dark/system preference, saved in localStorage
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
   utils/                       validation rules, Material table imports

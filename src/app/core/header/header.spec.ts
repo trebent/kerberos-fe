@@ -1,6 +1,10 @@
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatMenuHarness } from '@angular/material/menu/testing';
 import { provideRouter, Router } from '@angular/router';
 
+import { ThemeService } from '../../services/theme.service';
 import { AuthStub, createAuthStub, provideAuthStub } from '../../../testing/auth-stub';
 import { expectNoAxeViolations } from '../../../testing/axe';
 import { Header } from './header';
@@ -9,13 +13,16 @@ describe('Header', () => {
   let auth: AuthStub;
   let fixture: ComponentFixture<Header>;
   let navigate: ReturnType<typeof vi.spyOn>;
+  let loader: HarnessLoader;
 
   beforeEach(async () => {
+    localStorage.clear();
     auth = createAuthStub();
     TestBed.configureTestingModule({ providers: [provideRouter([]), provideAuthStub(auth)] });
     navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
 
     fixture = TestBed.createComponent(Header);
+    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     await fixture.whenStable();
   });
 
@@ -57,5 +64,14 @@ describe('Header', () => {
 
     expect(auth.superLogout).toHaveBeenCalled();
     expect(auth.logout).not.toHaveBeenCalled();
+  });
+
+  it('switches the color theme', async () => {
+    const menu = await loader.getHarness(
+      MatMenuHarness.with({ selector: '[aria-label^="Color theme"]' }),
+    );
+    await menu.clickItem({ text: /Dark/ });
+
+    expect(TestBed.inject(ThemeService).mode()).toBe('dark');
   });
 });

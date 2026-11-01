@@ -1,6 +1,9 @@
 <header>
   <mat-toolbar class="toolbar">
-    <a class="brand" routerLink="/">Kerberos</a>
+    <a class="brand" routerLink="/">
+      <span class="brand-emoji" aria-hidden="true">🐶</span>
+      <span class="brand-name">Kerberos</span>
+    </a>
 
     @if (auth.isLoggedIn()) {
       <nav class="nav-links" aria-label="Main">
@@ -18,6 +21,29 @@
     }
 
     <span class="spacer"></span>
+
+    <button
+      matIconButton
+      type="button"
+      [matMenuTriggerFor]="themeMenu"
+      [attr.aria-label]="'Color theme: ' + currentTheme().label"
+    >
+      <mat-icon>{{ currentTheme().icon }}</mat-icon>
+    </button>
+    <mat-menu #themeMenu="matMenu" aria-label="Color theme">
+      @for (option of themeOptions; track option.mode) {
+        <button
+          mat-menu-item
+          type="button"
+          role="menuitemradio"
+          [attr.aria-checked]="option.mode === theme.mode()"
+          (click)="theme.mode.set(option.mode)"
+        >
+          <mat-icon aria-hidden="true">{{ option.icon }}</mat-icon>
+          <span>{{ option.label }}</span>
+        </button>
+      }
+    </mat-menu>
 
     @if (auth.isLoggedIn()) {
       <span class="user-info">Logged in as {{ auth.username() }}</span>
