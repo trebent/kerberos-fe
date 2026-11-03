@@ -24,6 +24,9 @@ jobs:
           node-version-file: package.json
           cache: npm
 
+      - name: Install Angular CLI
+        run: make install/cli
+
       - name: Install dependencies
         run: make install
 
