@@ -1,3 +1,6 @@
+# Use the project's own Angular CLI (and other npm binaries) so no global install is needed.
+export PATH := $(CURDIR)/node_modules/.bin:$(PATH)
+
 default: check
 
 install:
