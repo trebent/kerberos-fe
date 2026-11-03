@@ -2,6 +2,12 @@ name: Make bundle
 
 on:
   workflow_dispatch:
+    inputs:
+      api-base-url:
+        description: Base URL of the Kerberos API the bundle talks to
+        required: true
+        default: https://api.trebent.se
+        type: string
 
 permissions:
   contents: read
@@ -18,8 +24,26 @@ jobs:
           node-version-file: package.json
           cache: npm
 
+      - name: Install Angular CLI
+        run: make install/cli
+
       - name: Install dependencies
         run: make install
+
+      - name: Set API base URL
+        env:
+          API_BASE_URL: ${{ inputs.api-base-url }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const url = process.env.API_BASE_URL;
+            new URL(url); // fail fast on an invalid URL
+            fs.writeFileSync(
+              "src/environments/environment.prod.ts",
+              `export const environment = {\n  production: true,\n  apiBaseUrl: ${JSON.stringify(url)},\n};\n`,
+            );
+          '
+          cat src/environments/environment.prod.ts
 
       - name: Generate production bundle
         run: make build/prod
