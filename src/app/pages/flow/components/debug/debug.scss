@@ -5,7 +5,6 @@
   border: 1px solid var(--mat-sys-outline-variant);
   background: var(--mat-sys-surface-container);
   border-radius: 0.75rem;
-  min-width: 32rem;
 }
 
 .card-content {
@@ -36,11 +35,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 0 1rem;
 
+  mat-form-field {
+    flex: 1 1 14rem;
+  }
+
+  // Line the button up with the form field's input box rather than its hint area.
   button {
-    margin-left: 1rem;
+    margin-block-end: 1.25rem;
   }
 }
 
@@ -65,6 +69,8 @@
   .meta-actions {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     justify-content: space-between;
     margin-top: 1rem;
   }

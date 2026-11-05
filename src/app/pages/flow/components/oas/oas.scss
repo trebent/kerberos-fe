@@ -13,6 +13,7 @@
 
 .oas-header {
   display: flex;
+  gap: 0.5rem;
   align-items: center;
   justify-content: space-between;
   padding: 8px 8px 8px 16px;
@@ -22,6 +23,7 @@
 
 .oas-body {
   flex: 1;
+  max-height: 70dvh;
   overflow: auto;
   padding: 16px;
 }

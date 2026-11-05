@@ -8,7 +8,6 @@ import { Users } from './components/users/users';
 @Component({
   imports: [Groups, PermissionsList, Profile, Users],
   selector: 'app-user-mgmt',
-  styleUrl: './user-mgmt.scss',
   templateUrl: './user-mgmt.html',
 })
 export class UserMgmt {}

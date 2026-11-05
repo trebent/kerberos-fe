@@ -1,47 +1,73 @@
+// Below this width the tool panel stacks above the pipeline instead of sitting beside it.
+$stack-below: 64rem;
+
 .flow-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-block-end: 1.5rem;
 
   .page-title {
     margin: 0;
   }
 }
 
-.chevron {
-  transition: transform 150ms ease;
+.flow-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 
-  &.expanded {
-    transform: rotate(90deg);
+.tool-label {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-icon {
+  margin-inline: 0 -0.5rem;
+}
+
+.flow-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.flow-panel {
+  flex: 0 1 32rem;
+  min-width: 0;
+}
+
+.flow-main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: $stack-below) {
+  .flow-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flow-panel {
+    flex-basis: auto;
   }
 }
 
-.oas-backend {
-  padding-inline-start: 2rem;
-}
+@media (max-width: 40rem) {
+  .flow-heading {
+    margin-block-end: 1rem;
+  }
 
-mat-sidenav-container {
-  width: 100%;
-  background: transparent;
-}
+  .flow-tools {
+    width: 100%;
 
-mat-sidenav {
-  height: fit-content;
-  padding: 0.25rem;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: var(--mat-sys-corner-medium);
-  background: var(--mat-sys-surface-container);
-}
-
-mat-sidenav-content {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  padding-inline-start: 1rem;
-
-  app-flow-pipeline,
-  app-error-display {
-    flex: 1;
+    > button {
+      flex: 1 1 0;
+    }
   }
 }

@@ -53,4 +53,45 @@ describe('Flow', () => {
     expect(alert?.textContent).toContain('Failed to load flow view.');
     await expectNoAxeViolations(fixture);
   });
+
+  it('opens an OpenAPI specification from the tools menu', async () => {
+    http.expectOne((req) => req.url.endsWith('/api/admin/flow')).flush(flow);
+    await fixture.whenStable();
+
+    // Drive the menu by hand: harnesses wait for stability, which the pending spec request blocks.
+    fixture.nativeElement.querySelector('[aria-label="OpenAPI specification"]').click();
+    await fixture.whenStable();
+    document.querySelector<HTMLButtonElement>('[role="menuitemradio"]')?.click();
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/admin/oas/echo'))
+      .flush(new Blob(['openapi: 3.0.0']));
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('app-oas h2')?.textContent).toContain('echo');
+    expect(element.querySelector('app-oas pre')?.textContent).toContain('openapi: 3.0.0');
+    await expectNoAxeViolations(fixture);
+  });
+
+  it('toggles the debug panel', async () => {
+    http.expectOne((req) => req.url.endsWith('/api/admin/flow')).flush(flow);
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    const debugButton = Array.from(element.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim().endsWith('Debug'),
+    )!;
+    expect(debugButton.getAttribute('aria-pressed')).toBe('false');
+
+    debugButton.click();
+    await fixture.whenStable();
+    expect(debugButton.getAttribute('aria-pressed')).toBe('true');
+    expect(element.querySelector('app-debug')).not.toBeNull();
+    await expectNoAxeViolations(fixture);
+
+    debugButton.click();
+    await fixture.whenStable();
+    expect(element.querySelector('app-debug')).toBeNull();
+  });
 });

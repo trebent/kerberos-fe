@@ -1,74 +1,70 @@
 <div class="page page-wide">
   <div class="flow-heading">
-    <button
-      matIconButton
-      type="button"
-      aria-label="Toggle flow tools"
-      aria-controls="flow-tools"
-      [attr.aria-expanded]="sidenav.opened"
-      (click)="sidenav.toggle()"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
     <h1 class="page-title">Flow</h1>
+
+    <div class="flow-tools" role="toolbar" aria-label="Flow tools">
+      <button
+        type="button"
+        [matButton]="selectedOASBackend() ? 'filled' : 'outlined'"
+        [matMenuTriggerFor]="oasMenu"
+        [disabled]="oasBackends().length === 0"
+        [attr.aria-label]="
+          selectedOASBackend()
+            ? 'OpenAPI specification: ' + selectedOASBackend()
+            : 'OpenAPI specification'
+        "
+      >
+        <mat-icon aria-hidden="true">description</mat-icon>
+        <span class="tool-label">{{ selectedOASBackend() ?? 'OpenAPI spec' }}</span>
+        <mat-icon class="dropdown-icon" aria-hidden="true" iconPositionEnd
+          >arrow_drop_down</mat-icon
+        >
+      </button>
+      <mat-menu #oasMenu="matMenu" xPosition="before" aria-label="OpenAPI specification">
+        @for (backend of oasBackends(); track backend) {
+          <button
+            mat-menu-item
+            type="button"
+            role="menuitemradio"
+            [attr.aria-checked]="selectedOASBackend() === backend"
+            (click)="selectOASBackend(backend)"
+          >
+            <mat-icon aria-hidden="true">{{
+              selectedOASBackend() === backend ? 'check' : 'dns'
+            }}</mat-icon>
+            <span>{{ backend }}</span>
+          </button>
+        }
+      </mat-menu>
+
+      <button
+        type="button"
+        [matButton]="debugOpen() ? 'filled' : 'outlined'"
+        [attr.aria-pressed]="debugOpen()"
+        (click)="onDebugClick()"
+      >
+        <mat-icon aria-hidden="true">bug_report</mat-icon>
+        Debug
+      </button>
+    </div>
   </div>
 
-  <mat-sidenav-container>
-    <mat-sidenav #sidenav id="flow-tools" mode="side">
-      <mat-action-list aria-label="Flow tools">
-        <button
-          mat-list-item
-          type="button"
-          [attr.aria-expanded]="oasBackends().length > 0 ? oasExpanded() : null"
-          (click)="toggleOASSection()"
-        >
-          <span matListItemTitle>OAS</span>
-          @if (oasBackends().length > 0) {
-            <span matListItemMeta>
-              <mat-icon class="chevron" [class.expanded]="oasExpanded()" aria-hidden="true"
-                >chevron_right</mat-icon
-              >
-            </span>
-          }
-        </button>
-        @if (oasExpanded()) {
-          @for (backend of oasBackends(); track backend) {
-            <button
-              mat-list-item
-              type="button"
-              class="oas-backend"
-              [attr.aria-pressed]="selectedOASBackend() === backend"
-              (click)="selectOASBackend(backend)"
-            >
-              {{ backend }}
-            </button>
-          }
-        }
-        <button
-          mat-list-item
-          type="button"
-          [attr.aria-pressed]="debugOpen()"
-          (click)="onDebugClick()"
-        >
-          Debug
-        </button>
-      </mat-action-list>
-    </mat-sidenav>
+  <div class="flow-layout">
+    @if (selectedOASBackend(); as backend) {
+      <app-oas class="flow-panel" [backend]="backend" (closed)="closeOAS()" />
+    }
 
-    <mat-sidenav-content>
-      @if (selectedOASBackend(); as backend) {
-        <app-oas [backend]="backend" (closed)="closeOAS()" />
-      }
+    @if (debugOpen()) {
+      <app-debug
+        class="flow-panel"
+        [backends]="routerBackends()"
+        (closed)="closeDebug()"
+        (callSelected)="onDebugCallSelected($event)"
+        (backendChange)="selectedDebugBackend.set($event)"
+      />
+    }
 
-      @if (debugOpen()) {
-        <app-debug
-          [backends]="routerBackends()"
-          (closed)="closeDebug()"
-          (callSelected)="onDebugCallSelected($event)"
-          (backendChange)="selectedDebugBackend.set($event)"
-        />
-      }
-
+    <div class="flow-main">
       @if (flowResource.hasValue()) {
         <app-flow-pipeline
           [flowMetas]="flowResource.value()"
@@ -84,6 +80,6 @@
           [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']"
         />
       }
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+    </div>
+  </div>
 </div>

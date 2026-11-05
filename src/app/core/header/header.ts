@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -12,6 +13,7 @@ import { ThemeMode, ThemeService } from '../../services/theme.service';
 interface NavLink {
   path: string;
   label: string;
+  icon: string;
 }
 
 interface ThemeOption {
@@ -23,6 +25,7 @@ interface ThemeOption {
 @Component({
   imports: [
     MatButton,
+    MatDivider,
     MatIcon,
     MatIconButton,
     MatMenu,
@@ -42,9 +45,9 @@ export class Header {
   protected readonly theme = inject(ThemeService);
 
   protected readonly links: readonly NavLink[] = [
-    { path: '/flow', label: 'Flow' },
-    { path: '/user-mgmt', label: 'Users' },
-    { path: '/auth-basic', label: 'Basic authentication' },
+    { path: '/flow', label: 'Flow', icon: 'account_tree' },
+    { path: '/user-mgmt', label: 'Users', icon: 'group' },
+    { path: '/auth-basic', label: 'Basic authentication', icon: 'key' },
   ];
 
   protected readonly themeOptions: readonly ThemeOption[] = [

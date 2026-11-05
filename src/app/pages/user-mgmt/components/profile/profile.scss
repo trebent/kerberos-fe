@@ -32,7 +32,7 @@ form {
   align-items: flex-start;
 
   mat-form-field {
-    min-width: 15rem;
+    min-width: min(15rem, 100%);
   }
 }
 

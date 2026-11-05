@@ -1,14 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import {
-  MatActionList,
-  MatListItem,
-  MatListItemMeta,
-  MatListItemTitle,
-} from '@angular/material/list';
-import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 
 import { ErrorDisplay } from '../../components/error-display/error-display';
 import {
@@ -26,15 +20,11 @@ import { Oas } from './components/oas/oas';
     Debug,
     ErrorDisplay,
     FlowPipeline,
-    MatActionList,
+    MatButton,
     MatIcon,
-    MatIconButton,
-    MatListItem,
-    MatListItemMeta,
-    MatListItemTitle,
-    MatSidenav,
-    MatSidenavContainer,
-    MatSidenavContent,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
     Oas,
   ],
   selector: 'app-flow',
@@ -66,21 +56,10 @@ export class Flow {
     return (routerComp.data as unknown as FlowMetaDataRouter).backends?.map((b) => b.name) ?? [];
   });
 
-  readonly drawerOpen = signal(false);
-  readonly oasExpanded = signal(false);
   readonly selectedOASBackend = signal<string | null>(null);
   readonly debugOpen = signal(false);
   readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
   readonly selectedDebugBackend = signal<string | null>(null);
-
-  toggleDrawer(): void {
-    this.drawerOpen.update((open) => !open);
-  }
-
-  toggleOASSection(): void {
-    if (this.oasBackends().length === 0) return;
-    this.oasExpanded.update((expanded) => !expanded);
-  }
 
   selectOASBackend(backend: string): void {
     if (this.selectedOASBackend() === backend) {
@@ -89,8 +68,7 @@ export class Flow {
     }
 
     this.selectedOASBackend.set(backend);
-    this.debugOpen.set(false);
-    this.drawerOpen.set(true);
+    this.closeDebug();
   }
 
   closeOAS(): void {
@@ -98,8 +76,13 @@ export class Flow {
   }
 
   onDebugClick(): void {
+    if (this.debugOpen()) {
+      this.closeDebug();
+      return;
+    }
+
     this.selectedOASBackend.set(null);
-    this.debugOpen.update((open) => !open);
+    this.debugOpen.set(true);
   }
 
   closeDebug(): void {
