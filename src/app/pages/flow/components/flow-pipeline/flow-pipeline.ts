@@ -1,4 +1,16 @@
-import { Component, computed, input, signal } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 
@@ -14,11 +26,15 @@ import { Placeholder, TransitionBadges } from '../transition-badges/transition-b
 
 @Component({
   imports: [CallDetails, MatIcon, MatTooltip, TransitionBadges],
+  host: { '[class.vertical]': 'vertical()' },
   selector: 'app-flow-pipeline',
   styleUrl: './flow-pipeline.scss',
   templateUrl: './flow-pipeline.html',
 })
 export class FlowPipeline {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly card = viewChild.required<ElementRef<HTMLElement>>('card');
+
   readonly flowMetas = input.required<FlowMeta[]>();
   readonly selectedCall = input<DebugSessionCall | null>(null);
   readonly callBackend = input<string | null>(null);
@@ -29,9 +45,56 @@ export class FlowPipeline {
 
   protected readonly hoveredBackend = signal<string | null>(null);
 
+  /** Runs the pipeline top to bottom because it does not fit across the available width. */
+  protected readonly vertical = signal(false);
+  /** The width of the host, kept up to date while the page is resized or panels open. */
+  private readonly availableWidth = signal(0);
+  /** The width the pipeline needed the last time it was laid out horizontally. */
+  private horizontalWidth = 0;
+
   protected readonly effectiveBackend = computed<string | null>(
     () => this.callBackend() ?? this.hoveredBackend(),
   );
+
+  constructor() {
+    this.watchAvailableWidth();
+
+    // New content changes the width a horizontal pipeline needs, so lay it out horizontally
+    // again and measure it. Both layout passes happen before the browser paints.
+    effect(() => {
+      this.flowMetas();
+      this.selectedCall();
+      untracked(() => this.vertical.set(false));
+    });
+
+    afterRenderEffect({
+      earlyRead: () => {
+        this.flowMetas();
+        this.selectedCall();
+        const available = this.availableWidth();
+
+        if (this.vertical()) {
+          return available < this.horizontalWidth;
+        }
+
+        const card = this.card().nativeElement;
+        const border = card.offsetWidth - card.clientWidth;
+        this.horizontalWidth = card.scrollWidth + border;
+        return card.scrollWidth > card.clientWidth;
+      },
+      write: (vertical) => this.vertical.set(vertical()),
+    });
+  }
+
+  private watchAvailableWidth(): void {
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(([entry]) =>
+      this.availableWidth.set(entry.contentRect.width),
+    );
+    observer.observe(this.host.nativeElement);
+    inject(DestroyRef).onDestroy(() => observer.disconnect());
+  }
 
   private static readonly ALWAYS_INVOLVED = new Set(['obs', 'router', 'forwarder']);
 
