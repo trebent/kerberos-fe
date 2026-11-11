@@ -1,10 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTooltip } from '@angular/material/tooltip';
 
-import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import {
   DebugSessionCall,
   FlowMeta,
@@ -14,24 +12,18 @@ import {
 } from '../../../../services/admin';
 
 @Component({
-  imports: [DatePipe, ErrorDisplay, MatIcon, MatProgressSpinner, MatTooltip],
+  imports: [DatePipe, MatIcon, MatTooltip],
   selector: 'app-flow-pipeline',
   styleUrl: './flow-pipeline.scss',
   templateUrl: './flow-pipeline.html',
 })
 export class FlowPipeline {
-  readonly flowMetas = input<FlowMeta[] | null>(null);
-  readonly isLoading = input<boolean>(false);
-  readonly hasError = input<boolean>(false);
+  readonly flowMetas = input.required<FlowMeta[]>();
   readonly selectedCall = input<DebugSessionCall | null>(null);
   readonly callBackend = input<string | null>(null);
 
-  readonly hasValue = computed(() => this.flowMetas() != null);
-
   readonly backends = computed<FlowMetaDataRouterBackend[]>(() => {
-    const flow = this.flowMetas();
-    if (!flow) return [];
-    const router = flow.find((c) => c.name === 'router');
+    const router = this.flowMetas().find((c) => c.name === 'router');
     if (!router) return [];
     return (router.data as unknown as FlowMetaDataRouter).backends ?? [];
   });
@@ -67,8 +59,6 @@ export class FlowPipeline {
 
   readonly involvedMap = computed<Map<string, Set<string>>>(() => {
     const flow = this.flowMetas();
-    if (!flow) return new Map();
-
     const map = new Map<string, Set<string>>();
     for (const backend of this.backends()) {
       const involved = new Set<string>();
@@ -93,7 +83,6 @@ export class FlowPipeline {
 
   isArrowDimmed(index: number): boolean {
     const flow = this.flowMetas();
-    if (!flow) return false;
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
 
