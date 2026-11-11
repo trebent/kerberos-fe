@@ -1,4 +1,5 @@
 import { inject, Service, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
@@ -21,6 +22,7 @@ const REFRESH_INTERVAL_MS = 2 * 60 * 1000;
 @Service()
 export class AuthService {
   private readonly usersService = inject(UsersService);
+  private readonly router = inject(Router);
 
   private readonly _isSuperuser = signal(false);
   readonly isSuperuser = this._isSuperuser.asReadonly();
@@ -89,16 +91,16 @@ export class AuthService {
       tap(() => this.onLogin(username, 0, false)),
       // The login response has no user ID, so load the current user.
       switchMap(() => this.getMe()),
+      // Without the current user the session is unusable, so don't leave it half signed in.
+      catchError((error: unknown) => {
+        this.onLogout();
+        return throwError(() => error);
+      }),
     );
   }
 
   logout(): Observable<null> {
-    return this.usersService.logout().pipe(
-      tap({
-        next: () => this.onLogout(),
-        error: () => this.onLogout(),
-      }),
-    );
+    return this.usersService.logout().pipe(this.signOutLocally());
   }
 
   updateUsername(newUsername: string): Observable<null> {
@@ -124,11 +126,19 @@ export class AuthService {
   }
 
   superLogout(): Observable<null> {
-    return this.usersService.logoutSuperuser().pipe(tap(() => this.onLogout()));
+    return this.usersService.logoutSuperuser().pipe(this.signOutLocally());
   }
 
   superChangePassword(newPassword: string, oldPassword: string): Observable<null> {
     return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
+  }
+
+  /** Signs out locally whether or not the backend accepted the logout. */
+  private signOutLocally() {
+    return tap<null>({
+      next: () => this.onLogout(),
+      error: () => this.onLogout(),
+    });
   }
 
   private onLogin(username: string, userID: number, isSuper: boolean): void {
@@ -167,6 +177,8 @@ export class AuthService {
       error: () => {
         console.error('Failed to refresh the session.');
         this.onLogout();
+        // The current page needs a session, so send the user back to log in.
+        void this.router.navigateByUrl('/login');
       },
     });
   }
