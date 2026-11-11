@@ -57,28 +57,21 @@ export class Flow {
   readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
   readonly selectedDebugBackend = signal<string | null>(null);
 
+  /** Picking the backend that is already shown closes the specification. */
   selectOASBackend(backend: string): void {
-    if (this.selectedOASBackend() === backend) {
-      this.selectedOASBackend.set(null);
-      return;
-    }
-
-    this.selectedOASBackend.set(backend);
-    this.closeDebug();
+    this.selectedOASBackend.update((current) => (current === backend ? null : backend));
   }
 
   closeOAS(): void {
     this.selectedOASBackend.set(null);
   }
 
-  onDebugClick(): void {
+  toggleDebug(): void {
     if (this.debugOpen()) {
       this.closeDebug();
-      return;
+    } else {
+      this.debugOpen.set(true);
     }
-
-    this.selectedOASBackend.set(null);
-    this.debugOpen.set(true);
   }
 
   closeDebug(): void {

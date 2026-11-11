@@ -1,68 +1,72 @@
 <div class="page page-wide">
-  <div class="flow-heading">
-    <h1 class="page-title">Flow</h1>
+  <h1 class="page-title">Flow</h1>
 
-    <div class="flow-tools" role="toolbar" aria-label="Flow tools">
-      <button
-        type="button"
-        [matButton]="selectedOASBackend() ? 'filled' : 'outlined'"
-        [matMenuTriggerFor]="oasMenu"
-        [disabled]="oasBackends().length === 0"
-        [attr.aria-label]="
-          selectedOASBackend()
-            ? 'OpenAPI specification: ' + selectedOASBackend()
-            : 'OpenAPI specification'
-        "
-      >
-        <mat-icon aria-hidden="true">description</mat-icon>
-        <span class="tool-label">{{ selectedOASBackend() ?? 'OpenAPI spec' }}</span>
-        <mat-icon class="dropdown-icon" aria-hidden="true" iconPositionEnd
-          >arrow_drop_down</mat-icon
+  <div class="flow-layout" [class.panel-open]="debugOpen() || selectedOASBackend()">
+    <!-- Each tool's panel opens directly under its button; both can be open at once. -->
+    <div class="flow-tools">
+      <div class="flow-tool">
+        <button
+          type="button"
+          [matButton]="debugOpen() ? 'filled' : 'outlined'"
+          aria-controls="flow-debug-panel"
+          [attr.aria-expanded]="debugOpen()"
+          (click)="toggleDebug()"
         >
-      </button>
-      <mat-menu #oasMenu="matMenu" xPosition="before" aria-label="OpenAPI specification">
-        @for (backend of oasBackends(); track backend) {
-          <button
-            mat-menu-item
-            type="button"
-            role="menuitemradio"
-            [attr.aria-checked]="selectedOASBackend() === backend"
-            (click)="selectOASBackend(backend)"
-          >
-            <mat-icon aria-hidden="true">{{
-              selectedOASBackend() === backend ? 'check' : 'dns'
-            }}</mat-icon>
-            <span>{{ backend }}</span>
-          </button>
+          <mat-icon aria-hidden="true">bug_report</mat-icon>
+          Debug
+        </button>
+
+        @if (debugOpen()) {
+          <app-debug
+            id="flow-debug-panel"
+            [backends]="routerBackends()"
+            (closed)="closeDebug()"
+            (callSelected)="onDebugCallSelected($event)"
+            (backendChange)="selectedDebugBackend.set($event)"
+          />
         }
-      </mat-menu>
+      </div>
 
-      <button
-        type="button"
-        [matButton]="debugOpen() ? 'filled' : 'outlined'"
-        [attr.aria-pressed]="debugOpen()"
-        (click)="onDebugClick()"
-      >
-        <mat-icon aria-hidden="true">bug_report</mat-icon>
-        Debug
-      </button>
+      <div class="flow-tool">
+        <button
+          type="button"
+          [matButton]="selectedOASBackend() ? 'filled' : 'outlined'"
+          [matMenuTriggerFor]="oasMenu"
+          [disabled]="oasBackends().length === 0"
+          [attr.aria-label]="
+            selectedOASBackend()
+              ? 'OpenAPI specification: ' + selectedOASBackend()
+              : 'OpenAPI specification'
+          "
+        >
+          <mat-icon aria-hidden="true">description</mat-icon>
+          <span class="tool-label">{{ selectedOASBackend() ?? 'OpenAPI spec' }}</span>
+          <mat-icon class="dropdown-icon" aria-hidden="true" iconPositionEnd
+            >arrow_drop_down</mat-icon
+          >
+        </button>
+        <mat-menu #oasMenu="matMenu" aria-label="OpenAPI specification">
+          @for (backend of oasBackends(); track backend) {
+            <button
+              mat-menu-item
+              type="button"
+              role="menuitemradio"
+              [attr.aria-checked]="selectedOASBackend() === backend"
+              (click)="selectOASBackend(backend)"
+            >
+              <mat-icon aria-hidden="true">{{
+                selectedOASBackend() === backend ? 'check' : 'dns'
+              }}</mat-icon>
+              <span>{{ backend }}</span>
+            </button>
+          }
+        </mat-menu>
+
+        @if (selectedOASBackend(); as backend) {
+          <app-oas [backend]="backend" (closed)="closeOAS()" />
+        }
+      </div>
     </div>
-  </div>
-
-  <div class="flow-layout">
-    @if (selectedOASBackend(); as backend) {
-      <app-oas class="flow-panel" [backend]="backend" (closed)="closeOAS()" />
-    }
-
-    @if (debugOpen()) {
-      <app-debug
-        class="flow-panel"
-        [backends]="routerBackends()"
-        (closed)="closeDebug()"
-        (callSelected)="onDebugCallSelected($event)"
-        (backendChange)="selectedDebugBackend.set($event)"
-      />
-    }
 
     <div class="flow-main">
       @if (flowResource.isLoading()) {
