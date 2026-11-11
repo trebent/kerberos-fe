@@ -30,6 +30,15 @@ describe('Flow', () => {
 
   afterEach(() => http.verify());
 
+  it('shows a spinner while the flow loads', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('[aria-label="Loading flow"]')).not.toBeNull();
+
+    http.expectOne((req) => req.url.endsWith('/api/admin/flow')).flush(flow);
+    await fixture.whenStable();
+    expect(element.querySelector('[aria-label="Loading flow"]')).toBeNull();
+  });
+
   it('renders the pipeline and its backends', async () => {
     http.expectOne((req) => req.url.endsWith('/api/admin/flow')).flush(flow);
     await fixture.whenStable();

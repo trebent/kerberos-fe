@@ -65,11 +65,13 @@
     }
 
     <div class="flow-main">
+      @if (flowResource.isLoading()) {
+        <mat-spinner diameter="32" aria-label="Loading flow" />
+      }
+
       @if (flowResource.hasValue()) {
         <app-flow-pipeline
           [flowMetas]="flowResource.value()"
-          [isLoading]="flowResource.isLoading()"
-          [hasError]="!!flowResource.error()"
           [selectedCall]="selectedDebugCall()"
           [callBackend]="selectedDebugBackend()"
         />
