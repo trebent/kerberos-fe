@@ -1,11 +1,10 @@
-// The pipeline lays itself out by the width it is given, not the viewport, because a tool
-// panel may sit beside it.
+// The pipeline runs left to right when it fits across the width it is given. When it does not
+// (a narrow screen, or tool panels beside it), the component adds the `vertical` class.
 :host {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  container-type: inline-size;
 }
 
 .flow-card {
@@ -227,8 +226,8 @@
   }
 }
 
-// Narrow: run the pipeline top to bottom and put the backends underneath.
-@container (max-width: 46rem) {
+// Vertical: run the pipeline top to bottom and put the backends underneath.
+:host(.vertical) {
   .flow-card {
     flex-direction: column;
     width: 100%;
