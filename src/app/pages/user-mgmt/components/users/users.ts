@@ -66,6 +66,7 @@ export class Users {
   }
 
   readonly createErrors = signal<string[]>([]);
+  readonly deleteErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
@@ -114,11 +115,15 @@ export class Users {
   }
 
   deleteUser(userId: number): void {
-    if (this.selectedUser()?.id === userId) {
-      this.selectedUser.set(null);
-    }
+    this.deleteErrors.set([]);
     this.usersService.deleteUser(userId).subscribe({
-      next: () => this.usersResource.reload(),
+      next: () => {
+        if (this.selectedUser()?.id === userId) {
+          this.selectedUser.set(null);
+        }
+        this.usersResource.reload();
+      },
+      error: () => this.deleteErrors.set(['Failed to delete user. Please try again.']),
     });
   }
 }

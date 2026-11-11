@@ -72,6 +72,7 @@ export class OrganisationsList {
   }
 
   readonly createErrors = signal<string[]>([]);
+  readonly deleteErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -129,15 +130,19 @@ export class OrganisationsList {
   }
 
   deleteOrg(orgId: number): void {
-    if (this.selectedOrgId() === orgId) {
-      this.selectedOrgId.set(null);
-      this.orgSelected.emit(null);
-    }
-    if (this.selectedOrg()?.id === orgId) {
-      this.selectedOrg.set(null);
-    }
+    this.deleteErrors.set([]);
     this.orgsService.deleteOrganisation(orgId).subscribe({
-      next: () => this.orgsResource.reload(),
+      next: () => {
+        if (this.selectedOrgId() === orgId) {
+          this.selectedOrgId.set(null);
+          this.orgSelected.emit(null);
+        }
+        if (this.selectedOrg()?.id === orgId) {
+          this.selectedOrg.set(null);
+        }
+        this.orgsResource.reload();
+      },
+      error: () => this.deleteErrors.set(['Failed to delete organisation. Please try again.']),
     });
   }
 }

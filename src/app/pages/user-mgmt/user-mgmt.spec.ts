@@ -70,4 +70,27 @@ describe('UserMgmt', () => {
     expect(fixture.nativeElement.querySelector('app-user-edit')).not.toBeNull();
     await expectNoAxeViolations(fixture);
   });
+
+  it('keeps the user editor open and explains a failed delete', async () => {
+    flushAll('/api/admin/users', users);
+    flushAll('/api/admin/groups', groups);
+    flushAll('/api/admin/permissions', permissions);
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    element.querySelector<HTMLButtonElement>('[aria-label="Edit user alice"]')!.click();
+    TestBed.tick();
+    flushAll('/api/admin/groups', groups);
+    await fixture.whenStable();
+
+    element.querySelector<HTMLButtonElement>('[aria-label="Delete user alice"]')!.click();
+    http
+      .expectOne((req) => req.method === 'DELETE' && req.url.endsWith('/api/admin/users/1'))
+      .flush(null, { status: 403, statusText: 'Forbidden' });
+    await fixture.whenStable();
+
+    expect(element.textContent).toContain('Failed to delete user.');
+    expect(element.querySelector('app-user-edit')).not.toBeNull();
+    await expectNoAxeViolations(fixture);
+  });
 });

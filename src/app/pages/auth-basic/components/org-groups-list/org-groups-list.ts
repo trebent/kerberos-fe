@@ -71,6 +71,7 @@ export class OrgGroupsList {
   }
 
   readonly createErrors = signal<string[]>([]);
+  readonly deleteErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -114,12 +115,18 @@ export class OrgGroupsList {
   }
 
   deleteGroup(groupId: number): void {
-    if (this.orgId() === null) return;
-    if (this.selectedGroup()?.id === groupId) {
-      this.selectedGroup.set(null);
-    }
-    this.groupsService.deleteGroup(this.orgId()!, groupId).subscribe({
-      next: () => this.groupsResource.reload(),
+    const orgId = this.orgId();
+    if (orgId === null) return;
+
+    this.deleteErrors.set([]);
+    this.groupsService.deleteGroup(orgId, groupId).subscribe({
+      next: () => {
+        if (this.selectedGroup()?.id === groupId) {
+          this.selectedGroup.set(null);
+        }
+        this.groupsResource.reload();
+      },
+      error: () => this.deleteErrors.set(['Failed to delete group. Please try again.']),
     });
   }
 }

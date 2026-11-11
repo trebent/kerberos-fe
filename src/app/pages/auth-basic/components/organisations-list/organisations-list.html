@@ -42,6 +42,10 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
+  @if (deleteErrors().length) {
+    <app-error-display [errors]="deleteErrors()" />
+  }
+
   <mat-form-field class="filter-field">
     <mat-label>Filter</mat-label>
     <input matInput (input)="applyFilter($event)" placeholder="Ex. my-org" />

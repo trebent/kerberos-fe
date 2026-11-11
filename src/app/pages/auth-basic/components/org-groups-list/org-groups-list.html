@@ -29,6 +29,10 @@
     <mat-divider />
     <h3>All groups</h3>
 
+    @if (deleteErrors().length) {
+      <app-error-display [errors]="deleteErrors()" />
+    }
+
     <mat-form-field class="filter-field">
       <mat-label>Filter</mat-label>
       <input matInput (input)="applyFilter($event)" placeholder="Ex. admins" />

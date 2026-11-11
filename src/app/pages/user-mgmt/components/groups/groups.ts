@@ -75,6 +75,7 @@ export class Groups {
 
   readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
+  readonly deleteErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -148,11 +149,15 @@ export class Groups {
   }
 
   deleteGroup(groupId: number): void {
-    if (this.selectedGroup()?.id === groupId) {
-      this.selectedGroup.set(null);
-    }
+    this.deleteErrors.set([]);
     this.usersService.deleteGroup(groupId).subscribe({
-      next: () => this.groupsResource.reload(),
+      next: () => {
+        if (this.selectedGroup()?.id === groupId) {
+          this.selectedGroup.set(null);
+        }
+        this.groupsResource.reload();
+      },
+      error: () => this.deleteErrors.set(['Failed to delete group. Please try again.']),
     });
   }
 }
