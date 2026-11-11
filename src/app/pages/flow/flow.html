@@ -69,23 +69,25 @@
     </div>
 
     <div class="flow-main">
-      @if (flowResource.isLoading()) {
-        <mat-spinner diameter="32" aria-label="Loading flow" />
-      }
+      <div class="flow-stage">
+        @if (flowResource.isLoading()) {
+          <mat-spinner diameter="32" aria-label="Loading flow" />
+        }
 
-      @if (flowResource.hasValue()) {
-        <app-flow-pipeline
-          [flowMetas]="flowResource.value()"
-          [selectedCall]="selectedDebugCall()"
-          [callBackend]="selectedDebugBackend()"
-        />
-      }
+        @if (flowResource.hasValue()) {
+          <app-flow-pipeline
+            [flowMetas]="flowResource.value()"
+            [selectedCall]="selectedDebugCall()"
+            [callBackend]="selectedDebugBackend()"
+          />
+        }
 
-      @if (flowResource.error()) {
-        <app-error-display
-          [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']"
-        />
-      }
+        @if (flowResource.error()) {
+          <app-error-display
+            [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']"
+          />
+        }
+      </div>
     </div>
   </div>
 </div>
