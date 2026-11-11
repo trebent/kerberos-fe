@@ -10,14 +10,13 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { MAT_TABLE } from '../../../../utils/material-table';
-
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import {
   CreateOrganisation201Response,
   Organisation,
   OrganisationsService,
 } from '../../../../services/auth-basic';
+import { MAT_TABLE } from '../../../../utils/material-table';
 import { OrganisationDetail } from '../organisation-detail/organisation-detail';
 
 @Component({

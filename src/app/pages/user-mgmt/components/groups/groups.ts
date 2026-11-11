@@ -11,10 +11,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { MAT_TABLE } from '../../../../utils/material-table';
-
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Group, UsersService } from '../../../../services/admin';
+import { MAT_TABLE } from '../../../../utils/material-table';
+import { toggleId } from '../../../../utils/selection';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
@@ -73,7 +73,6 @@ export class Groups {
 
   readonly createSelectedPermissionIds = signal<number[]>([]);
 
-  readonly showCreate = signal(false);
   readonly createErrors = signal<string[]>([]);
   readonly deleteErrors = signal<string[]>([]);
   readonly createForm = this.fb.nonNullable.group({
@@ -95,24 +94,7 @@ export class Groups {
   }
 
   toggleCreatePermission(permissionId: number): void {
-    const current = this.createSelectedPermissionIds();
-    if (current.includes(permissionId)) {
-      this.createSelectedPermissionIds.set(current.filter((id) => id !== permissionId));
-    } else {
-      this.createSelectedPermissionIds.set([...current, permissionId]);
-    }
-  }
-
-  openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.createSelectedPermissionIds.set([]);
-    this.selectedGroup.set(null);
-    this.showCreate.set(true);
-  }
-
-  cancelCreate(): void {
-    this.showCreate.set(false);
+    this.createSelectedPermissionIds.update((ids) => toggleId(ids, permissionId));
   }
 
   submitCreate(): void {
@@ -123,7 +105,6 @@ export class Groups {
       .createGroup({ name, permissionIDs: this.createSelectedPermissionIds() })
       .subscribe({
         next: () => {
-          this.showCreate.set(false);
           this.createForm.reset();
           this.createSelectedPermissionIds.set([]);
           this.groupsResource.reload();
@@ -135,7 +116,6 @@ export class Groups {
   }
 
   openEdit(group: Group): void {
-    this.showCreate.set(false);
     this.selectedGroup.set(group);
   }
 

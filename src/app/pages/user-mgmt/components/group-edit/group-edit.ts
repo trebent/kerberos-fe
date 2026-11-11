@@ -10,6 +10,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Group, UsersService } from '../../../../services/admin';
+import { toggleId } from '../../../../utils/selection';
 
 @Component({
   imports: [
@@ -62,12 +63,7 @@ export class GroupEdit {
   }
 
   togglePermission(permissionId: number): void {
-    const current = this.selectedPermissionIds();
-    if (current.includes(permissionId)) {
-      this.selectedPermissionIds.set(current.filter((id) => id !== permissionId));
-    } else {
-      this.selectedPermissionIds.set([...current, permissionId]);
-    }
+    this.selectedPermissionIds.update((ids) => toggleId(ids, permissionId));
   }
 
   save(): void {

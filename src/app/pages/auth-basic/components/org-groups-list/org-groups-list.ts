@@ -8,13 +8,12 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { of } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
-
-import { MAT_TABLE } from '../../../../utils/material-table';
+import { of } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Group, GroupsService } from '../../../../services/auth-basic';
+import { MAT_TABLE } from '../../../../utils/material-table';
 import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
 
 @Component({

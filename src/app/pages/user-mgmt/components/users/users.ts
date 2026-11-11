@@ -10,10 +10,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { MAT_TABLE } from '../../../../utils/material-table';
-
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { User, UsersService } from '../../../../services/admin';
+import { MAT_TABLE } from '../../../../utils/material-table';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
@@ -74,16 +73,13 @@ export class Users {
 
   readonly selectedUser = signal<User | null>(null, { equal: () => false });
 
-  readonly groupName = (g: { name: string }) => g.name;
+  /** The user's group names for the table, or a dash when they have none. */
+  groupNames(user: User): string {
+    return user.groups?.length ? user.groups.map((group) => group.name).join(', ') : '—';
+  }
 
   applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  }
-
-  openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.selectedUser.set(null);
   }
 
   submitCreate(): void {

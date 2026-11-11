@@ -11,6 +11,7 @@ import { switchMap } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { User, UsersService } from '../../../../services/admin';
+import { toggleId } from '../../../../utils/selection';
 
 @Component({
   imports: [
@@ -62,12 +63,7 @@ export class UserEdit {
   }
 
   toggleGroup(groupId: number): void {
-    const current = this.selectedGroupIds();
-    if (current.includes(groupId)) {
-      this.selectedGroupIds.set(current.filter((id) => id !== groupId));
-    } else {
-      this.selectedGroupIds.set([...current, groupId]);
-    }
+    this.selectedGroupIds.update((ids) => toggleId(ids, groupId));
   }
 
   save(): void {

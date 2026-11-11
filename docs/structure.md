@@ -30,7 +30,7 @@ src/app/
     theme.service.ts           light/dark/system preference, saved in localStorage
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
-  utils/                       validation rules, Material table imports
+  utils/                       validation rules, selection helpers, Material table imports
 src/testing/                   test helpers: AuthService stub, axe-core check
 openapi/                       API specs the clients are generated from (vendored from Kerberos)
 ```
