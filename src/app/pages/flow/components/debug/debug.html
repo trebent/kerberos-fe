@@ -69,6 +69,10 @@
       </div>
     </div>
 
+    @if (sessionErrors().length) {
+      <app-error-display [errors]="sessionErrors()" />
+    }
+
     @if (isLoadingSession()) {
       <div class="session-loading">
         <mat-spinner diameter="28" aria-label="Loading sessions" />

@@ -57,6 +57,7 @@ export class Debug {
   readonly isStarting = signal(false);
   readonly isStopping = signal(false);
   readonly isDeleting = signal(false);
+  readonly sessionErrors = signal<string[]>([]);
   readonly calls = signal<DebugSessionCall[]>([]);
   readonly callsFetched = signal(false);
   readonly isFetchingCalls = signal(false);
@@ -79,32 +80,39 @@ export class Debug {
   });
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       const backend = this.selectedBackend();
       this.backendChange.emit(backend);
       this.sessions.set([]);
       this.selectedSessionId.set(null);
-      this._resetCallState();
+      this.sessionErrors.set([]);
+      this.resetCallState();
 
-      if (!backend) return;
+      if (!backend) {
+        this.isLoadingSession.set(false);
+        return;
+      }
 
       this.isLoadingSession.set(true);
-      this.debugService
-        .listDebugSessions(backend)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (sessions) => {
-            this.sessions.set([...sessions].sort((a, b) => a.id - b.id));
-            this.isLoadingSession.set(false);
-          },
-          error: () => this.isLoadingSession.set(false),
-        });
+      const subscription = this.debugService.listDebugSessions(backend).subscribe({
+        next: (sessions) => {
+          this.sessions.set([...sessions].sort((a, b) => a.id - b.id));
+          this.isLoadingSession.set(false);
+        },
+        error: () => {
+          this.sessionErrors.set(['Failed to load debug sessions.']);
+          this.isLoadingSession.set(false);
+        },
+      });
+      // Drop the response if another backend is picked (or the panel closes) before it arrives.
+      onCleanup(() => subscription.unsubscribe());
     });
   }
 
   onSessionSelect(id: number | null): void {
     this.selectedSessionId.set(id);
-    this._resetCallState();
+    this.sessionErrors.set([]);
+    this.resetCallState();
   }
 
   startSession(): void {
@@ -112,6 +120,7 @@ export class Debug {
     if (!backend || this.isStarting()) return;
 
     this.isStarting.set(true);
+    this.sessionErrors.set([]);
     this.debugService
       .startDebugSession(backend)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -119,10 +128,13 @@ export class Debug {
         next: (session) => {
           this.sessions.update((list) => [...list, session].sort((a, b) => a.id - b.id));
           this.selectedSessionId.set(session.id);
-          this._resetCallState();
+          this.resetCallState();
           this.isStarting.set(false);
         },
-        error: () => this.isStarting.set(false),
+        error: () => {
+          this.sessionErrors.set(['Failed to start a debug session.']);
+          this.isStarting.set(false);
+        },
       });
   }
 
@@ -132,6 +144,7 @@ export class Debug {
     if (!session || !backend || this.isStopping()) return;
 
     this.isStopping.set(true);
+    this.sessionErrors.set([]);
     this.debugService
       .stopDebugSession(backend, session.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -141,7 +154,10 @@ export class Debug {
           this.sessions.update((list) => list.map((s) => (s.id === stopped.id ? stopped : s)));
           this.isStopping.set(false);
         },
-        error: () => this.isStopping.set(false),
+        error: () => {
+          this.sessionErrors.set(['Failed to stop the debug session.']);
+          this.isStopping.set(false);
+        },
       });
   }
 
@@ -151,6 +167,7 @@ export class Debug {
     if (!session || !backend || this.isDeleting()) return;
 
     this.isDeleting.set(true);
+    this.sessionErrors.set([]);
     this.debugService
       .deleteDebugSession(backend, session.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -158,10 +175,13 @@ export class Debug {
         next: () => {
           this.sessions.update((list) => list.filter((s) => s.id !== session.id));
           this.selectedSessionId.set(null);
-          this._resetCallState();
+          this.resetCallState();
           this.isDeleting.set(false);
         },
-        error: () => this.isDeleting.set(false),
+        error: () => {
+          this.sessionErrors.set(['Failed to delete the debug session.']);
+          this.isDeleting.set(false);
+        },
       });
   }
 
@@ -228,7 +248,7 @@ export class Debug {
     return code >= 200 && code < 300 ? 'status-ok' : 'status-err';
   }
 
-  private _resetCallState(): void {
+  private resetCallState(): void {
     this.calls.set([]);
     this.callsFetched.set(false);
     this.callsFetchError.set(false);
