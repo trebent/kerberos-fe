@@ -20,7 +20,10 @@ describe('AuthBasic', () => {
     TestBed.tick();
     http
       .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations'))
-      .flush([{ id: 7, name: 'acme' }]);
+      .flush([
+        { id: 7, name: 'acme' },
+        { id: 8, name: 'globex' },
+      ]);
     await fixture.whenStable();
   });
 
@@ -53,6 +56,38 @@ describe('AuthBasic', () => {
         .querySelector('[aria-label="Select organisation acme"]')
         ?.getAttribute('aria-pressed'),
     ).toBe('true');
+    await expectNoAxeViolations(fixture);
+  });
+
+  it('closes the user edit panel when another organisation is selected', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const click = (label: string) =>
+      element.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!.click();
+
+    click('Select organisation acme');
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/users'))
+      .flush([{ id: 1, name: 'bob', groups: [] }]);
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/groups')).flush([]);
+    await fixture.whenStable();
+
+    click('Edit user bob');
+    TestBed.tick();
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/groups')).flush([]);
+    http
+      .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/users/1/groups'))
+      .flush([]);
+    await fixture.whenStable();
+    expect(element.querySelector('app-org-user-detail')).not.toBeNull();
+
+    click('Select organisation globex');
+    TestBed.tick();
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/8/users')).flush([]);
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/8/groups')).flush([]);
+    await fixture.whenStable();
+
+    expect(element.querySelector('app-org-user-detail')).toBeNull();
     await expectNoAxeViolations(fixture);
   });
 });

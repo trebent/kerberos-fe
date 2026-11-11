@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal, viewChild } from '@angular/core';
+import { Component, effect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -75,7 +75,12 @@ export class OrgGroupsList {
     name: ['', Validators.required],
   });
 
-  readonly selectedGroup = signal<Group | null>(null, { equal: () => false });
+  /** The group being edited. Switching organisation closes the edit panel. */
+  readonly selectedGroup = linkedSignal<number | null, Group | null>({
+    source: this.orgId,
+    computation: () => null,
+    equal: () => false,
+  });
 
   applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
