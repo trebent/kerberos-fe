@@ -51,46 +51,5 @@
   }
 
   <h4>Change password</h4>
-
-  <app-request-feedback [status]="passwordStatus" />
-
-  <form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
-    <mat-form-field appearance="outline">
-      <mat-label>Current password</mat-label>
-      <input
-        matInput
-        type="password"
-        formControlName="oldPassword"
-        autocomplete="current-password"
-      />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>New password</mat-label>
-      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Confirm new password</mat-label>
-      <input
-        matInput
-        type="password"
-        formControlName="confirmPassword"
-        autocomplete="new-password"
-        [errorStateMatcher]="mismatchMatcher"
-      />
-      @if (
-        passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched
-      ) {
-        <mat-error>Passwords do not match.</mat-error>
-      }
-    </mat-form-field>
-    <div class="form-actions">
-      <button
-        matButton="filled"
-        type="submit"
-        [disabled]="passwordForm.invalid || passwordStatus.pending()"
-      >
-        Change password
-      </button>
-    </div>
-  </form>
+  <app-password-change [change]="changePassword" />
 </app-edit-panel>

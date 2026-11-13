@@ -115,10 +115,6 @@ export class AuthService {
     );
   }
 
-  changePassword(userID: number, newPassword: string, oldPassword: string): Observable<null> {
-    return this.usersService.changeUserPassword(userID, { newPassword, oldPassword });
-  }
-
   superLogin(clientId: string, clientSecret: string): Observable<null> {
     return this.usersService
       .loginSuperuser({ clientId, clientSecret })
@@ -129,8 +125,17 @@ export class AuthService {
     return this.usersService.logoutSuperuser().pipe(this.signOutLocally());
   }
 
-  superChangePassword(newPassword: string, oldPassword: string): Observable<null> {
-    return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
+  /** Changes the signed-in user's own password, through the superuser endpoint for the superuser. */
+  changeOwnPassword(oldPassword: string, newPassword: string): Observable<null> {
+    if (this._isSuperuser()) {
+      return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
+    }
+
+    const userID = this._userID();
+    if (userID === null) {
+      return throwError(() => new Error('No user ID available'));
+    }
+    return this.usersService.changeUserPassword(userID, { newPassword, oldPassword });
   }
 
   /** Signs out locally whether or not the backend accepted the logout. */

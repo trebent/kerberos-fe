@@ -75,4 +75,26 @@ describe('AuthService', () => {
     expect(auth.isLoggedIn()).toBe(false);
     expect(navigate).toHaveBeenCalledWith('/login');
   });
+
+  it("changes the signed-in user's own password", () => {
+    auth.login('alice', 'secret').subscribe();
+    expectRequest('/api/admin/login').flush(null);
+    expectRequest('/api/admin/me').flush({
+      isSuperuser: false,
+      user: { id: 4, username: 'alice' },
+    });
+
+    auth.changeOwnPassword('old', 'new').subscribe();
+    const request = expectRequest('/api/admin/users/4/password');
+    expect(request.request.body).toEqual({ oldPassword: 'old', newPassword: 'new' });
+    request.flush(null);
+  });
+
+  it("changes the superuser's password through the superuser endpoint", () => {
+    auth.superLogin('admin', 'secret').subscribe();
+    expectRequest('/api/admin/superuser/login').flush(null);
+
+    auth.changeOwnPassword('old', 'new').subscribe();
+    expectRequest('/api/admin/superuser/password').flush(null);
+  });
 });

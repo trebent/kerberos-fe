@@ -8,7 +8,7 @@
   </p>
 
   @if (!authService.isSuperuser()) {
-    <h3>Change Username</h3>
+    <h3>Change username</h3>
 
     <app-request-feedback [status]="usernameStatus" />
 
@@ -29,48 +29,6 @@
     <mat-divider />
   }
 
-  <h3>Change Password</h3>
-
-  <app-request-feedback [status]="passwordStatus" />
-
-  <form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
-    <mat-form-field appearance="outline">
-      <mat-label>Current password</mat-label>
-      <input
-        matInput
-        type="password"
-        formControlName="oldPassword"
-        autocomplete="current-password"
-      />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>New password</mat-label>
-      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Confirm new password</mat-label>
-      <input
-        matInput
-        type="password"
-        formControlName="confirmPassword"
-        autocomplete="new-password"
-        [errorStateMatcher]="mismatchMatcher"
-      />
-      @if (
-        passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched
-      ) {
-        <mat-error>Passwords do not match.</mat-error>
-      }
-    </mat-form-field>
-
-    <button
-      matButton="filled"
-      type="submit"
-      [disabled]="passwordForm.invalid || passwordStatus.pending()"
-    >
-      Change password
-    </button>
-  </form>
+  <h3>Change password</h3>
+  <app-password-change [change]="changePassword" />
 </div>

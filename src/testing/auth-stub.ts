@@ -29,8 +29,7 @@ export function createAuthStub(options: { username?: string; isSuperuser?: boole
     superLogin: vi.fn(done),
     superLogout: vi.fn(done),
     updateUsername: vi.fn(done),
-    changePassword: vi.fn(done),
-    superChangePassword: vi.fn(done),
+    changeOwnPassword: vi.fn(done),
   };
 }
 
