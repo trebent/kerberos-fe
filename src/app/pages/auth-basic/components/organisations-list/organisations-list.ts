@@ -20,6 +20,7 @@ import { MAT_TABLE } from '../../../../utils/material-table';
 import { OrganisationDetail } from '../organisation-detail/organisation-detail';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     ErrorDisplay,
     MatButton,

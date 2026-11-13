@@ -18,6 +18,7 @@ import { toggleId } from '../../../../utils/selection';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     ErrorDisplay,
     MatButton,

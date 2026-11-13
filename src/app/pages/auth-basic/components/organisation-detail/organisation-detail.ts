@@ -9,6 +9,7 @@ import { ErrorDisplay } from '../../../../components/error-display/error-display
 import { Organisation, OrganisationsService } from '../../../../services/auth-basic';
 
 @Component({
+  host: { class: 'section-card edit-panel' },
   imports: [
     ErrorDisplay,
     MatButton,

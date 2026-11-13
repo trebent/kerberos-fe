@@ -16,6 +16,7 @@ import {
 } from '../../../../utils/validation';
 
 @Component({
+  host: { class: 'section-card edit-panel' },
   imports: [
     ErrorDisplay,
     MatButton,

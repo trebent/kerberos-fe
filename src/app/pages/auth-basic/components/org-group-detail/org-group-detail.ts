@@ -9,6 +9,7 @@ import { ErrorDisplay } from '../../../../components/error-display/error-display
 import { Group, GroupsService } from '../../../../services/auth-basic';
 
 @Component({
+  host: { class: 'section-card edit-panel' },
   imports: [
     ErrorDisplay,
     MatButton,

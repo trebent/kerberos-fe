@@ -17,6 +17,7 @@ import { MAT_TABLE } from '../../../../utils/material-table';
 import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     ErrorDisplay,
     MatButton,

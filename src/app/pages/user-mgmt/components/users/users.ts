@@ -16,6 +16,7 @@ import { MAT_TABLE } from '../../../../utils/material-table';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     ErrorDisplay,
     MatButton,

@@ -13,6 +13,7 @@ import { Group, UsersService } from '../../../../services/admin';
 import { toggleId } from '../../../../utils/selection';
 
 @Component({
+  host: { class: 'section-card edit-panel' },
   imports: [
     ErrorDisplay,
     MatButton,

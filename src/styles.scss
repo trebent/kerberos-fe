@@ -119,7 +119,19 @@ a {
   }
 }
 
-// Section cards used by the management pages.
+// Section cards: a bordered surface for one part of a page, such as a table with its create
+// form, or a tool panel. A component that is a card puts the class on its own element with
+// `host: { class: 'section-card' }` and lays its content out in `.card-header-container`
+// (title and actions) and `.card-content`.
+.section-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
 .card-header-container {
   display: flex;
   align-items: center;
@@ -130,6 +142,22 @@ a {
 
 .card-content {
   padding: 0.5rem 1rem;
+}
+
+// Edit panels: a padded card inside a section card for editing the selected row, opened from
+// the row's edit button. Use `host: { class: 'section-card edit-panel' }` and start the
+// template with an `.edit-header` holding the `.edit-title` and a close button.
+.edit-panel {
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
 }
 
 // On phones table cells wrap long values and the actions column gives up its fixed width,
