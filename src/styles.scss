@@ -21,6 +21,8 @@ html {
 
   // Material 3 has no "success" role; this pair keeps AA contrast on surfaces in both modes.
   --app-success: light-dark(#1a7f3c, #7dd99a);
+  // For code, IDs, URLs and HTTP methods. Roboto Mono is used when the system has it.
+  --app-font-mono: 'Roboto Mono', 'Courier New', monospace;
 }
 
 body {
@@ -221,14 +223,53 @@ a {
   font: var(--mat-sys-body-medium);
 }
 
+.mono {
+  font-family: var(--app-font-mono);
+}
+
+// Label/value rows describing one record, such as a debug session or a recorded call.
+.meta-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 0.82rem;
+}
+
+.meta-label {
+  flex-shrink: 0;
+  min-width: 72px;
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 500;
+}
+
+.meta-value {
+  color: var(--mat-sys-on-surface);
+  overflow-wrap: anywhere;
+}
+
+// HTTP status codes: 2xx in the success color, anything else in the error color. Defined after
+// `.meta-value` so a status shown as a meta value keeps its color.
+.status-ok,
+.status-err {
+  font-weight: 600;
+}
+
+.status-ok {
+  color: var(--app-success);
+}
+
+.status-err {
+  color: var(--mat-sys-error);
+}
+
 .flow-meta-tooltip {
   white-space: pre-wrap;
-  font-family: monospace;
+  font-family: var(--app-font-mono);
   font-size: 12px;
   text-align: left;
 
   .mdc-tooltip__surface {
-    font-family: monospace;
+    font-family: var(--app-font-mono);
     font-size: 12px;
     text-align: left;
   }

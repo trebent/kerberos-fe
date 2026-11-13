@@ -1,23 +1,7 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container);
-  border-radius: 0.75rem;
-}
-
 .card-content {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-}
-
-.debug-body {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  padding: 1rem;
 }
 
 .debug-controls {
@@ -76,25 +60,6 @@
   }
 }
 
-.meta-row {
-  display: flex;
-  gap: 8px;
-  font-size: 0.82rem;
-  align-items: baseline;
-}
-
-.meta-label {
-  color: var(--mat-sys-on-surface-variant);
-  font-weight: 500;
-  min-width: 72px;
-  flex-shrink: 0;
-}
-
-.meta-value {
-  color: var(--mat-sys-on-surface);
-  word-break: break-all;
-}
-
 .calls-section {
   display: flex;
   flex-direction: column;
@@ -151,14 +116,14 @@
 
 .call-method {
   font-weight: 600;
-  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-family: var(--app-font-mono);
   min-width: 52px;
   color: var(--mat-sys-primary);
   flex-shrink: 0;
 }
 
 .call-url {
-  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-family: var(--app-font-mono);
   color: var(--mat-sys-on-surface);
   word-break: break-all;
   flex: 1;
@@ -166,22 +131,14 @@
 }
 
 .call-status {
-  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-family: var(--app-font-mono);
   font-weight: 600;
   font-size: 0.78rem;
   padding: 1px 5px;
   border-radius: 3px;
   flex-shrink: 0;
-
-  &.status-ok {
-    color: var(--app-success);
-    background: color-mix(in srgb, var(--app-success) 12%, transparent);
-  }
-
-  &.status-err {
-    color: var(--mat-sys-error);
-    background: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
-  }
+  // A tint of the status color from `.status-ok` / `.status-err`.
+  background: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .call-detail-spinner {
