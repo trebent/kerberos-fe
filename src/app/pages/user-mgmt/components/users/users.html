@@ -31,11 +31,7 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
-  <mat-form-field class="filter-field">
-    <mat-label>Filter</mat-label>
-    <input matInput (input)="applyFilter($event)" placeholder="Ex. admin" />
-  </mat-form-field>
-  <div class="table-wrapper">
+  <app-filtered-table [dataSource]="dataSource" filterExample="admin">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -48,38 +44,29 @@
       <ng-container matColumnDef="groups">
         <th mat-header-cell *matHeaderCellDef>Groups</th>
         <td mat-cell *matCellDef="let u">
-          {{ u.groups?.length ? u.groups!.map(groupName).join(', ') : '—' }}
+          {{ joinNames(u.groups) }}
         </td>
       </ng-container>
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
         <td mat-cell *matCellDef="let u">
-          <button
-            matIconButton
-            type="button"
-            (click)="openEdit(u)"
-            [attr.aria-label]="'Edit user ' + u.username"
-          >
-            <mat-icon aria-hidden="true">edit</mat-icon>
-          </button>
-          <button
-            matIconButton
-            type="button"
-            (click)="deleteUser(u.id)"
-            [attr.aria-label]="'Delete user ' + u.username"
-          >
-            <mat-icon aria-hidden="true">delete</mat-icon>
-          </button>
+          <app-row-actions
+            [label]="'user ' + u.username"
+            (edit)="selectedUser.set(u)"
+            (delete)="deleteUser(u.id)"
+          />
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons />
-  </div>
+  </app-filtered-table>
 
   @if (selectedUser()) {
-    <app-user-edit [user]="selectedUser()!" (saved)="onDetailSaved()" (closed)="onDetailClosed()" />
+    <app-user-edit
+      [user]="selectedUser()!"
+      (saved)="onDetailSaved()"
+      (closed)="selectedUser.set(null)"
+    />
   }
 </div>

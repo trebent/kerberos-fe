@@ -42,11 +42,7 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
-  <mat-form-field class="filter-field">
-    <mat-label>Filter</mat-label>
-    <input matInput (input)="applyFilter($event)" placeholder="Ex. my-org" />
-  </mat-form-field>
-  <div class="table-wrapper">
+  <app-filtered-table [dataSource]="dataSource" filterExample="my-org">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -69,37 +65,24 @@
             >
               Select
             </button>
-            <button
-              matIconButton
-              type="button"
-              (click)="openEdit(o)"
-              [attr.aria-label]="'Edit organisation ' + o.name"
-            >
-              <mat-icon aria-hidden="true">edit</mat-icon>
-            </button>
-            <button
-              matIconButton
-              type="button"
-              (click)="deleteOrg(o.id)"
-              [attr.aria-label]="'Delete organisation ' + o.name"
-            >
-              <mat-icon aria-hidden="true">delete</mat-icon>
-            </button>
+            <app-row-actions
+              [label]="'organisation ' + o.name"
+              (edit)="selectedOrg.set(o)"
+              (delete)="deleteOrg(o.id)"
+            />
           </div>
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons />
-  </div>
+  </app-filtered-table>
 
   @if (selectedOrg()) {
     <app-organisation-detail
       [organisation]="selectedOrg()!"
       (saved)="onDetailSaved()"
-      (closed)="onDetailClosed()"
+      (closed)="selectedOrg.set(null)"
     />
   }
 </div>

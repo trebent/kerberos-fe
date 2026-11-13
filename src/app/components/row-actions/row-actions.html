@@ -1,0 +1,6 @@
+<button matIconButton type="button" [attr.aria-label]="'Edit ' + label()" (click)="edit.emit()">
+  <mat-icon aria-hidden="true">edit</mat-icon>
+</button>
+<button matIconButton type="button" [attr.aria-label]="'Delete ' + label()" (click)="delete.emit()">
+  <mat-icon aria-hidden="true">delete</mat-icon>
+</button>

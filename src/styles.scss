@@ -132,6 +132,17 @@ a {
   padding: 0.5rem 1rem;
 }
 
+// Cells of the tables inside `app-filtered-table`. They are written in each page's template and
+// projected into the table component, so they are styled here rather than in either component.
+// The sticky `actions` column holds the row's buttons and keeps them in view while the table
+// scrolls sideways.
+.table-wrapper .mat-column-actions {
+  width: 10rem;
+  background: var(--mat-table-background-color, var(--mat-sys-surface));
+  text-align: center;
+  white-space: nowrap;
+}
+
 // On phones table cells wrap long values and the actions column gives up its fixed width,
 // so every column stays visible without sideways scrolling.
 @media (max-width: 40rem) {
