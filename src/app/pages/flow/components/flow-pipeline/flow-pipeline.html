@@ -1,39 +1,5 @@
 @if (selectedCall(); as call) {
-  <div class="call-meta-box">
-    <div class="meta-row">
-      <span class="meta-label">ID</span>
-      <span class="meta-value">{{ call.id }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Method</span>
-      <span class="meta-value mono">{{ call.method }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Status</span>
-      <span
-        class="meta-value mono"
-        [class.status-ok]="call.statusCode >= 200 && call.statusCode < 300"
-        [class.status-err]="!(call.statusCode >= 200 && call.statusCode < 300)"
-        >{{ call.statusCode }}</span
-      >
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">URL</span>
-      <span class="meta-value mono">{{ call.url }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Started</span>
-      <span class="meta-value">{{ call.startedAt | date: 'medium' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Stopped</span>
-      <span class="meta-value">{{ call.stoppedAt | date: 'medium' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Duration</span>
-      <span class="meta-value mono">{{ callDuration(call) }}</span>
-    </div>
-  </div>
+  <app-call-details [call]="call" />
 }
 <div #card class="flow-card">
   <div class="flow-section">

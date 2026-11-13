@@ -178,18 +178,6 @@
   font-style: italic;
 }
 
-.call-meta-box {
-  display: flex;
-  box-sizing: border-box;
-  max-width: 100%;
-  flex-direction: column;
-  gap: 6px;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 10px;
-  background: var(--mat-sys-surface-container);
-  padding: 12px 20px;
-}
-
 // Vertical: run the pipeline top to bottom and put the backends underneath.
 :host(.vertical) {
   .flow-card {
@@ -240,7 +228,7 @@
     justify-content: center;
   }
 
-  .call-meta-box {
+  app-call-details {
     width: 100%;
   }
 }

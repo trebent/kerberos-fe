@@ -17,7 +17,7 @@ src/app/
   pages/                       one directory per navigable route
     login/
     flow/
-      components/              debug, flow-pipeline, oas
+      components/              call-details, debug, flow-pipeline, oas
     user-mgmt/
       components/              profile, users, user-edit, groups, group-edit, permissions-list
     auth-basic/
@@ -30,7 +30,7 @@ src/app/
     theme.service.ts           light/dark/system preference, saved in localStorage
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
-  utils/                       validation rules, selection helpers, Material table imports
+  utils/                       validation rules, selection and HTTP status helpers, Material table imports
 src/testing/                   test helpers: AuthService stub, axe-core check
 openapi/                       API specs the clients are generated from (vendored from Kerberos)
 ```

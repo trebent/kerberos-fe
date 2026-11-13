@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import {
   afterRenderEffect,
   Component,
@@ -22,9 +21,10 @@ import {
   FlowMetaDataRouterBackend,
   FlowTransition,
 } from '../../../../services/admin';
+import { CallDetails } from '../call-details/call-details';
 
 @Component({
-  imports: [DatePipe, MatIcon, MatTooltip],
+  imports: [CallDetails, MatIcon, MatTooltip],
   host: { '[class.vertical]': 'vertical()' },
   selector: 'app-flow-pipeline',
   styleUrl: './flow-pipeline.scss',
@@ -167,23 +167,6 @@ export class FlowPipeline {
   getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
     const entry = this.transitionsByComponent().get(compName);
     return entry ? entry[direction] : [];
-  }
-
-  callDuration(call: DebugSessionCall): string {
-    if (!call.stoppedAt) return '—';
-    const ms = this.parseIsoMs(call.stoppedAt) - this.parseIsoMs(call.startedAt);
-    return `${ms.toFixed(3)}ms`;
-  }
-
-  private parseIsoMs(iso: string): number {
-    const match = /\.(\d+)Z?$/.exec(iso);
-    const base = new Date(iso).getTime();
-    if (!match) return base;
-    // getTime() truncates to milliseconds; recover full sub-ms precision from the fraction
-    const frac = match[1];
-    if (frac.length <= 3) return base;
-    const subMs = parseFloat(`0.${frac.slice(3)}`);
-    return base + subMs;
   }
 
   formatTransitionTooltip(t: FlowTransition): string {

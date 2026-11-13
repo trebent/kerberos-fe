@@ -159,7 +159,7 @@
                   [attr.aria-pressed]="selectedCallId() === call.id"
                 >
                   <span class="call-method">{{ call.method }}</span>
-                  <span [class]="'call-status ' + statusClass(call.statusCode)">{{
+                  <span class="call-status" [class]="httpStatusClass(call.statusCode)">{{
                     call.statusCode
                   }}</span>
                   <span class="call-url">{{ call.url }}</span>
