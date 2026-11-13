@@ -87,8 +87,4 @@ export class Flow {
     this.selectedDebugCall.set(null);
     this.selectedDebugBackend.set(null);
   }
-
-  protected onDebugCallSelected(call: DebugSessionCall | null): void {
-    this.selectedDebugCall.set(call);
-  }
 }

@@ -59,7 +59,7 @@
         class="flow-panel"
         [backends]="routerBackends()"
         (closed)="closeDebug()"
-        (callSelected)="onDebugCallSelected($event)"
+        (callSelected)="selectedDebugCall.set($event)"
         (backendChange)="selectedDebugBackend.set($event)"
       />
     }

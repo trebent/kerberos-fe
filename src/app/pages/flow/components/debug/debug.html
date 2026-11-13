@@ -13,8 +13,8 @@
         <mat-select
           placeholder="Ex. echo"
           canSelectNullableOptions
-          [ngModel]="selectedBackend()"
-          (ngModelChange)="selectedBackend.set($event)"
+          [value]="selectedBackend()"
+          (selectionChange)="selectedBackend.set($event.value)"
         >
           <mat-option [value]="null">None</mat-option>
           @for (backend of backends(); track backend) {
@@ -23,13 +23,19 @@
         </mat-select>
       </mat-form-field>
 
+      <app-request-feedback [status]="startStatus" />
       <button
         matButton="filled"
         type="button"
-        [disabled]="!selectedBackend() || isStarting() || isLoadingSession() || isSessionRunning()"
+        [disabled]="
+          !selectedBackend() ||
+          startStatus.pending() ||
+          sessionsResource.isLoading() ||
+          isSessionRunning()
+        "
         (click)="startSession()"
       >
-        @if (isStarting()) {
+        @if (startStatus.pending()) {
           <mat-spinner diameter="16" aria-hidden="true" />
         }
         Start new debug session
@@ -38,19 +44,22 @@
       <mat-divider />
       <h3 class="session-ctrl-header">Session controls</h3>
 
+      <app-request-feedback [status]="stopStatus" />
       <div class="session-controls">
         <mat-form-field>
           <mat-label>Select session</mat-label>
           <mat-select
             placeholder="Ex. #1337"
-            [disabled]="!selectedBackend() || isLoadingSession()"
-            [ngModel]="selectedSessionId()"
-            (ngModelChange)="onSessionSelect($event)"
+            [disabled]="!sessionsResource.hasValue()"
+            [value]="selectedSessionId()"
+            (selectionChange)="selectedSessionId.set($event.value)"
           >
-            @for (session of sessions(); track session.id) {
-              <mat-option [value]="session.id"
-                >#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option
-              >
+            @if (sessionsResource.hasValue()) {
+              @for (session of sessionsResource.value(); track session.id) {
+                <mat-option [value]="session.id"
+                  >#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option
+                >
+              }
             }
           </mat-select>
         </mat-form-field>
@@ -58,10 +67,10 @@
         <button
           matButton="outlined"
           type="button"
-          [disabled]="!isSessionRunning() || isStopping()"
+          [disabled]="!isSessionRunning() || stopStatus.pending()"
           (click)="stopSession()"
         >
-          @if (isStopping()) {
+          @if (stopStatus.pending()) {
             <mat-spinner diameter="16" aria-hidden="true" />
           }
           Stop session
@@ -69,33 +78,35 @@
       </div>
     </div>
 
-    @if (isLoadingSession()) {
+    @if (sessionsResource.isLoading()) {
       <div class="session-loading">
         <mat-spinner diameter="28" aria-label="Loading sessions" />
       </div>
     }
+    @if (sessionsResource.error()) {
+      <app-error-display [errors]="['Failed to load debug sessions.']" />
+    }
 
+    <app-request-feedback [status]="deleteStatus" />
     <div class="session-meta">
-      @if (!selectedSession()) {
-        <span class="session-empty">No session selected</span>
-      } @else {
+      @if (selectedSession(); as session) {
         <div>
           <div class="meta-row">
             <span class="meta-label">Session ID</span>
-            <span class="meta-value">{{ selectedSession()!.id }}</span>
+            <span class="meta-value">{{ session.id }}</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Started</span>
-            <span class="meta-value">{{ selectedSession()!.startedAt | date: 'medium' }}</span>
+            <span class="meta-value">{{ session.startedAt | date: 'medium' }}</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Expires</span>
-            <span class="meta-value">{{ selectedSession()!.expiresAt | date: 'medium' }}</span>
+            <span class="meta-value">{{ session.expiresAt | date: 'medium' }}</span>
           </div>
           <div class="meta-row">
             <span class="meta-label">Stopped</span>
             <span class="meta-value">{{
-              selectedSession()!.stoppedAt ? (selectedSession()!.stoppedAt | date: 'medium') : '—'
+              session.stoppedAt ? (session.stoppedAt | date: 'medium') : '—'
             }}</span>
           </div>
         </div>
@@ -103,24 +114,24 @@
           <button
             matButton="filled"
             type="button"
-            [disabled]="isFetchingCalls()"
+            [disabled]="callsResource.isLoading()"
             (click)="fetchCalls()"
           >
-            @if (isFetchingCalls()) {
+            @if (callsResource.isLoading()) {
               <mat-spinner diameter="16" aria-hidden="true" />
             } @else {
               <mat-icon aria-hidden="true">refresh</mat-icon>
             }
-            Fetch Calls
+            Fetch calls
           </button>
           <button
             matButton="outlined"
             type="button"
             class="delete-btn"
-            [disabled]="isDeleting()"
+            [disabled]="deleteStatus.pending()"
             (click)="deleteSession()"
           >
-            @if (isDeleting()) {
+            @if (deleteStatus.pending()) {
               <mat-spinner diameter="16" aria-hidden="true" />
             } @else {
               <mat-icon aria-hidden="true">delete</mat-icon>
@@ -128,38 +139,39 @@
             Delete
           </button>
         </div>
+      } @else {
+        <span class="session-empty">No session selected</span>
       }
     </div>
 
     @if (selectedSession()) {
       <div class="calls-section">
-        @if (callsFetchError()) {
+        @if (callsResource.error()) {
           <app-error-display [errors]="['Failed to load session calls.']" />
         }
-
-        @if (callDetailError()) {
+        @if (callDetailFailed()) {
           <app-error-display [errors]="['Failed to load call details.']" />
         }
 
-        @if (callsFetched() && !callsFetchError()) {
-          @if (calls().length === 0) {
+        @if (callsResource.hasValue()) {
+          @if (callsResource.value().length === 0) {
             <p class="calls-empty">No calls recorded yet.</p>
           } @else {
             <div class="calls-list">
-              @for (call of calls(); track call.id) {
+              @for (call of callsResource.value(); track call.id) {
                 <button
                   type="button"
                   class="call-row"
                   [class.selected]="selectedCallId() === call.id"
-                  (click)="onCallClick(call)"
                   [attr.aria-pressed]="selectedCallId() === call.id"
+                  (click)="toggleCall(call)"
                 >
                   <span class="call-method">{{ call.method }}</span>
                   <span class="call-status" [class]="httpStatusClass(call.statusCode)">{{
                     call.statusCode
                   }}</span>
                   <span class="call-url">{{ call.url }}</span>
-                  @if (selectedCallId() === call.id && isFetchingCallDetail()) {
+                  @if (selectedCallId() === call.id && callDetailLoading()) {
                     <mat-spinner
                       diameter="14"
                       class="call-detail-spinner"
