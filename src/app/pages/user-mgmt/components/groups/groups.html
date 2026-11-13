@@ -1,50 +1,42 @@
-<div class="card-header-container">
-  <h2 class="section-title">Groups</h2>
-</div>
-<div class="card-content">
-  <h3>Create group</h3>
+<app-list-card
+  heading="Groups"
+  createHeading="Create group"
+  listHeading="All groups"
+  [resource]="groupsResource"
+  loadError="Failed to load groups."
+>
+  <div create>
+    <app-request-feedback [status]="createStatus" />
 
-  <app-request-feedback [status]="createStatus" />
-
-  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
-    <mat-form-field appearance="outline">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
-    @if (permissionsResource.hasValue()) {
-      <fieldset class="checkbox-fieldset">
-        <legend>Permissions</legend>
-        @for (p of permissionsResource.value()!; track p.id) {
-          <mat-checkbox
-            [checked]="createPermissions.has(p.id)"
-            (change)="createPermissions.toggle(p.id)"
-          >
-            {{ p.name }}
-          </mat-checkbox>
-        }
-      </fieldset>
-    }
-    <div class="form-actions">
-      <button
-        matButton="filled"
-        type="submit"
-        [disabled]="createForm.invalid || createStatus.pending()"
-      >
-        Create
-      </button>
-    </div>
-  </form>
-
-  <mat-divider />
-  <h3>All groups</h3>
-
-  @if (groupsResource.error()) {
-    <app-error-display [errors]="['Failed to load groups.']" />
-  }
-
-  @if (groupsResource.isLoading()) {
-    <mat-spinner diameter="32" aria-label="Loading" />
-  }
+    <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+      @if (permissionsResource.hasValue()) {
+        <fieldset class="checkbox-fieldset">
+          <legend>Permissions</legend>
+          @for (p of permissionsResource.value(); track p.id) {
+            <mat-checkbox
+              [checked]="createPermissions.has(p.id)"
+              (change)="createPermissions.toggle(p.id)"
+            >
+              {{ p.name }}
+            </mat-checkbox>
+          }
+        </fieldset>
+      }
+      <div class="form-actions">
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="createForm.invalid || createStatus.pending()"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
 
   <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="admin">
@@ -76,11 +68,7 @@
     </table>
   </app-filtered-table>
 
-  @if (selectedGroup()) {
-    <app-group-edit
-      [group]="selectedGroup()!"
-      (saved)="onDetailSaved()"
-      (closed)="selectedGroup.set(null)"
-    />
+  @if (selectedGroup(); as group) {
+    <app-group-edit [group]="group" (saved)="onDetailSaved()" (closed)="selectedGroup.set(null)" />
   }
-</div>
+</app-list-card>

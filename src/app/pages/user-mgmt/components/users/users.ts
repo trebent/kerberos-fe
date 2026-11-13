@@ -2,13 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
-import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { ListCard } from '../../../../components/list-card/list-card';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/admin';
@@ -18,17 +16,14 @@ import { requestStatus } from '../../../../utils/request-status';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
-  host: { class: 'section-card' },
   imports: [
+    ListCard,
     RequestFeedback,
-    ErrorDisplay,
     FilteredTable,
     MatButton,
-    MatDivider,
     MatFormField,
     MatInput,
     MatLabel,
-    MatProgressSpinner,
     ...MAT_TABLE,
     ReactiveFormsModule,
     RowActions,

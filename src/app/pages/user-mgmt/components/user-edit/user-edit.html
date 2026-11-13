@@ -14,7 +14,7 @@
     @if (groupsResource.hasValue()) {
       <fieldset class="checkbox-fieldset">
         <legend>Groups</legend>
-        @for (g of groupsResource.value()!; track g.id) {
+        @for (g of groupsResource.value(); track g.id) {
           <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
             {{ g.name }}
           </mat-checkbox>

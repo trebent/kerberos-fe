@@ -13,7 +13,7 @@
     @if (permissionsResource.hasValue()) {
       <fieldset class="checkbox-fieldset">
         <legend>Permissions</legend>
-        @for (p of permissionsResource.value()!; track p.id) {
+        @for (p of permissionsResource.value(); track p.id) {
           <mat-checkbox
             [checked]="selectedPermissions.has(p.id)"
             (change)="selectedPermissions.toggle(p.id)"

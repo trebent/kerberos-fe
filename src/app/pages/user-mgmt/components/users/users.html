@@ -1,39 +1,32 @@
-<div class="card-header-container">
-  <h2 class="section-title">Users</h2>
-</div>
-<div class="card-content">
-  <h3>Create User</h3>
-  <app-request-feedback [status]="createStatus" />
-  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
-    <mat-form-field appearance="outline">
-      <mat-label>Username</mat-label>
-      <input matInput formControlName="username" autocomplete="username" />
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" formControlName="password" autocomplete="new-password" />
-    </mat-form-field>
-    <div class="form-actions">
-      <button
-        matButton="filled"
-        type="submit"
-        [disabled]="createForm.invalid || createStatus.pending()"
-      >
-        Create
-      </button>
-    </div>
-  </form>
-
-  <mat-divider />
-  <h3>All users</h3>
-
-  @if (usersResource.error()) {
-    <app-error-display [errors]="['Failed to load users.']" />
-  }
-
-  @if (usersResource.isLoading()) {
-    <mat-spinner diameter="32" aria-label="Loading" />
-  }
+<app-list-card
+  heading="Users"
+  createHeading="Create user"
+  listHeading="All users"
+  [resource]="usersResource"
+  loadError="Failed to load users."
+>
+  <div create>
+    <app-request-feedback [status]="createStatus" />
+    <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <mat-form-field appearance="outline">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" autocomplete="username" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" autocomplete="new-password" />
+      </mat-form-field>
+      <div class="form-actions">
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="createForm.invalid || createStatus.pending()"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
 
   <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="admin">
@@ -67,11 +60,7 @@
     </table>
   </app-filtered-table>
 
-  @if (selectedUser()) {
-    <app-user-edit
-      [user]="selectedUser()!"
-      (saved)="onDetailSaved()"
-      (closed)="selectedUser.set(null)"
-    />
+  @if (selectedUser(); as user) {
+    <app-user-edit [user]="user" (saved)="onDetailSaved()" (closed)="selectedUser.set(null)" />
   }
-</div>
+</app-list-card>
