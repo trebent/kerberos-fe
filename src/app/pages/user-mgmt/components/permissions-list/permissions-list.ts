@@ -15,9 +15,9 @@ import { UsersService } from '../../../../services/admin';
 export class PermissionsList {
   private readonly usersService = inject(UsersService);
 
-  readonly displayedColumns = ['id', 'name'];
+  protected readonly displayedColumns = ['id', 'name'];
 
-  readonly permissionsResource = rxResource({
+  protected readonly permissionsResource = rxResource({
     stream: () => this.usersService.getPermissions(),
   });
 }

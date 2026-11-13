@@ -38,7 +38,7 @@ export class Flow {
     stream: () => this.flowService.getFlow(),
   });
 
-  readonly oasBackends = computed<string[]>(() => {
+  protected readonly oasBackends = computed<string[]>(() => {
     if (!this.flowResource.hasValue()) return [];
     const flow = this.flowResource.value();
     if (!flow) return [];
@@ -47,7 +47,7 @@ export class Flow {
     return (oasComp.data as unknown as FlowMetaDataOAS).backends ?? [];
   });
 
-  readonly routerBackends = computed<string[]>(() => {
+  protected readonly routerBackends = computed<string[]>(() => {
     if (!this.flowResource.hasValue()) return [];
     const flow = this.flowResource.value();
     if (!flow) return [];
@@ -56,12 +56,12 @@ export class Flow {
     return (routerComp.data as unknown as FlowMetaDataRouter).backends?.map((b) => b.name) ?? [];
   });
 
-  readonly selectedOASBackend = signal<string | null>(null);
-  readonly debugOpen = signal(false);
-  readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
-  readonly selectedDebugBackend = signal<string | null>(null);
+  protected readonly selectedOASBackend = signal<string | null>(null);
+  protected readonly debugOpen = signal(false);
+  protected readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
+  protected readonly selectedDebugBackend = signal<string | null>(null);
 
-  selectOASBackend(backend: string): void {
+  protected selectOASBackend(backend: string): void {
     if (this.selectedOASBackend() === backend) {
       this.selectedOASBackend.set(null);
       return;
@@ -71,11 +71,11 @@ export class Flow {
     this.closeDebug();
   }
 
-  closeOAS(): void {
+  protected closeOAS(): void {
     this.selectedOASBackend.set(null);
   }
 
-  onDebugClick(): void {
+  protected onDebugClick(): void {
     if (this.debugOpen()) {
       this.closeDebug();
       return;
@@ -85,13 +85,13 @@ export class Flow {
     this.debugOpen.set(true);
   }
 
-  closeDebug(): void {
+  protected closeDebug(): void {
     this.debugOpen.set(false);
     this.selectedDebugCall.set(null);
     this.selectedDebugBackend.set(null);
   }
 
-  onDebugCallSelected(call: DebugSessionCall | null): void {
+  protected onDebugCallSelected(call: DebugSessionCall | null): void {
     this.selectedDebugCall.set(call);
   }
 }

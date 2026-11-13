@@ -40,13 +40,13 @@ export class Users {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
-  readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
+  protected readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
 
-  readonly usersResource = rxResource({
+  protected readonly usersResource = rxResource({
     stream: () => this.usersService.getUsers(),
   });
 
-  readonly dataSource = new MatTableDataSource<User>();
+  protected readonly dataSource = new MatTableDataSource<User>();
 
   private readonly paginator = viewChild(MatPaginator);
 
@@ -65,27 +65,27 @@ export class Users {
     });
   }
 
-  readonly createErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
   });
 
-  readonly selectedUser = signal<User | null>(null, { equal: () => false });
+  protected readonly selectedUser = signal<User | null>(null, { equal: () => false });
 
-  readonly groupName = (g: { name: string }) => g.name;
+  protected readonly groupName = (g: { name: string }) => g.name;
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  openCreate(): void {
+  protected openCreate(): void {
     this.createForm.reset();
     this.createErrors.set([]);
     this.selectedUser.set(null);
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid) return;
     this.createErrors.set([]);
     const { username, password } = this.createForm.getRawValue();
@@ -100,20 +100,20 @@ export class Users {
     });
   }
 
-  openEdit(user: User): void {
+  protected openEdit(user: User): void {
     this.selectedUser.set(user);
   }
 
-  onDetailSaved(): void {
+  protected onDetailSaved(): void {
     this.selectedUser.set(null);
     this.usersResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedUser.set(null);
   }
 
-  deleteUser(userId: number): void {
+  protected deleteUser(userId: number): void {
     if (this.selectedUser()?.id === userId) {
       this.selectedUser.set(null);
     }

@@ -42,13 +42,13 @@ export class Groups {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
-  readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
+  protected readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
 
-  readonly groupsResource = rxResource({
+  protected readonly groupsResource = rxResource({
     stream: () => this.usersService.getGroups(),
   });
 
-  readonly dataSource = new MatTableDataSource<Group>();
+  protected readonly dataSource = new MatTableDataSource<Group>();
 
   private readonly paginator = viewChild(MatPaginator);
 
@@ -67,33 +67,33 @@ export class Groups {
     });
   }
 
-  readonly permissionsResource = rxResource({
+  protected readonly permissionsResource = rxResource({
     stream: () => this.usersService.getPermissions(),
   });
 
-  readonly createSelectedPermissionIds = signal<number[]>([]);
+  protected readonly createSelectedPermissionIds = signal<number[]>([]);
 
-  readonly showCreate = signal(false);
-  readonly createErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly showCreate = signal(false);
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
-  readonly selectedGroup = signal<Group | null>(null, { equal: () => false });
+  protected readonly selectedGroup = signal<Group | null>(null, { equal: () => false });
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  isCreateSelected(permissionId: number): boolean {
+  protected isCreateSelected(permissionId: number): boolean {
     return this.createSelectedPermissionIds().includes(permissionId);
   }
 
-  getPermissionIDs(group: Group): string {
+  protected getPermissionIDs(group: Group): string {
     return (group.permissions ?? []).map((p) => p.id).join(', ');
   }
 
-  toggleCreatePermission(permissionId: number): void {
+  protected toggleCreatePermission(permissionId: number): void {
     const current = this.createSelectedPermissionIds();
     if (current.includes(permissionId)) {
       this.createSelectedPermissionIds.set(current.filter((id) => id !== permissionId));
@@ -102,7 +102,7 @@ export class Groups {
     }
   }
 
-  openCreate(): void {
+  protected openCreate(): void {
     this.createForm.reset();
     this.createErrors.set([]);
     this.createSelectedPermissionIds.set([]);
@@ -110,11 +110,11 @@ export class Groups {
     this.showCreate.set(true);
   }
 
-  cancelCreate(): void {
+  protected cancelCreate(): void {
     this.showCreate.set(false);
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid) return;
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
@@ -133,21 +133,21 @@ export class Groups {
       });
   }
 
-  openEdit(group: Group): void {
+  protected openEdit(group: Group): void {
     this.showCreate.set(false);
     this.selectedGroup.set(group);
   }
 
-  onDetailSaved(): void {
+  protected onDetailSaved(): void {
     this.selectedGroup.set(null);
     this.groupsResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedGroup.set(null);
   }
 
-  deleteGroup(groupId: number): void {
+  protected deleteGroup(groupId: number): void {
     if (this.selectedGroup()?.id === groupId) {
       this.selectedGroup.set(null);
     }

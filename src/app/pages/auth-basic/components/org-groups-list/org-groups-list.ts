@@ -43,9 +43,9 @@ export class OrgGroupsList {
 
   readonly orgId = input.required<number | null>();
 
-  readonly displayedColumns = ['id', 'name', 'actions'];
+  protected readonly displayedColumns = ['id', 'name', 'actions'];
 
-  readonly groupsResource = rxResource({
+  protected readonly groupsResource = rxResource({
     params: () => this.orgId(),
     stream: ({ params: orgId }) => {
       if (orgId === null) {
@@ -55,7 +55,7 @@ export class OrgGroupsList {
     },
   });
 
-  readonly dataSource = new MatTableDataSource<Group>();
+  protected readonly dataSource = new MatTableDataSource<Group>();
 
   private readonly paginator = viewChild(MatPaginator);
 
@@ -70,23 +70,23 @@ export class OrgGroupsList {
     });
   }
 
-  readonly createErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
   /** The group being edited. Switching organisation closes the edit panel. */
-  readonly selectedGroup = linkedSignal<number | null, Group | null>({
+  protected readonly selectedGroup = linkedSignal<number | null, Group | null>({
     source: this.orgId,
     computation: () => null,
     equal: () => false,
   });
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
@@ -101,19 +101,19 @@ export class OrgGroupsList {
     });
   }
 
-  openEdit(group: Group): void {
+  protected openEdit(group: Group): void {
     this.selectedGroup.set(group);
   }
 
-  onDataChanged(): void {
+  protected onDataChanged(): void {
     this.groupsResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedGroup.set(null);
   }
 
-  deleteGroup(groupId: number): void {
+  protected deleteGroup(groupId: number): void {
     if (this.orgId() === null) return;
     if (this.selectedGroup()?.id === groupId) {
       this.selectedGroup.set(null);
