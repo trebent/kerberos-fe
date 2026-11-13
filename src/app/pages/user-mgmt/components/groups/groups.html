@@ -4,9 +4,7 @@
 <div class="card-content">
   <h3>Create group</h3>
 
-  @if (createErrors().length) {
-    <app-error-display [errors]="createErrors()" />
-  }
+  <app-request-feedback [status]="createStatus" />
 
   <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
@@ -27,7 +25,13 @@
       </fieldset>
     }
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="createForm.invalid">Create</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="createForm.invalid || createStatus.pending()"
+      >
+        Create
+      </button>
     </div>
   </form>
 
@@ -42,6 +46,7 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
+  <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="admin">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
@@ -62,7 +67,7 @@
           <app-row-actions
             [label]="'group ' + g.name"
             (edit)="selectedGroup.set(g)"
-            (delete)="deleteGroup(g.id)"
+            (delete)="deleteGroup(g)"
           />
         </td>
       </ng-container>

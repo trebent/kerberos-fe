@@ -10,12 +10,7 @@
   @if (!authService.isSuperuser()) {
     <h3>Change Username</h3>
 
-    @if (usernameErrors().length) {
-      <app-error-display [errors]="usernameErrors()" />
-    }
-    @if (usernameSuccess()) {
-      <p class="success-message" role="status">Username updated successfully.</p>
-    }
+    <app-request-feedback [status]="usernameStatus" />
 
     <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
       <mat-form-field appearance="outline">
@@ -23,7 +18,11 @@
         <input matInput formControlName="newUsername" autocomplete="username" />
       </mat-form-field>
 
-      <button matButton="filled" type="submit" [disabled]="usernameForm.invalid">
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="usernameForm.invalid || usernameStatus.pending()"
+      >
         Update username
       </button>
     </form>
@@ -32,12 +31,7 @@
 
   <h3>Change Password</h3>
 
-  @if (passwordErrors().length) {
-    <app-error-display [errors]="passwordErrors()" />
-  }
-  @if (passwordSuccess()) {
-    <p class="success-message" role="status">Password changed successfully.</p>
-  }
+  <app-request-feedback [status]="passwordStatus" />
 
   <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
     <mat-form-field appearance="outline">
@@ -71,7 +65,11 @@
       }
     </mat-form-field>
 
-    <button matButton="filled" type="submit" [disabled]="passwordForm.invalid">
+    <button
+      matButton="filled"
+      type="submit"
+      [disabled]="passwordForm.invalid || passwordStatus.pending()"
+    >
       Change password
     </button>
   </form>

@@ -1,0 +1,6 @@
+@if (status().error(); as error) {
+  <app-error-display [errors]="[error]" />
+}
+@if (status().success(); as success) {
+  <p class="success-message" role="status">{{ success }}</p>
+}

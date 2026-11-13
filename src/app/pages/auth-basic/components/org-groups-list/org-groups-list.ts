@@ -1,4 +1,4 @@
-import { Component, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, inject, input, linkedSignal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -9,14 +9,17 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { of } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, GroupsService } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
+import { requestStatus } from '../../../../utils/request-status';
 import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
 
 @Component({
   imports: [
+    RequestFeedback,
     ErrorDisplay,
     FilteredTable,
     MatButton,
@@ -54,7 +57,12 @@ export class OrgGroupsList {
 
   protected readonly dataSource = resourceDataSource(this.groupsResource);
 
-  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createStatus = requestStatus({
+    failure: 'Failed to create group. Please try again.',
+  });
+  protected readonly deleteStatus = requestStatus({
+    failure: 'Failed to delete group. Please try again.',
+  });
   protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -66,31 +74,30 @@ export class OrgGroupsList {
   });
 
   protected submitCreate(): void {
-    if (this.createForm.invalid || this.orgId() === null) return;
-    this.createErrors.set([]);
-    const { name } = this.createForm.getRawValue();
-    this.groupsService.createGroup(this.orgId()!, { name }).subscribe({
-      next: () => {
+    const orgId = this.orgId();
+    if (this.createForm.invalid || orgId === null) return;
+    this.createStatus.run(
+      this.groupsService.createGroup(orgId, this.createForm.getRawValue()),
+      () => {
         this.createForm.reset();
         this.groupsResource.reload();
       },
-      error: () => {
-        this.createErrors.set(['Failed to create group. Please try again.']);
-      },
-    });
+    );
   }
 
-  protected onDataChanged(): void {
+  protected onDetailSaved(): void {
+    this.selectedGroup.set(null);
     this.groupsResource.reload();
   }
 
-  protected deleteGroup(groupId: number): void {
-    if (this.orgId() === null) return;
-    if (this.selectedGroup()?.id === groupId) {
-      this.selectedGroup.set(null);
-    }
-    this.groupsService.deleteGroup(this.orgId()!, groupId).subscribe({
-      next: () => this.groupsResource.reload(),
+  protected deleteGroup(group: Group): void {
+    const orgId = this.orgId();
+    if (orgId === null) return;
+    this.deleteStatus.run(this.groupsService.deleteGroup(orgId, group.id), () => {
+      if (this.selectedGroup()?.id === group.id) {
+        this.selectedGroup.set(null);
+      }
+      this.groupsResource.reload();
     });
   }
 }

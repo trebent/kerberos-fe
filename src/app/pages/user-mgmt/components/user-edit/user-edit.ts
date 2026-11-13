@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -9,14 +9,15 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { switchMap } from 'rxjs';
 
 import { EditPanel } from '../../../../components/edit-panel/edit-panel';
-import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { User, UsersService } from '../../../../services/admin';
 import { IdSelection } from '../../../../utils/id-selection';
+import { requestStatus } from '../../../../utils/request-status';
 
 @Component({
   imports: [
+    RequestFeedback,
     EditPanel,
-    ErrorDisplay,
     MatButton,
     MatCheckbox,
     MatFormField,
@@ -43,7 +44,7 @@ export class UserEdit {
   });
 
   protected readonly selectedGroups = new IdSelection();
-  protected readonly saveErrors = signal<string[]>([]);
+  protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
   protected readonly editForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
@@ -57,23 +58,14 @@ export class UserEdit {
     });
   }
 
+  /** Saves the username, then the group membership. */
   protected save(): void {
     if (this.editForm.invalid) return;
-    this.saveErrors.set([]);
-    const { username } = this.editForm.getRawValue();
     const userId = this.user().id;
-    this.usersService
-      .updateUser(userId, { username })
-      .pipe(
-        switchMap(() =>
-          this.usersService.updateUserGroups(userId, {
-            groupIDs: [...this.selectedGroups.selected()],
-          }),
-        ),
-      )
-      .subscribe({
-        next: () => this.saved.emit(),
-        error: () => this.saveErrors.set(['Failed to save. Please try again.']),
-      });
+    const groupIDs = [...this.selectedGroups.selected()];
+    const request$ = this.usersService
+      .updateUser(userId, this.editForm.getRawValue())
+      .pipe(switchMap(() => this.usersService.updateUserGroups(userId, { groupIDs })));
+    this.saveStatus.run(request$, () => this.saved.emit());
   }
 }

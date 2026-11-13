@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -9,8 +10,10 @@ import { forkJoin } from 'rxjs';
 
 import { EditPanel } from '../../../../components/edit-panel/edit-panel';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
-import { Group, GroupsService, User, UsersService } from '../../../../services/auth-basic';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { GroupsService, User, UsersService } from '../../../../services/auth-basic';
 import { IdSelection } from '../../../../utils/id-selection';
+import { requestStatus } from '../../../../utils/request-status';
 import {
   PasswordMismatchStateMatcher,
   passwordsMatchValidator,
@@ -18,8 +21,9 @@ import {
 
 @Component({
   imports: [
-    EditPanel,
     ErrorDisplay,
+    RequestFeedback,
+    EditPanel,
     MatButton,
     MatCheckbox,
     MatError,
@@ -43,20 +47,33 @@ export class OrgUserDetail {
   readonly orgId = input.required<number>();
   readonly user = input.required<User>();
 
+  /** The user was changed. The panel stays open, as it holds several forms. */
+  readonly changed = output<void>();
   readonly closed = output<void>();
-  readonly dataChanged = output<void>();
 
-  protected readonly nameErrors = signal<string[]>([]);
-  protected readonly nameSuccess = signal(false);
-
-  protected readonly groupsLoading = signal(false);
-  protected readonly availableGroups = signal<Group[]>([]);
+  /** The organisation's groups, and the ones this user is in. */
+  protected readonly groupsResource = rxResource({
+    params: () => ({ orgId: this.orgId(), userId: this.user().id }),
+    stream: ({ params: { orgId, userId } }) =>
+      forkJoin({
+        all: this.groupsService.listGroups(orgId),
+        member: this.usersService.getUserGroups(orgId, userId),
+      }),
+  });
   protected readonly selectedGroups = new IdSelection();
-  protected readonly groupErrors = signal<string[]>([]);
-  protected readonly groupSuccess = signal(false);
 
-  protected readonly passwordErrors = signal<string[]>([]);
-  protected readonly passwordSuccess = signal(false);
+  protected readonly nameStatus = requestStatus({
+    failure: 'Failed to update name. Please try again.',
+    success: 'Name updated successfully.',
+  });
+  protected readonly groupsStatus = requestStatus({
+    failure: 'Failed to update groups. Please try again.',
+    success: 'Groups updated successfully.',
+  });
+  protected readonly passwordStatus = requestStatus({
+    failure: 'Failed to change password. Please check your current password and try again.',
+    success: 'Password changed successfully.',
+  });
 
   protected readonly nameForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -72,88 +89,38 @@ export class OrgUserDetail {
   );
 
   constructor() {
+    effect(() => this.nameForm.reset({ name: this.user().name }));
     effect(() => {
-      this.nameForm.reset({ name: this.user().name });
-      this.loadGroups();
-    });
-  }
-
-  private loadGroups(): void {
-    this.groupsLoading.set(true);
-    const orgId = this.orgId();
-    const userId = this.user().id;
-    forkJoin([
-      this.groupsService.listGroups(orgId),
-      this.usersService.getUserGroups(orgId, userId),
-    ]).subscribe({
-      next: ([groups, userGroups]) => {
-        this.availableGroups.set(groups);
-        this.selectedGroups.set(userGroups.map((g) => g.id));
-        this.groupsLoading.set(false);
-      },
-      error: () => {
-        this.groupErrors.set(['Failed to load groups.']);
-        this.groupsLoading.set(false);
-      },
+      if (this.groupsResource.hasValue()) {
+        this.selectedGroups.set(this.groupsResource.value().member.map((group) => group.id));
+      }
     });
   }
 
   protected saveName(): void {
     if (this.nameForm.invalid) return;
-    this.nameErrors.set([]);
-    this.nameSuccess.set(false);
-    const { name } = this.nameForm.getRawValue();
-    const u = this.user();
-    this.usersService.updateUser(this.orgId(), u.id, { id: u.id, name }).subscribe({
-      next: () => {
-        this.nameSuccess.set(true);
-        this.dataChanged.emit();
-
-        setTimeout(() => {
-          this.nameSuccess.set(false);
-        }, 2000);
-      },
-      error: () => this.nameErrors.set(['Failed to update name. Please try again.']),
+    const { id } = this.user();
+    const request$ = this.usersService.updateUser(this.orgId(), id, {
+      id,
+      ...this.nameForm.getRawValue(),
     });
+    this.nameStatus.run(request$, () => this.changed.emit());
   }
 
   protected saveGroups(): void {
-    this.groupErrors.set([]);
-    this.groupSuccess.set(false);
-    const groups = this.availableGroups().filter((g) => this.selectedGroups.has(g.id));
-    this.usersService.updateUserGroups(this.orgId(), this.user().id, groups).subscribe({
-      next: () => {
-        this.groupSuccess.set(true);
-        this.dataChanged.emit();
-
-        setTimeout(() => {
-          this.groupSuccess.set(false);
-        }, 2000);
-      },
-      error: () => this.groupErrors.set(['Failed to update groups. Please try again.']),
-    });
+    if (!this.groupsResource.hasValue()) return;
+    const groups = this.groupsResource.value().all.filter((g) => this.selectedGroups.has(g.id));
+    const request$ = this.usersService.updateUserGroups(this.orgId(), this.user().id, groups);
+    this.groupsStatus.run(request$, () => this.changed.emit());
   }
 
   protected savePassword(): void {
     if (this.passwordForm.invalid) return;
-    this.passwordErrors.set([]);
-    this.passwordSuccess.set(false);
     const { oldPassword, newPassword } = this.passwordForm.getRawValue();
-    this.usersService
-      .changePassword(this.orgId(), this.user().id, { oldPassword, password: newPassword })
-      .subscribe({
-        next: () => {
-          this.passwordSuccess.set(true);
-          this.passwordForm.reset();
-
-          setTimeout(() => {
-            this.passwordSuccess.set(false);
-          }, 2000);
-        },
-        error: () =>
-          this.passwordErrors.set([
-            'Failed to change password. Please check your current password and try again.',
-          ]),
-      });
+    const request$ = this.usersService.changePassword(this.orgId(), this.user().id, {
+      oldPassword,
+      password: newPassword,
+    });
+    this.passwordStatus.run(request$, () => this.passwordForm.reset());
   }
 }

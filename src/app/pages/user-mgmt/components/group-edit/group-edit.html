@@ -1,7 +1,5 @@
 <app-edit-panel heading="Edit group" (closed)="closed.emit()">
-  @if (saveErrors().length) {
-    <app-error-display [errors]="saveErrors()" />
-  }
+  <app-request-feedback [status]="saveStatus" />
 
   <form [formGroup]="editForm" (ngSubmit)="save()">
     <mat-form-field appearance="outline">
@@ -27,7 +25,13 @@
     }
 
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="editForm.invalid">Save</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="editForm.invalid || saveStatus.pending()"
+      >
+        Save
+      </button>
     </div>
   </form>
 </app-edit-panel>

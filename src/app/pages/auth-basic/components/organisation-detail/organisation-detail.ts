@@ -1,17 +1,18 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
 import { EditPanel } from '../../../../components/edit-panel/edit-panel';
-import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { Organisation, OrganisationsService } from '../../../../services/auth-basic';
+import { requestStatus } from '../../../../utils/request-status';
 
 @Component({
   imports: [
+    RequestFeedback,
     EditPanel,
-    ErrorDisplay,
     MatButton,
     MatFormField,
     MatInput,
@@ -31,7 +32,7 @@ export class OrganisationDetail {
   readonly saved = output<void>();
   readonly closed = output<void>();
 
-  protected readonly saveErrors = signal<string[]>([]);
+  protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
   protected readonly editForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -43,12 +44,11 @@ export class OrganisationDetail {
 
   protected save(): void {
     if (this.editForm.invalid) return;
-    this.saveErrors.set([]);
-    const { name } = this.editForm.getRawValue();
-    const org = this.organisation();
-    this.orgsService.updateOrganisation(org.id, { id: org.id, name }).subscribe({
-      next: () => this.saved.emit(),
-      error: () => this.saveErrors.set(['Failed to save. Please try again.']),
+    const { id } = this.organisation();
+    const request$ = this.orgsService.updateOrganisation(id, {
+      id,
+      ...this.editForm.getRawValue(),
     });
+    this.saveStatus.run(request$, () => this.saved.emit());
   }
 }

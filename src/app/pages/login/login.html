@@ -1,9 +1,7 @@
 <div class="page page-narrow">
   <h1 class="page-title">Sign in to Kerberos</h1>
 
-  @if (errors().length) {
-    <app-error-display [errors]="errors()" />
-  }
+  <app-request-feedback [status]="signInStatus" />
 
   <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
     <mat-form-field>
@@ -18,8 +16,8 @@
 
     <mat-slide-toggle formControlName="superLogin">Sign in as superuser</mat-slide-toggle>
 
-    <button matButton="filled" type="submit" [disabled]="form.invalid || submitting()">
-      {{ submitting() ? 'Signing in…' : 'Sign in' }}
+    <button matButton="filled" type="submit" [disabled]="form.invalid || signInStatus.pending()">
+      {{ signInStatus.pending() ? 'Signing in…' : 'Sign in' }}
     </button>
   </form>
 </div>

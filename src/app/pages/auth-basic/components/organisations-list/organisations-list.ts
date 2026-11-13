@@ -8,6 +8,7 @@ import { MatInput } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import {
@@ -16,10 +17,12 @@ import {
   OrganisationsService,
 } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
+import { requestStatus } from '../../../../utils/request-status';
 import { OrganisationDetail } from '../organisation-detail/organisation-detail';
 
 @Component({
   imports: [
+    RequestFeedback,
     ErrorDisplay,
     FilteredTable,
     MatButton,
@@ -51,7 +54,12 @@ export class OrganisationsList {
 
   protected readonly dataSource = resourceDataSource(this.orgsResource);
 
-  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createStatus = requestStatus({
+    failure: 'Failed to create organisation. Please try again.',
+  });
+  protected readonly deleteStatus = requestStatus({
+    failure: 'Failed to delete organisation. Please try again.',
+  });
   protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -62,22 +70,12 @@ export class OrganisationsList {
 
   protected submitCreate(): void {
     if (this.createForm.invalid) return;
-    this.createErrors.set([]);
-    const { name } = this.createForm.getRawValue();
-    this.orgsService.createOrganisation({ name }).subscribe({
-      next: (resp) => {
-        this.createForm.reset();
-        this.newOrgCredentials.set(resp);
-        this.orgsResource.reload();
-      },
-      error: () => {
-        this.createErrors.set(['Failed to create organisation. Please try again.']);
-      },
+    const request$ = this.orgsService.createOrganisation(this.createForm.getRawValue());
+    this.createStatus.run(request$, (credentials) => {
+      this.createForm.reset();
+      this.newOrgCredentials.set(credentials);
+      this.orgsResource.reload();
     });
-  }
-
-  protected dismissCredentials(): void {
-    this.newOrgCredentials.set(null);
   }
 
   protected toggleManage(org: Organisation): void {
@@ -96,16 +94,16 @@ export class OrganisationsList {
     this.orgsResource.reload();
   }
 
-  protected deleteOrg(orgId: number): void {
-    if (this.selectedOrgId() === orgId) {
-      this.selectedOrgId.set(null);
-      this.orgSelected.emit(null);
-    }
-    if (this.selectedOrg()?.id === orgId) {
-      this.selectedOrg.set(null);
-    }
-    this.orgsService.deleteOrganisation(orgId).subscribe({
-      next: () => this.orgsResource.reload(),
+  protected deleteOrg(org: Organisation): void {
+    this.deleteStatus.run(this.orgsService.deleteOrganisation(org.id), () => {
+      if (this.selectedOrgId() === org.id) {
+        this.selectedOrgId.set(null);
+        this.orgSelected.emit(null);
+      }
+      if (this.selectedOrg()?.id === org.id) {
+        this.selectedOrg.set(null);
+      }
+      this.orgsResource.reload();
     });
   }
 }
