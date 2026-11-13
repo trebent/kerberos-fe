@@ -90,4 +90,31 @@ describe('AuthBasic', () => {
     expect(element.querySelector('app-org-user-detail')).toBeNull();
     await expectNoAxeViolations(fixture);
   });
+
+  it("drops the previous organisation's users when the next one fails to load", async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    const click = (label: string) =>
+      element.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!.click();
+
+    click('Select organisation acme');
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/users'))
+      .flush([{ id: 1, name: 'bob', groups: [] }]);
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7/groups')).flush([]);
+    await fixture.whenStable();
+    expect(element.textContent).toContain('bob');
+
+    click('Select organisation globex');
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/8/users'))
+      .flush(null, { status: 500, statusText: 'Server Error' });
+    http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/8/groups')).flush([]);
+    await fixture.whenStable();
+
+    expect(element.textContent).toContain('Failed to load users.');
+    expect(element.textContent).not.toContain('bob');
+    await expectNoAxeViolations(fixture);
+  });
 });

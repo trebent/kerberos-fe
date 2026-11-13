@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -8,11 +8,10 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { User, UsersService } from '../../../../services/admin';
-import { MAT_TABLE } from '../../../../utils/material-table';
+import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
@@ -45,24 +44,8 @@ export class Users {
     stream: () => this.usersService.getUsers(),
   });
 
-  readonly dataSource = new MatTableDataSource<User>();
-
   private readonly paginator = viewChild(MatPaginator);
-
-  constructor() {
-    // The paginator only exists once the table is rendered.
-    effect(() => {
-      this.dataSource.paginator = this.paginator() ?? null;
-    });
-
-    effect(() => {
-      if (this.usersResource.hasValue()) {
-        this.dataSource.data = this.usersResource.value();
-      } else {
-        this.dataSource.data = [];
-      }
-    });
-  }
+  readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
 
   readonly createErrors = signal<string[]>([]);
   readonly deleteErrors = signal<string[]>([]);
@@ -71,7 +54,7 @@ export class Users {
     password: ['', Validators.required],
   });
 
-  readonly selectedUser = signal<User | null>(null, { equal: () => false });
+  readonly selectedUser = signal<User | null>(null);
 
   /** The user's group names for the table, or a dash when they have none. */
   groupNames(user: User): string {

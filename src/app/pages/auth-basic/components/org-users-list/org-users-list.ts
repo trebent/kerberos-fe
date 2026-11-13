@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
+import { Component, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -8,12 +8,11 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
 import { of } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { User, UsersService } from '../../../../services/auth-basic';
-import { MAT_TABLE } from '../../../../utils/material-table';
+import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 
 @Component({
@@ -54,20 +53,8 @@ export class OrgUsersList {
     },
   });
 
-  readonly dataSource = new MatTableDataSource<User>();
-
   private readonly paginator = viewChild(MatPaginator);
-
-  constructor() {
-    // The paginator only exists once the table is rendered.
-    effect(() => {
-      this.dataSource.paginator = this.paginator() ?? null;
-    });
-
-    effect(() => {
-      this.dataSource.data = this.usersResource.value() ?? [];
-    });
-  }
+  readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
 
   readonly createErrors = signal<string[]>([]);
   readonly deleteErrors = signal<string[]>([]);
@@ -80,7 +67,6 @@ export class OrgUsersList {
   readonly selectedUser = linkedSignal<number | null, User | null>({
     source: this.orgId,
     computation: () => null,
-    equal: () => false,
   });
 
   applyFilter(event: Event): void {
