@@ -23,6 +23,7 @@ import { ErrorDisplay } from '../../../../components/error-display/error-display
 import { DebugService, DebugSession, DebugSessionCall } from '../../../../services/admin';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     DatePipe,
     ErrorDisplay,

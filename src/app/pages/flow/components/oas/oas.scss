@@ -1,26 +1,3 @@
-:host {
-  display: block;
-}
-
-.oas {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container);
-  border-radius: 0.75rem;
-}
-
-.oas-header {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 8px 8px 16px;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-  flex-shrink: 0;
-}
-
 .oas-body {
   flex: 1;
   max-height: 70dvh;
@@ -36,7 +13,7 @@
 
 .oas-pre {
   margin: 0;
-  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-family: var(--app-font-mono);
   font-size: 0.8rem;
   line-height: 1.5;
   white-space: pre;
