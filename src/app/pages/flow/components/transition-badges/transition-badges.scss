@@ -1,0 +1,35 @@
+.transition-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--app-font-mono);
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: default;
+  letter-spacing: 0.03em;
+
+  &.ok {
+    color: var(--app-success);
+    background: color-mix(in srgb, var(--app-success) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--app-success) 30%, transparent);
+  }
+
+  &.nok {
+    color: var(--mat-sys-error);
+    background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mat-sys-error) 30%, transparent);
+  }
+
+  &.none {
+    color: var(--mat-sys-on-surface-variant);
+    background: color-mix(in srgb, var(--mat-sys-on-surface-variant) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mat-sys-on-surface-variant) 20%, transparent);
+  }
+
+  &.na {
+    color: var(--mat-sys-on-surface-variant);
+    background: transparent;
+    border: 1px dashed var(--mat-sys-outline-variant);
+    opacity: 0.6;
+    font-weight: 500;
+  }
+}

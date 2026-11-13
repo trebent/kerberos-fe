@@ -1,0 +1,21 @@
+@for (transition of transitions(); track transition.startedAt) {
+  <div
+    class="transition-badge"
+    [class.ok]="transition.result.outcome === 'success'"
+    [class.nok]="transition.result.outcome === 'failure'"
+    tabindex="0"
+    [matTooltip]="tooltip(transition)"
+    matTooltipClass="flow-meta-tooltip"
+  >
+    {{ transition.result.outcome === 'success' ? 'OK' : 'NOK' }}
+  </div>
+}
+@if (placeholder(); as placeholder) {
+  <div
+    class="transition-badge"
+    [class.na]="placeholder === 'n/a'"
+    [class.none]="placeholder === 'none'"
+  >
+    {{ placeholder }}
+  </div>
+}

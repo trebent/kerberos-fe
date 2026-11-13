@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  box-sizing: border-box;
+  max-width: 100%;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container);
+  padding: 12px 20px;
+}

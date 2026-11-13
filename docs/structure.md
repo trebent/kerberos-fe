@@ -17,7 +17,7 @@ src/app/
   pages/                       one directory per navigable route
     login/
     flow/
-      components/              debug, flow-pipeline, oas
+      components/              debug, flow-pipeline, oas, call-details, transition-badges
     user-mgmt/
       components/              profile, users, user-edit, groups, group-edit, permissions-list
     auth-basic/
@@ -37,6 +37,8 @@ src/app/
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
   utils/                       plain functions and classes, no components or services
+    flow-meta.ts               flowComponentData, typed access to a flow component's data
+    http-status.ts             httpStatusClass, the color class for an HTTP status
     id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells

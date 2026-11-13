@@ -1,39 +1,5 @@
 @if (selectedCall(); as call) {
-  <div class="call-meta-box">
-    <div class="meta-row">
-      <span class="meta-label">ID</span>
-      <span class="meta-value">{{ call.id }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Method</span>
-      <span class="meta-value mono">{{ call.method }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Status</span>
-      <span
-        class="meta-value mono"
-        [class.status-ok]="call.statusCode >= 200 && call.statusCode < 300"
-        [class.status-err]="!(call.statusCode >= 200 && call.statusCode < 300)"
-        >{{ call.statusCode }}</span
-      >
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">URL</span>
-      <span class="meta-value mono">{{ call.url }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Started</span>
-      <span class="meta-value">{{ call.startedAt | date: 'medium' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Stopped</span>
-      <span class="meta-value">{{ call.stoppedAt | date: 'medium' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Duration</span>
-      <span class="meta-value mono">{{ callDuration(call) }}</span>
-    </div>
-  </div>
+  <app-call-details [call]="call" />
 }
 <div class="flow-card">
   <div class="flow-section">
@@ -41,26 +7,10 @@
     <div class="pipeline">
       @for (comp of flowMetas(); track comp.name; let last = $last; let i = $index) {
         <div class="flow-col">
-          <div class="transitions-row inbound">
-            @for (t of getTransitions(comp.name, 'inbound'); track t.startedAt) {
-              <div
-                class="transition-badge"
-                [class.ok]="t.result.outcome === 'success'"
-                [class.nok]="t.result.outcome === 'failure'"
-                tabindex="0"
-                [matTooltip]="formatTransitionTooltip(t)"
-                matTooltipClass="flow-meta-tooltip"
-              >
-                {{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}
-              </div>
-            }
-            @if (shouldShowNA(comp.name)) {
-              <div class="transition-badge na">n/a</div>
-            }
-            @if (shouldShowNone(comp.name, 'inbound')) {
-              <div class="transition-badge none">none</div>
-            }
-          </div>
+          <app-transition-badges
+            [transitions]="getTransitions(comp.name, 'inbound')"
+            [placeholder]="placeholder(comp.name, 'inbound')"
+          />
           <div
             class="flow-box"
             tabindex="0"
@@ -71,26 +21,10 @@
           >
             {{ comp.name }}
           </div>
-          <div class="transitions-row outbound">
-            @for (t of getTransitions(comp.name, 'outbound'); track t.startedAt) {
-              <div
-                class="transition-badge"
-                [class.ok]="t.result.outcome === 'success'"
-                [class.nok]="t.result.outcome === 'failure'"
-                tabindex="0"
-                [matTooltip]="formatTransitionTooltip(t)"
-                matTooltipClass="flow-meta-tooltip"
-              >
-                {{ t.result.outcome === 'success' ? 'OK' : 'NOK' }}
-              </div>
-            }
-            @if (shouldShowNA(comp.name)) {
-              <div class="transition-badge na">n/a</div>
-            }
-            @if (shouldShowNone(comp.name, 'outbound')) {
-              <div class="transition-badge none">none</div>
-            }
-          </div>
+          <app-transition-badges
+            [transitions]="getTransitions(comp.name, 'outbound')"
+            [placeholder]="placeholder(comp.name, 'outbound')"
+          />
         </div>
         @if (!last) {
           <mat-icon class="arrow" aria-hidden="true" [class.dimmed]="isArrowDimmed(i)"

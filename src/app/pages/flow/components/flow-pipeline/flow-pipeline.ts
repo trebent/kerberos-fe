@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -6,13 +5,15 @@ import { MatTooltip } from '@angular/material/tooltip';
 import {
   DebugSessionCall,
   FlowMeta,
-  FlowMetaDataRouter,
   FlowMetaDataRouterBackend,
   FlowTransition,
 } from '../../../../services/admin';
+import { flowComponentData } from '../../../../utils/flow-meta';
+import { CallDetails } from '../call-details/call-details';
+import { Placeholder, TransitionBadges } from '../transition-badges/transition-badges';
 
 @Component({
-  imports: [DatePipe, MatIcon, MatTooltip],
+  imports: [CallDetails, MatIcon, MatTooltip, TransitionBadges],
   selector: 'app-flow-pipeline',
   styleUrl: './flow-pipeline.scss',
   templateUrl: './flow-pipeline.html',
@@ -23,9 +24,7 @@ export class FlowPipeline {
   readonly callBackend = input<string | null>(null);
 
   protected readonly backends = computed<FlowMetaDataRouterBackend[]>(() => {
-    const router = this.flowMetas().find((c) => c.name === 'router');
-    if (!router) return [];
-    return (router.data as unknown as FlowMetaDataRouter).backends ?? [];
+    return flowComponentData(this.flowMetas(), 'router')?.backends ?? [];
   });
 
   protected readonly hoveredBackend = signal<string | null>(null);
@@ -86,58 +85,20 @@ export class FlowPipeline {
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
 
-  protected shouldShowNA(compName: string): boolean {
-    if (!this.selectedCall()) return false;
-    const eb = this.effectiveBackend();
-    if (!eb) return false;
-    return !(this.involvedMap().get(eb)?.has(compName) ?? false);
-  }
-
-  protected shouldShowNone(compName: string, direction: 'inbound' | 'outbound'): boolean {
-    const eb = this.effectiveBackend();
-    if (!eb) return false;
-    const involved = this.involvedMap().get(eb)?.has(compName) ?? false;
-    if (!involved) return false;
-    return !!(this.selectedCall() && this.getTransitions(compName, direction).length === 0);
+  /**
+   * What to show in a component's badge row when it recorded no transitions for the selected call:
+   * "n/a" when the call's backend does not pass through it, "none" when it does.
+   */
+  protected placeholder(compName: string, direction: 'inbound' | 'outbound'): Placeholder | null {
+    const backend = this.effectiveBackend();
+    if (!this.selectedCall() || !backend) return null;
+    if (!(this.involvedMap().get(backend)?.has(compName) ?? false)) return 'n/a';
+    return this.getTransitions(compName, direction).length === 0 ? 'none' : null;
   }
 
   protected getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
     const entry = this.transitionsByComponent().get(compName);
     return entry ? entry[direction] : [];
-  }
-
-  protected callDuration(call: DebugSessionCall): string {
-    if (!call.stoppedAt) return '—';
-    const ms = this.parseIsoMs(call.stoppedAt) - this.parseIsoMs(call.startedAt);
-    return `${ms.toFixed(3)}ms`;
-  }
-
-  private parseIsoMs(iso: string): number {
-    const match = /\.(\d+)Z?$/.exec(iso);
-    const base = new Date(iso).getTime();
-    if (!match) return base;
-    // getTime() truncates to milliseconds; recover full sub-ms precision from the fraction
-    const frac = match[1];
-    if (frac.length <= 3) return base;
-    const subMs = parseFloat(`0.${frac.slice(3)}`);
-    return base + subMs;
-  }
-
-  protected formatTransitionTooltip(t: FlowTransition): string {
-    const lines = [
-      `Started:  ${this.formatTimestamp(t.startedAt)}`,
-      `Stopped:  ${this.formatTimestamp(t.stoppedAt)}`,
-    ];
-    if (t.result.outcome === 'failure' && t.result.cause) {
-      lines.push(`Error:    ${t.result.cause}`);
-    }
-    return lines.join('\n');
-  }
-
-  private formatTimestamp(iso: string): string {
-    const match = /T(\d{2}:\d{2}:\d{2}(?:\.\d+)?)/.exec(iso);
-    const timePart = match ? match[1] : iso;
-    return `${new Date(iso).toLocaleDateString()} ${timePart}`;
   }
 
   private hasBackendInTree(data: unknown, name: string): boolean {
