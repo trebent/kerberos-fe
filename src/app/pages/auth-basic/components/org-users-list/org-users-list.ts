@@ -41,9 +41,9 @@ export class OrgUsersList {
 
   readonly orgId = input.required<number | null>();
 
-  readonly displayedColumns = ['id', 'name', 'groups', 'actions'];
+  protected readonly displayedColumns = ['id', 'name', 'groups', 'actions'];
 
-  readonly usersResource = rxResource({
+  protected readonly usersResource = rxResource({
     params: () => this.orgId(),
     stream: ({ params: orgId }) => {
       if (orgId === null) {
@@ -54,26 +54,26 @@ export class OrgUsersList {
   });
 
   private readonly paginator = viewChild(MatPaginator);
-  readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
+  protected readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
 
-  readonly createErrors = signal<string[]>([]);
-  readonly deleteErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly deleteErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
     password: ['', Validators.required],
   });
 
   /** The user being edited. Switching organisation closes the edit panel. */
-  readonly selectedUser = linkedSignal<number | null, User | null>({
+  protected readonly selectedUser = linkedSignal<number | null, User | null>({
     source: this.orgId,
     computation: () => null,
   });
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
     this.createErrors.set([]);
     const { name, password } = this.createForm.getRawValue();
@@ -88,19 +88,19 @@ export class OrgUsersList {
     });
   }
 
-  openEdit(user: User): void {
+  protected openEdit(user: User): void {
     this.selectedUser.set(user);
   }
 
-  onDataChanged(): void {
+  protected onDataChanged(): void {
     this.usersResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedUser.set(null);
   }
 
-  deleteUser(userId: number): void {
+  protected deleteUser(userId: number): void {
     const orgId = this.orgId();
     if (orgId === null) return;
 

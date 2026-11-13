@@ -38,34 +38,34 @@ export class Users {
   private readonly usersService = inject(UsersService);
   private readonly fb = inject(FormBuilder);
 
-  readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
+  protected readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
 
-  readonly usersResource = rxResource({
+  protected readonly usersResource = rxResource({
     stream: () => this.usersService.getUsers(),
   });
 
   private readonly paginator = viewChild(MatPaginator);
-  readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
+  protected readonly dataSource = resourceDataSource(this.usersResource, this.paginator);
 
-  readonly createErrors = signal<string[]>([]);
-  readonly deleteErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly deleteErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
   });
 
-  readonly selectedUser = signal<User | null>(null);
+  protected readonly selectedUser = signal<User | null>(null);
 
   /** The user's group names for the table, or a dash when they have none. */
-  groupNames(user: User): string {
+  protected groupNames(user: User): string {
     return user.groups?.length ? user.groups.map((group) => group.name).join(', ') : '—';
   }
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid) return;
     this.createErrors.set([]);
     const { username, password } = this.createForm.getRawValue();
@@ -80,20 +80,20 @@ export class Users {
     });
   }
 
-  openEdit(user: User): void {
+  protected openEdit(user: User): void {
     this.selectedUser.set(user);
   }
 
-  onDetailSaved(): void {
+  protected onDetailSaved(): void {
     this.selectedUser.set(null);
     this.usersResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedUser.set(null);
   }
 
-  deleteUser(userId: number): void {
+  protected deleteUser(userId: number): void {
     this.deleteErrors.set([]);
     this.usersService.deleteUser(userId).subscribe({
       next: () => {

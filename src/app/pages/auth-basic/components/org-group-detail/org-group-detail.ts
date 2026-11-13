@@ -33,9 +33,9 @@ export class OrgGroupDetail {
   readonly closed = output<void>();
   readonly dataChanged = output<void>();
 
-  readonly saveErrors = signal<string[]>([]);
+  protected readonly saveErrors = signal<string[]>([]);
 
-  readonly editForm = this.fb.nonNullable.group({
+  protected readonly editForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
@@ -45,7 +45,7 @@ export class OrgGroupDetail {
     });
   }
 
-  save(): void {
+  protected save(): void {
     if (this.editForm.invalid) return;
     this.saveErrors.set([]);
     const { name } = this.editForm.getRawValue();
@@ -59,7 +59,7 @@ export class OrgGroupDetail {
     });
   }
 
-  close(): void {
+  protected close(): void {
     this.closed.emit();
   }
 }

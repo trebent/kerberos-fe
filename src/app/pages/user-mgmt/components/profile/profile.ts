@@ -31,22 +31,22 @@ import {
   templateUrl: './profile.html',
 })
 export class Profile {
-  readonly authService = inject(AuthService);
+  protected readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  readonly mismatchMatcher = new PasswordMismatchStateMatcher();
+  protected readonly mismatchMatcher = new PasswordMismatchStateMatcher();
 
-  readonly usernameErrors = signal<string[]>([]);
-  readonly usernameSuccess = signal(false);
+  protected readonly usernameErrors = signal<string[]>([]);
+  protected readonly usernameSuccess = signal(false);
 
-  readonly passwordErrors = signal<string[]>([]);
-  readonly passwordSuccess = signal(false);
+  protected readonly passwordErrors = signal<string[]>([]);
+  protected readonly passwordSuccess = signal(false);
 
-  readonly usernameForm = this.fb.nonNullable.group({
+  protected readonly usernameForm = this.fb.nonNullable.group({
     newUsername: ['', [Validators.required]],
   });
 
-  readonly passwordForm = this.fb.nonNullable.group(
+  protected readonly passwordForm = this.fb.nonNullable.group(
     {
       oldPassword: ['', [Validators.required]],
       newPassword: ['', [Validators.required]],
@@ -55,7 +55,7 @@ export class Profile {
     { validators: passwordsMatchValidator },
   );
 
-  submitUsername(): void {
+  protected submitUsername(): void {
     if (this.usernameForm.invalid) return;
 
     this.usernameErrors.set([]);
@@ -79,7 +79,7 @@ export class Profile {
     });
   }
 
-  submitPassword(): void {
+  protected submitPassword(): void {
     if (this.passwordForm.invalid) return;
 
     this.passwordErrors.set([]);

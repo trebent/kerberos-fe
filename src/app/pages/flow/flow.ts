@@ -41,32 +41,32 @@ export class Flow {
   });
 
   /** Backends the OAS validator has a specification for. */
-  readonly oasBackends = computed<string[]>(() => {
+  protected readonly oasBackends = computed<string[]>(() => {
     const oas = this.flowComponent<FlowMetaDataOAS>('oas-validator');
     return oas?.backends ?? [];
   });
 
   /** Backends the router forwards to. */
-  readonly routerBackends = computed<string[]>(() => {
+  protected readonly routerBackends = computed<string[]>(() => {
     const router = this.flowComponent<FlowMetaDataRouter>('router');
     return router?.backends?.map((backend) => backend.name) ?? [];
   });
 
-  readonly selectedOASBackend = signal<string | null>(null);
-  readonly debugOpen = signal(false);
-  readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
-  readonly selectedDebugBackend = signal<string | null>(null);
+  protected readonly selectedOASBackend = signal<string | null>(null);
+  protected readonly debugOpen = signal(false);
+  protected readonly selectedDebugCall = signal<DebugSessionCall | null>(null);
+  protected readonly selectedDebugBackend = signal<string | null>(null);
 
   /** Picking the backend that is already shown closes the specification. */
-  selectOASBackend(backend: string): void {
+  protected selectOASBackend(backend: string): void {
     this.selectedOASBackend.update((current) => (current === backend ? null : backend));
   }
 
-  closeOAS(): void {
+  protected closeOAS(): void {
     this.selectedOASBackend.set(null);
   }
 
-  toggleDebug(): void {
+  protected toggleDebug(): void {
     if (this.debugOpen()) {
       this.closeDebug();
     } else {
@@ -74,13 +74,13 @@ export class Flow {
     }
   }
 
-  closeDebug(): void {
+  protected closeDebug(): void {
     this.debugOpen.set(false);
     this.selectedDebugCall.set(null);
     this.selectedDebugBackend.set(null);
   }
 
-  onDebugCallSelected(call: DebugSessionCall | null): void {
+  protected onDebugCallSelected(call: DebugSessionCall | null): void {
     this.selectedDebugCall.set(call);
   }
 

@@ -39,14 +39,14 @@ export class UserEdit {
   readonly saved = output<void>();
   readonly closed = output<void>();
 
-  readonly groupsResource = rxResource({
+  protected readonly groupsResource = rxResource({
     stream: () => this.usersService.getGroups(),
   });
 
-  readonly selectedGroupIds = signal<number[]>([]);
-  readonly saveErrors = signal<string[]>([]);
+  protected readonly selectedGroupIds = signal<number[]>([]);
+  protected readonly saveErrors = signal<string[]>([]);
 
-  readonly editForm = this.fb.nonNullable.group({
+  protected readonly editForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
   });
 
@@ -58,15 +58,15 @@ export class UserEdit {
     });
   }
 
-  isSelected(groupId: number): boolean {
+  protected isSelected(groupId: number): boolean {
     return this.selectedGroupIds().includes(groupId);
   }
 
-  toggleGroup(groupId: number): void {
+  protected toggleGroup(groupId: number): void {
     this.selectedGroupIds.update((ids) => toggleId(ids, groupId));
   }
 
-  save(): void {
+  protected save(): void {
     if (this.editForm.invalid) return;
     this.saveErrors.set([]);
     const { username } = this.editForm.getRawValue();
@@ -84,7 +84,7 @@ export class UserEdit {
       });
   }
 
-  close(): void {
+  protected close(): void {
     this.closed.emit();
   }
 }

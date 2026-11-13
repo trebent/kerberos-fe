@@ -14,7 +14,6 @@ const session = (id: number) => ({
 
 describe('Debug', () => {
   let fixture: ComponentFixture<Debug>;
-  let debug: Debug;
   let http: HttpTestingController;
 
   beforeEach(async () => {
@@ -25,28 +24,41 @@ describe('Debug', () => {
 
     fixture = TestBed.createComponent(Debug);
     fixture.componentRef.setInput('backends', ['echo', 'other']);
-    debug = fixture.componentInstance;
     await fixture.whenStable();
   });
+
+  /** Picks an option in one of the panel's selects. Ticks, as pending requests block stability. */
+  function choose(selectLabel: string, option: string): void {
+    const select = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('mat-form-field'))
+      .find((field) => field.querySelector('mat-label')?.textContent?.trim() === selectLabel)!
+      .querySelector<HTMLElement>('.mat-mdc-select-trigger')!;
+    select.click();
+    TestBed.tick();
+    Array.from(document.querySelectorAll<HTMLElement>('mat-option'))
+      .find((element) => element.textContent?.trim().startsWith(option))!
+      .click();
+    TestBed.tick();
+  }
 
   afterEach(() => http.verify());
 
   it('ignores sessions of a backend that is no longer selected', () => {
-    debug.selectedBackend.set('echo');
-    TestBed.tick();
+    choose('Select backend', 'echo');
     const echoRequest = http.expectOne((req) => req.url.endsWith(sessionsUrl('echo')));
 
-    debug.selectedBackend.set('other');
-    TestBed.tick();
+    choose('Select backend', 'other');
     http.expectOne((req) => req.url.endsWith(sessionsUrl('other'))).flush([session(2)]);
+    TestBed.tick();
 
     expect(echoRequest.cancelled).toBe(true);
-    expect(debug.sessions().map((s) => s.id)).toEqual([2]);
+    choose('Select session', '#2');
+    expect(fixture.nativeElement.querySelector('.session-meta')?.textContent).toMatch(
+      /Session ID\s*2/,
+    );
   });
 
   it('explains a failed session load', async () => {
-    debug.selectedBackend.set('echo');
-    TestBed.tick();
+    choose('Select backend', 'echo');
     http
       .expectOne((req) => req.url.endsWith(sessionsUrl('echo')))
       .flush(null, { status: 500, statusText: 'Server Error' });

@@ -39,7 +39,7 @@ export class OrgUserDetail {
   private readonly groupsService = inject(GroupsService);
   private readonly fb = inject(FormBuilder);
 
-  readonly mismatchMatcher = new PasswordMismatchStateMatcher();
+  protected readonly mismatchMatcher = new PasswordMismatchStateMatcher();
 
   readonly orgId = input.required<number>();
   readonly user = input.required<User>();
@@ -47,23 +47,23 @@ export class OrgUserDetail {
   readonly closed = output<void>();
   readonly dataChanged = output<void>();
 
-  readonly nameErrors = signal<string[]>([]);
-  readonly nameSuccess = signal(false);
+  protected readonly nameErrors = signal<string[]>([]);
+  protected readonly nameSuccess = signal(false);
 
-  readonly groupsLoading = signal(false);
-  readonly availableGroups = signal<Group[]>([]);
-  readonly selectedGroupIds = signal<Set<number>>(new Set());
-  readonly groupErrors = signal<string[]>([]);
-  readonly groupSuccess = signal(false);
+  protected readonly groupsLoading = signal(false);
+  protected readonly availableGroups = signal<Group[]>([]);
+  protected readonly selectedGroupIds = signal<Set<number>>(new Set());
+  protected readonly groupErrors = signal<string[]>([]);
+  protected readonly groupSuccess = signal(false);
 
-  readonly passwordErrors = signal<string[]>([]);
-  readonly passwordSuccess = signal(false);
+  protected readonly passwordErrors = signal<string[]>([]);
+  protected readonly passwordSuccess = signal(false);
 
-  readonly nameForm = this.fb.nonNullable.group({
+  protected readonly nameForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
-  readonly passwordForm = this.fb.nonNullable.group(
+  protected readonly passwordForm = this.fb.nonNullable.group(
     {
       oldPassword: ['', Validators.required],
       newPassword: ['', Validators.required],
@@ -99,7 +99,7 @@ export class OrgUserDetail {
     });
   }
 
-  toggleGroup(group: Group): void {
+  protected toggleGroup(group: Group): void {
     const ids = new Set(this.selectedGroupIds());
     if (ids.has(group.id)) {
       ids.delete(group.id);
@@ -109,7 +109,7 @@ export class OrgUserDetail {
     this.selectedGroupIds.set(ids);
   }
 
-  saveName(): void {
+  protected saveName(): void {
     if (this.nameForm.invalid) return;
     this.nameErrors.set([]);
     this.nameSuccess.set(false);
@@ -128,7 +128,7 @@ export class OrgUserDetail {
     });
   }
 
-  saveGroups(): void {
+  protected saveGroups(): void {
     this.groupErrors.set([]);
     this.groupSuccess.set(false);
     const groups = this.availableGroups().filter((g) => this.selectedGroupIds().has(g.id));
@@ -145,7 +145,7 @@ export class OrgUserDetail {
     });
   }
 
-  savePassword(): void {
+  protected savePassword(): void {
     if (this.passwordForm.invalid) return;
     this.passwordErrors.set([]);
     this.passwordSuccess.set(false);
@@ -168,7 +168,7 @@ export class OrgUserDetail {
       });
   }
 
-  close(): void {
+  protected close(): void {
     this.closed.emit();
   }
 }
