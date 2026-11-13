@@ -32,14 +32,8 @@
   <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="admin">
     <table mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let u">{{ u.id }}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let u">{{ u.name }}</td>
-      </ng-container>
+      <mat-text-column name="id" headerText="ID" />
+      <mat-text-column name="name" />
       <ng-container matColumnDef="groups">
         <th mat-header-cell *matHeaderCellDef>Groups</th>
         <td mat-cell *matCellDef="let u">
