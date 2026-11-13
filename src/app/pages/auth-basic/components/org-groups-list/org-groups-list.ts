@@ -18,6 +18,7 @@ import { requestStatus } from '../../../../utils/request-status';
 import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     ErrorDisplay,
@@ -34,7 +35,6 @@ import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
     OrgGroupDetail,
   ],
   selector: 'app-org-groups-list',
-  styleUrl: './org-groups-list.scss',
   templateUrl: './org-groups-list.html',
 })
 export class OrgGroupsList {

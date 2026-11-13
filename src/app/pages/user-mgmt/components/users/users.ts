@@ -18,6 +18,7 @@ import { requestStatus } from '../../../../utils/request-status';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     ErrorDisplay,
@@ -34,7 +35,6 @@ import { UserEdit } from '../user-edit/user-edit';
     UserEdit,
   ],
   selector: 'app-users',
-  styleUrl: './users.scss',
   templateUrl: './users.html',
 })
 export class Users {

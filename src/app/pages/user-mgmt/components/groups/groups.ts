@@ -19,6 +19,7 @@ import { requestStatus } from '../../../../utils/request-status';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     ErrorDisplay,
@@ -36,7 +37,6 @@ import { GroupEdit } from '../group-edit/group-edit';
     MatCheckbox,
   ],
   selector: 'app-groups',
-  styleUrl: './groups.scss',
   templateUrl: './groups.html',
 })
 export class Groups {

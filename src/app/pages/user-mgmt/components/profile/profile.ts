@@ -15,6 +15,7 @@ import {
 } from '../../../../utils/validation';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     MatButton,

@@ -7,6 +7,7 @@ import { MAT_TABLE } from '../../../../utils/material-table';
 import { UsersService } from '../../../../services/admin';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [ErrorDisplay, MatProgressSpinner, ...MAT_TABLE],
   selector: 'app-permissions-list',
   styleUrl: './permissions-list.scss',

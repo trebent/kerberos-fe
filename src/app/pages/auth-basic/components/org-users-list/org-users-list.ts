@@ -19,6 +19,7 @@ import { requestStatus } from '../../../../utils/request-status';
 import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     ErrorDisplay,
@@ -35,7 +36,6 @@ import { OrgUserDetail } from '../org-user-detail/org-user-detail';
     OrgUserDetail,
   ],
   selector: 'app-org-users-list',
-  styleUrl: './org-users-list.scss',
   templateUrl: './org-users-list.html',
 })
 export class OrgUsersList {

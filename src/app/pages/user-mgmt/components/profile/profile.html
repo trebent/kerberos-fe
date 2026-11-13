@@ -12,7 +12,7 @@
 
     <app-request-feedback [status]="usernameStatus" />
 
-    <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+    <form class="compact-form" [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
       <mat-form-field appearance="outline">
         <mat-label>New username</mat-label>
         <input matInput formControlName="newUsername" autocomplete="username" />
@@ -33,7 +33,7 @@
 
   <app-request-feedback [status]="passwordStatus" />
 
-  <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+  <form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
     <mat-form-field appearance="outline">
       <mat-label>Current password</mat-label>
       <input
