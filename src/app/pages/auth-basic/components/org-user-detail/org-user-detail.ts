@@ -1,15 +1,16 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 
+import { EditPanel } from '../../../../components/edit-panel/edit-panel';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Group, GroupsService, User, UsersService } from '../../../../services/auth-basic';
+import { IdSelection } from '../../../../utils/id-selection';
 import {
   PasswordMismatchStateMatcher,
   passwordsMatchValidator,
@@ -17,13 +18,12 @@ import {
 
 @Component({
   imports: [
+    EditPanel,
     ErrorDisplay,
     MatButton,
     MatCheckbox,
     MatError,
     MatFormField,
-    MatIcon,
-    MatIconButton,
     MatInput,
     MatLabel,
     MatProgressSpinner,
@@ -51,7 +51,7 @@ export class OrgUserDetail {
 
   protected readonly groupsLoading = signal(false);
   protected readonly availableGroups = signal<Group[]>([]);
-  protected readonly selectedGroupIds = signal<Set<number>>(new Set());
+  protected readonly selectedGroups = new IdSelection();
   protected readonly groupErrors = signal<string[]>([]);
   protected readonly groupSuccess = signal(false);
 
@@ -88,7 +88,7 @@ export class OrgUserDetail {
     ]).subscribe({
       next: ([groups, userGroups]) => {
         this.availableGroups.set(groups);
-        this.selectedGroupIds.set(new Set(userGroups.map((g) => g.id)));
+        this.selectedGroups.set(userGroups.map((g) => g.id));
         this.groupsLoading.set(false);
       },
       error: () => {
@@ -96,16 +96,6 @@ export class OrgUserDetail {
         this.groupsLoading.set(false);
       },
     });
-  }
-
-  protected toggleGroup(group: Group): void {
-    const ids = new Set(this.selectedGroupIds());
-    if (ids.has(group.id)) {
-      ids.delete(group.id);
-    } else {
-      ids.add(group.id);
-    }
-    this.selectedGroupIds.set(ids);
   }
 
   protected saveName(): void {
@@ -130,7 +120,7 @@ export class OrgUserDetail {
   protected saveGroups(): void {
     this.groupErrors.set([]);
     this.groupSuccess.set(false);
-    const groups = this.availableGroups().filter((g) => this.selectedGroupIds().has(g.id));
+    const groups = this.availableGroups().filter((g) => this.selectedGroups.has(g.id));
     this.usersService.updateUserGroups(this.orgId(), this.user().id, groups).subscribe({
       next: () => {
         this.groupSuccess.set(true);
@@ -165,9 +155,5 @@ export class OrgUserDetail {
             'Failed to change password. Please check your current password and try again.',
           ]),
       });
-  }
-
-  protected close(): void {
-    this.closed.emit();
   }
 }

@@ -24,6 +24,7 @@ src/app/
       components/              organisations-list, organisation-detail, org-users-list,
                                org-user-detail, org-groups-list, org-group-detail
   components/                  shared components used by two or more pages
+    edit-panel/                card with a heading and close button around an edit form
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
     row-actions/               a table row's edit and delete buttons
@@ -33,6 +34,7 @@ src/app/
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
   utils/                       plain functions and classes, no components or services
+    id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells
     validation.ts              password match validator and error state matcher
