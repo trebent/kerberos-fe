@@ -33,7 +33,6 @@ import { UserEdit } from '../user-edit/user-edit';
     UserEdit,
   ],
   selector: 'app-users',
-  styleUrl: './users.scss',
   templateUrl: './users.html',
 })
 export class Users {

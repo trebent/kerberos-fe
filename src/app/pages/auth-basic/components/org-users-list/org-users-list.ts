@@ -34,7 +34,6 @@ import { OrgUserDetail } from '../org-user-detail/org-user-detail';
     OrgUserDetail,
   ],
   selector: 'app-org-users-list',
-  styleUrl: './org-users-list.scss',
   templateUrl: './org-users-list.html',
 })
 export class OrgUsersList {

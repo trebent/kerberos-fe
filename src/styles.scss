@@ -160,6 +160,68 @@ a {
   margin-bottom: 0.25rem;
 }
 
+// Dividers between the parts of a section card, such as its create form and its table.
+.card-content > mat-divider {
+  margin: 0.5rem 0;
+}
+
+// Hint shown in a section card that has nothing to show yet.
+.prompt-message {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+// The create and edit forms in section cards: fields stacked at their natural width (not the
+// full card width, unlike `.form-stack`), with the submit button in a `.form-actions` row.
+.compact-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .form-actions {
+    display: flex;
+  }
+
+  mat-form-field {
+    min-width: min(15rem, 100%);
+  }
+}
+
+// A labelled group of checkboxes, such as a group's permissions or a user's groups.
+.checkbox-fieldset {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.25rem;
+
+  legend {
+    padding: 0 0.25rem;
+    font: var(--mat-sys-label-medium);
+  }
+}
+
+// Filterable tables in section cards: a full-width `.filter-field` above a `.table-wrapper`
+// holding the `mat-table` and its paginator. The wrapper scrolls sideways if a row is too wide,
+// and the sticky `actions` column keeps the row's buttons in view.
+.filter-field {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+
+  .mat-column-actions {
+    background: var(--mat-table-background-color, var(--mat-sys-surface));
+    white-space: nowrap;
+    text-align: center;
+    width: 10rem;
+  }
+}
+
 // On phones table cells wrap long values and the actions column gives up its fixed width,
 // so every column stays visible without sideways scrolling.
 @media (max-width: 40rem) {

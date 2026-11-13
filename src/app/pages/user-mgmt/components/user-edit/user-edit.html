@@ -10,7 +10,7 @@
   <app-error-display [errors]="saveErrors()" />
 }
 
-<form [formGroup]="editForm" (ngSubmit)="save()">
+<form class="compact-form" [formGroup]="editForm" (ngSubmit)="save()">
   <mat-form-field appearance="outline">
     <mat-label>Username</mat-label>
     <input matInput formControlName="username" autocomplete="username" />
@@ -21,7 +21,7 @@
   }
 
   @if (groupsResource.hasValue()) {
-    <fieldset class="groups-fieldset">
+    <fieldset class="checkbox-fieldset">
       <legend>Groups</legend>
       @for (g of groupsResource.value()!; track g.id) {
         <mat-checkbox [checked]="isSelected(g.id)" (change)="toggleGroup(g.id)">

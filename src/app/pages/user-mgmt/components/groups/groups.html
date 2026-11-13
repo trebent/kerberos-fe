@@ -8,13 +8,13 @@
     <app-error-display [errors]="createErrors()" />
   }
 
-  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
     </mat-form-field>
     @if (permissionsResource.hasValue()) {
-      <fieldset class="permissions-fieldset">
+      <fieldset class="checkbox-fieldset">
         <legend>Permissions</legend>
         @for (p of permissionsResource.value()!; track p.id) {
           <mat-checkbox [checked]="isCreateSelected(p.id)" (change)="toggleCreatePermission(p.id)">

@@ -21,7 +21,6 @@ import { Group, GroupsService } from '../../../../services/auth-basic';
     ReactiveFormsModule,
   ],
   selector: 'app-org-group-detail',
-  styleUrl: './org-group-detail.scss',
   templateUrl: './org-group-detail.html',
 })
 export class OrgGroupDetail {

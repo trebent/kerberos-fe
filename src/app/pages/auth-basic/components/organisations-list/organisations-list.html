@@ -6,7 +6,7 @@
   @if (createErrors().length) {
     <app-error-display [errors]="createErrors()" />
   }
-  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />

@@ -27,7 +27,6 @@ import { toggleId } from '../../../../utils/selection';
     ReactiveFormsModule,
   ],
   selector: 'app-group-edit',
-  styleUrl: './group-edit.scss',
   templateUrl: './group-edit.html',
 })
 export class GroupEdit {

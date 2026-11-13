@@ -17,7 +17,7 @@
   <app-error-display [errors]="nameErrors()" />
 }
 
-<form [formGroup]="nameForm" (ngSubmit)="saveName()">
+<form class="compact-form" [formGroup]="nameForm" (ngSubmit)="saveName()">
   <mat-form-field appearance="outline">
     <mat-label>Name</mat-label>
     <input matInput formControlName="name" autocomplete="username" />
@@ -44,7 +44,7 @@
 }
 
 @if (!groupsLoading() && availableGroups().length) {
-  <fieldset class="groups-fieldset">
+  <fieldset class="checkbox-fieldset">
     <legend>Select groups</legend>
     @for (g of availableGroups(); track g.id) {
       <mat-checkbox [checked]="selectedGroupIds().has(g.id)" (change)="toggleGroup(g)">
@@ -69,7 +69,7 @@
   <app-error-display [errors]="passwordErrors()" />
 }
 
-<form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+<form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
   <mat-form-field appearance="outline">
     <mat-label>Current password</mat-label>
     <input matInput type="password" formControlName="oldPassword" autocomplete="current-password" />

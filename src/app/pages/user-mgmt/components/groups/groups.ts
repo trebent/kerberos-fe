@@ -36,7 +36,6 @@ import { GroupEdit } from '../group-edit/group-edit';
     MatCheckbox,
   ],
   selector: 'app-groups',
-  styleUrl: './groups.scss',
   templateUrl: './groups.html',
 })
 export class Groups {

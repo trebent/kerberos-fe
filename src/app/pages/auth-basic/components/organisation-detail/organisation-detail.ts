@@ -21,7 +21,6 @@ import { Organisation, OrganisationsService } from '../../../../services/auth-ba
     ReactiveFormsModule,
   ],
   selector: 'app-organisation-detail',
-  styleUrl: './organisation-detail.scss',
   templateUrl: './organisation-detail.html',
 })
 export class OrganisationDetail {

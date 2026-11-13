@@ -23,6 +23,7 @@ This file records only the facts specific to this project. Where it conflicts wi
 
 - The single M3 theme lives in `src/styles.scss` (`mat.$cyan-palette` primary, `mat.$orange-palette` tertiary, Roboto, density 0). `color-scheme` is set on `html`; `ThemeService` switches it between `light`, `dark`, and `light dark`
 - Use `--app-success` (defined in `src/styles.scss`) for success states; M3 has no success role
+- Shared page styles live in `src/styles.scss` and are documented there: section cards (`.section-card`, `.edit-panel`), forms (`.form-stack`, `.compact-form`, `.checkbox-fieldset`) and filterable tables (`.filter-field`, `.table-wrapper`). Use them instead of restyling the same thing in a component; component stylesheets hold only what is specific to that component
 - Import table directives through `MAT_TABLE` from `src/app/utils/material-table.ts`
 
 ## API clients

@@ -17,7 +17,7 @@
       <p class="success-message" role="status">Username updated successfully.</p>
     }
 
-    <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+    <form class="compact-form" [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
       <mat-form-field appearance="outline">
         <mat-label>New username</mat-label>
         <input matInput formControlName="newUsername" autocomplete="username" />
@@ -39,7 +39,7 @@
     <p class="success-message" role="status">Password changed successfully.</p>
   }
 
-  <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+  <form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
     <mat-form-field appearance="outline">
       <mat-label>Current password</mat-label>
       <input
