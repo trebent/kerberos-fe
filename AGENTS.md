@@ -15,6 +15,14 @@ This repo relies on the skills in the [`angular-bootstrap`](https://github.com/m
 
 This file records only the facts specific to this project. Where it conflicts with a skill, this file wins.
 
+## Readability and complexity
+
+- Readability comes first. A person or an agent should be able to read a component top to bottom in its own file and understand it. When readability conflicts with shorter code, fewer files or less duplication, choose readability
+- Keep complexity low: plain signals, inputs, outputs and services. No generic base classes, controllers, or components configured by large option objects
+- Extract shared code only when there are three or more copies and the shared part has a clear name of its own (`RowActions`, `CheckboxGroup`). Similar-looking code that reads clearly where it is stays where it is; for example, each list card keeps its own create, delete and reload logic
+- Keep each file about one thing. When a component mixes concerns (layout and data formatting, say), move the pure logic to `utils/` with a spec
+- Name things for what they do, and write comments that explain why rather than what
+
 ## Project structure
 
 - This app's directory map is in `docs/structure.md`
