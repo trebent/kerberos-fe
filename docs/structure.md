@@ -22,10 +22,10 @@ src/app/
       components/              profile, users, user-edit, groups, group-edit, permissions-list
     auth-basic/
       components/              organisations-list, org-users-list, org-user-detail, org-groups-list,
-                               rename-panel
+                               rename-dialog
   components/                  shared components used by two or more pages
     checkbox-group/            labelled checkboxes that tick IDs in an IdSelection
-    edit-panel/                card with a heading and close button around an edit form
+    edit-dialog/               title, close button and scrolling body of an edit dialog
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
     list-card/                 card for one kind of record: create section above the list

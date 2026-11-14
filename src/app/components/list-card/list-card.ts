@@ -7,7 +7,8 @@ import { ErrorDisplay } from '../error-display/error-display';
 /**
  * The card a management page shows for one kind of record: a create section above a list
  * section that reports how `resource` (the records) is loading. Mark the create form and anything
- * that belongs with it as `create`; everything else (the table, its edit panel) goes in the list.
+ * that belongs with it as `create`; everything else (the table and its messages) goes in the list,
+ * which scrolls on its own when the card has a fixed height.
  *
  * ```html
  * <app-list-card heading="Users" createHeading="Create user" listHeading="All users"
@@ -21,6 +22,7 @@ import { ErrorDisplay } from '../error-display/error-display';
   host: { class: 'section-card' },
   imports: [ErrorDisplay, MatDivider, MatProgressSpinner],
   selector: 'app-list-card',
+  styleUrl: './list-card.scss',
   templateUrl: './list-card.html',
 })
 export class ListCard {

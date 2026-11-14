@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { createAuthStub, provideAuthStub } from '../../../testing/auth-stub';
 import { expectNoAxeViolations } from '../../../testing/axe';
@@ -25,6 +26,8 @@ describe('UserMgmt', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideAuthStub(createAuthStub({ username: 'alice' })),
+        // Dialogs open and close without waiting for animations.
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
     });
     http = TestBed.inject(HttpTestingController);
@@ -50,6 +53,15 @@ describe('UserMgmt', () => {
     return request.request.body;
   };
 
+  /** Answers the list reload a closing dialog triggers, once the dialog has finished closing. */
+  async function flushReload(url: string, body: object): Promise<void> {
+    await vi.waitFor(() => {
+      TestBed.tick();
+      http.expectOne((req) => req.method === 'GET' && req.url.endsWith(url)).flush(body);
+    });
+    await fixture.whenStable();
+  }
+
   async function loadPage(body: { groups?: object[] } = {}): Promise<void> {
     flushGets('/api/admin/users', users);
     flushGets('/api/admin/groups', body.groups ?? groups);
@@ -57,12 +69,13 @@ describe('UserMgmt', () => {
     await fixture.whenStable();
   }
 
-  /** Clicks an edit button and answers the list its panel loads. */
-  async function openEditor(label: string, url: string, body: object[]): Promise<void> {
+  /** Clicks an edit button, answers the list its dialog loads, and returns the dialog. */
+  async function openEditor(label: string, url: string, body: object[]): Promise<Element> {
     clickLabelled(element, label);
     TestBed.tick();
     flushGets(url, body);
     await fixture.whenStable();
+    return document.querySelector('mat-dialog-container')!;
   }
 
   it('lists users, groups and permissions', async () => {
@@ -113,46 +126,42 @@ describe('UserMgmt', () => {
     await fixture.whenStable();
   });
 
-  it('opens the user editor', async () => {
+  it('opens the user editor in a dialog', async () => {
     await loadPage();
-    await openEditor('Edit user alice', '/api/admin/groups', groups);
+    const dialog = await openEditor('Edit user alice', '/api/admin/groups', groups);
 
-    expect(element.querySelector('app-user-edit')).not.toBeNull();
-    await expectNoAxeViolations(fixture);
+    expect(dialog.querySelector('app-user-edit')).not.toBeNull();
+    expect(dialog.querySelector('input')?.value).toBe('alice');
+    await expectNoAxeViolations(fixture, dialog);
   });
 
   it('saves the username, then the group membership', async () => {
     await loadPage();
-    await openEditor('Edit user alice', '/api/admin/groups', groups);
+    const editor = await openEditor('Edit user alice', '/api/admin/groups', groups);
 
-    const editor = element.querySelector('app-user-edit')!;
     fillIn(editor, { Username: 'alicia' });
     toggleCheckbox(editor, 'admins');
     submitForm(editor.querySelector('input')!);
 
     expect(expectRequest('PUT', '/api/admin/users/1')).toEqual({ username: 'alicia' });
     expect(expectRequest('PUT', '/api/admin/users/1/groups')).toEqual({ groupIDs: [] });
-    TestBed.tick();
-    flushGets('/api/admin/users', users);
-    await fixture.whenStable();
+    await flushReload('/api/admin/users', users);
 
-    expect(element.querySelector('app-user-edit')).toBeNull();
+    expect(document.querySelector('app-user-edit')).toBeNull();
   });
 
   it('opens the group editor for a group listed without its permissions', async () => {
     await loadPage({ groups: [{ id: 2, name: 'staff' }] });
-    await openEditor('Edit group staff', '/api/admin/permissions', permissions);
+    const editor = await openEditor('Edit group staff', '/api/admin/permissions', permissions);
 
-    const nameInput = element.querySelector<HTMLInputElement>('app-group-edit input');
-    expect(nameInput?.value).toBe('staff');
-    await expectNoAxeViolations(fixture);
+    expect(editor.querySelector('input')?.value).toBe('staff');
+    await expectNoAxeViolations(fixture, editor);
   });
 
   it('saves a group with its name and ticked permissions', async () => {
     await loadPage();
-    await openEditor('Edit group admins', '/api/admin/permissions', permissions);
+    const editor = await openEditor('Edit group admins', '/api/admin/permissions', permissions);
 
-    const editor = element.querySelector('app-group-edit')!;
     fillIn(editor, { Name: 'owners' });
     toggleCheckbox(editor, 'users:read');
     submitForm(editor.querySelector('input')!);
@@ -161,16 +170,13 @@ describe('UserMgmt', () => {
       name: 'owners',
       permissionIDs: [2],
     });
-    TestBed.tick();
-    flushGets('/api/admin/groups', groups);
-    await fixture.whenStable();
+    await flushReload('/api/admin/groups', groups);
 
-    expect(element.querySelector('app-group-edit')).toBeNull();
+    expect(document.querySelector('app-group-edit')).toBeNull();
   });
 
-  it('keeps the user editor open and explains a failed delete', async () => {
+  it('explains a failed delete', async () => {
     await loadPage();
-    await openEditor('Edit user alice', '/api/admin/groups', groups);
 
     clickLabelled(element, 'Delete user alice');
     http
@@ -179,7 +185,6 @@ describe('UserMgmt', () => {
     await fixture.whenStable();
 
     expect(element.textContent).toContain('Failed to delete user.');
-    expect(element.querySelector('app-user-edit')).not.toBeNull();
     await expectNoAxeViolations(fixture);
   });
 

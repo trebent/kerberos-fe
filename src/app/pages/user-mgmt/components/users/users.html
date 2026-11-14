@@ -49,7 +49,7 @@
         <td mat-cell *matCellDef="let u">
           <app-row-actions
             [label]="'user ' + u.username"
-            (edit)="selectedUser.set(u)"
+            (edit)="editUser(u)"
             (delete)="deleteUser(u)"
           />
         </td>
@@ -58,8 +58,4 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </app-filtered-table>
-
-  @if (selectedUser(); as user) {
-    <app-user-edit [user]="user" (saved)="onDetailSaved()" (closed)="selectedUser.set(null)" />
-  }
 </app-list-card>

@@ -2,6 +2,7 @@ import { Component, inject, model, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
@@ -16,7 +17,7 @@ import {
 } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { requestStatus } from '../../../../utils/request-status';
-import { Rename, RenamePanel } from '../rename-panel/rename-panel';
+import { RenameDialog, RenameDialogData } from '../rename-dialog/rename-dialog';
 
 @Component({
   imports: [
@@ -31,7 +32,6 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
     MatLabel,
     ...MAT_TABLE,
     RowActions,
-    RenamePanel,
   ],
   selector: 'app-organisations-list',
   styleUrl: './organisations-list.scss',
@@ -39,6 +39,7 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
 })
 export class OrganisationsList {
   private readonly orgsService = inject(OrganisationsService);
+  private readonly dialog = inject(MatDialog);
 
   /** The organisation whose users and groups the page manages. */
   readonly selectedOrgId = model<number | null>(null);
@@ -61,11 +62,7 @@ export class OrganisationsList {
     submission: { action: async () => this.create() },
   });
 
-  protected readonly renameOrganisation: Rename = (id, name) =>
-    this.orgsService.updateOrganisation(id, { id, name });
-
   protected readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
-  protected readonly selectedOrg = signal<Organisation | null>(null);
 
   private create(): void {
     const request$ = this.orgsService.createOrganisation(this.createForm().value());
@@ -81,18 +78,24 @@ export class OrganisationsList {
     this.selectedOrgId.update((id) => (id === org.id ? null : org.id));
   }
 
-  protected onDetailSaved(): void {
-    this.selectedOrg.set(null);
-    this.orgsResource.reload();
+  protected renameOrg(org: Organisation): void {
+    const data: RenameDialogData = {
+      heading: 'Edit organisation',
+      name: org.name,
+      rename: (name) => this.orgsService.updateOrganisation(org.id, { id: org.id, name }),
+    };
+    this.dialog
+      .open<RenameDialog, RenameDialogData, boolean>(RenameDialog, { data })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) this.orgsResource.reload();
+      });
   }
 
   protected deleteOrg(org: Organisation): void {
     this.deleteStatus.run(this.orgsService.deleteOrganisation(org.id), () => {
       if (this.selectedOrgId() === org.id) {
         this.selectedOrgId.set(null);
-      }
-      if (this.selectedOrg()?.id === org.id) {
-        this.selectedOrg.set(null);
       }
       this.orgsResource.reload();
     });

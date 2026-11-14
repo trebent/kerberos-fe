@@ -1,7 +1,8 @@
-import { Component, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
@@ -13,7 +14,7 @@ import { User, UsersService } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
-import { OrgUserDetail } from '../org-user-detail/org-user-detail';
+import { OrgUserDetail, OrgUserDetailData } from '../org-user-detail/org-user-detail';
 
 const NEW_USER = { name: '', password: '' };
 
@@ -30,13 +31,13 @@ const NEW_USER = { name: '', password: '' };
     MatLabel,
     ...MAT_TABLE,
     RowActions,
-    OrgUserDetail,
   ],
   selector: 'app-org-users-list',
   templateUrl: './org-users-list.html',
 })
 export class OrgUsersList {
   private readonly usersService = inject(UsersService);
+  private readonly dialog = inject(MatDialog);
 
   readonly orgId = input.required<number | null>();
 
@@ -66,12 +67,6 @@ export class OrgUsersList {
     { submission: { action: async () => this.create() } },
   );
 
-  /** The user being edited. Switching organisation closes the edit panel. */
-  protected readonly selectedUser = linkedSignal<number | null, User | null>({
-    source: this.orgId,
-    computation: () => null,
-  });
-
   private create(): void {
     const orgId = this.orgId();
     if (orgId === null) return;
@@ -81,14 +76,21 @@ export class OrgUsersList {
     });
   }
 
+  /** Opens the user's edit dialog, and reloads the list when it closes in case it saved. */
+  protected editUser(user: User): void {
+    const orgId = this.orgId();
+    if (orgId === null) return;
+    this.dialog
+      .open<OrgUserDetail, OrgUserDetailData>(OrgUserDetail, { data: { orgId, user } })
+      .afterClosed()
+      .subscribe(() => this.usersResource.reload());
+  }
+
   protected deleteUser(user: User): void {
     const orgId = this.orgId();
     if (orgId === null) return;
-    this.deleteStatus.run(this.usersService.deleteUser(orgId, user.id), () => {
-      if (this.selectedUser()?.id === user.id) {
-        this.selectedUser.set(null);
-      }
-      this.usersResource.reload();
-    });
+    this.deleteStatus.run(this.usersService.deleteUser(orgId, user.id), () =>
+      this.usersResource.reload(),
+    );
   }
 }

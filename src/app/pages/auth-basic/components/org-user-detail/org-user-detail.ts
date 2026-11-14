@@ -1,14 +1,15 @@
-import { Component, effect, inject, input, linkedSignal, output } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 
 import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
-import { EditPanel } from '../../../../components/edit-panel/edit-panel';
+import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import {
   ChangePassword,
@@ -19,10 +20,19 @@ import { GroupsService, User, UsersService } from '../../../../services/auth-bas
 import { IdSelection } from '../../../../utils/id-selection';
 import { requestStatus } from '../../../../utils/request-status';
 
+export interface OrgUserDetailData {
+  orgId: number;
+  user: User;
+}
+
+/**
+ * Edits an organisation user's name, groups and password. Open it with `MatDialog`. It holds
+ * several forms, so it stays open after a save; the caller reloads the user list when it closes.
+ */
 @Component({
   imports: [
     CheckboxGroup,
-    EditPanel,
+    EditDialog,
     ErrorDisplay,
     FormField,
     FormRoot,
@@ -41,21 +51,15 @@ import { requestStatus } from '../../../../utils/request-status';
 export class OrgUserDetail {
   private readonly usersService = inject(UsersService);
   private readonly groupsService = inject(GroupsService);
-
-  readonly orgId = input.required<number>();
-  readonly user = input.required<User>();
-
-  /** The user was changed. The panel stays open, as it holds several forms. */
-  readonly changed = output<void>();
-  readonly closed = output<void>();
+  private readonly orgId = inject<OrgUserDetailData>(MAT_DIALOG_DATA).orgId;
+  private readonly user = inject<OrgUserDetailData>(MAT_DIALOG_DATA).user;
 
   /** The organisation's groups, and the ones this user is in. */
   protected readonly groupsResource = rxResource({
-    params: () => ({ orgId: this.orgId(), userId: this.user().id }),
-    stream: ({ params: { orgId, userId } }) =>
+    stream: () =>
       forkJoin({
-        all: this.groupsService.listGroups(orgId),
-        member: this.usersService.getUserGroups(orgId, userId),
+        all: this.groupsService.listGroups(this.orgId),
+        member: this.usersService.getUserGroups(this.orgId, this.user.id),
       }),
   });
   protected readonly selectedGroups = new IdSelection();
@@ -70,13 +74,13 @@ export class OrgUserDetail {
   });
 
   protected readonly nameForm = form(
-    linkedSignal(() => ({ name: this.user().name })),
+    signal({ name: this.user.name }),
     (path) => required(path.name),
     { submission: { action: async () => this.saveName() } },
   );
 
   protected readonly changePassword: ChangePassword = (oldPassword, newPassword) =>
-    this.usersService.changePassword(this.orgId(), this.user().id, {
+    this.usersService.changePassword(this.orgId, this.user.id, {
       oldPassword,
       password: newPassword,
     });
@@ -90,18 +94,17 @@ export class OrgUserDetail {
   }
 
   private saveName(): void {
-    const { id } = this.user();
-    const request$ = this.usersService.updateUser(this.orgId(), id, {
+    const { id } = this.user;
+    const request$ = this.usersService.updateUser(this.orgId, id, {
       id,
       ...this.nameForm().value(),
     });
-    this.nameStatus.run(request$, () => this.changed.emit());
+    this.nameStatus.run(request$);
   }
 
   protected saveGroups(): void {
     if (!this.groupsResource.hasValue()) return;
     const groups = this.groupsResource.value().all.filter((g) => this.selectedGroups.has(g.id));
-    const request$ = this.usersService.updateUserGroups(this.orgId(), this.user().id, groups);
-    this.groupsStatus.run(request$, () => this.changed.emit());
+    this.groupsStatus.run(this.usersService.updateUserGroups(this.orgId, this.user.id, groups));
   }
 }

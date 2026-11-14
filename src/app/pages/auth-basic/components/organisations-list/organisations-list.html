@@ -60,7 +60,7 @@
             </button>
             <app-row-actions
               [label]="'organisation ' + o.name"
-              (edit)="selectedOrg.set(o)"
+              (edit)="renameOrg(o)"
               (delete)="deleteOrg(o)"
             />
           </div>
@@ -70,14 +70,4 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </app-filtered-table>
-
-  @if (selectedOrg(); as org) {
-    <app-rename-panel
-      heading="Edit organisation"
-      [item]="org"
-      [rename]="renameOrganisation"
-      (saved)="onDetailSaved()"
-      (closed)="selectedOrg.set(null)"
-    />
-  }
 </app-list-card>

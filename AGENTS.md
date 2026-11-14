@@ -41,7 +41,8 @@ This file records only the facts specific to this project. Where it conflicts wi
 
 - The single M3 theme lives in `src/styles.scss` (`mat.$cyan-palette` primary, `mat.$orange-palette` tertiary, Roboto, density 0). `color-scheme` is set on `html`; `ThemeService` switches it between `light`, `dark`, and `light dark`
 - Use `--app-success` (defined in `src/styles.scss`) for success states; M3 has no success role
-- Shared building blocks: section cards (`.section-card`, `.card-header-container`, `.card-content`), forms (`.form-stack`, `.compact-form`) are global classes documented in `src/styles.scss`; tables, edit panels, row buttons, checkbox lists and request feedback are components in `src/app/components/` (`FilteredTable`, `EditPanel`, `RowActions`, `CheckboxGroup`, `RequestFeedback`, with `requestStatus` and `resourceDataSource` in `utils/`). Use them instead of restyling or rewiring the same thing in a component
+- Shared building blocks: section cards (`.section-card`, `.card-header-container`, `.card-content`) laid out in a `.card-grid`, forms (`.form-stack`, `.compact-form`) are global classes documented in `src/styles.scss`; tables, edit dialogs, row buttons, checkbox lists and request feedback are components in `src/app/components/` (`FilteredTable`, `EditDialog`, `RowActions`, `CheckboxGroup`, `RequestFeedback`, with `requestStatus` and `resourceDataSource` in `utils/`). Use them instead of restyling or rewiring the same thing in a component
+- Records are edited in a `MatDialog`: the list card opens the editor with `dialog.open(Editor, { data })` and reloads its list from `afterClosed()`. The editor injects `MAT_DIALOG_DATA` and uses `<app-edit-dialog>` as its template root. `app.config.ts` sets the dialog defaults, and dialogs fill the screen on phones
 - Import table directives through `MAT_TABLE` from `src/app/utils/material-table.ts`
 
 ## API clients

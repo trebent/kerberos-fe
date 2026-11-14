@@ -1,10 +1,10 @@
-import { Component, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { throwError } from 'rxjs';
 
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { ListCard } from '../../../../components/list-card/list-card';
@@ -13,7 +13,7 @@ import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, GroupsService } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { requestStatus } from '../../../../utils/request-status';
-import { Rename, RenamePanel } from '../rename-panel/rename-panel';
+import { RenameDialog, RenameDialogData } from '../rename-dialog/rename-dialog';
 
 @Component({
   imports: [
@@ -28,13 +28,13 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
     MatLabel,
     ...MAT_TABLE,
     RowActions,
-    RenamePanel,
   ],
   selector: 'app-org-groups-list',
   templateUrl: './org-groups-list.html',
 })
 export class OrgGroupsList {
   private readonly groupsService = inject(GroupsService);
+  private readonly dialog = inject(MatDialog);
 
   readonly orgId = input.required<number | null>();
 
@@ -58,20 +58,6 @@ export class OrgGroupsList {
     submission: { action: async () => this.create() },
   });
 
-  protected readonly renameGroup: Rename = (id, name) => {
-    const orgId = this.orgId();
-    if (orgId === null) {
-      return throwError(() => new Error('No organisation selected'));
-    }
-    return this.groupsService.updateGroup(orgId, id, { id, name });
-  };
-
-  /** The group being edited. Switching organisation closes the edit panel. */
-  protected readonly selectedGroup = linkedSignal<number | null, Group | null>({
-    source: this.orgId,
-    computation: () => null,
-  });
-
   private create(): void {
     const orgId = this.orgId();
     if (orgId === null) return;
@@ -81,19 +67,27 @@ export class OrgGroupsList {
     });
   }
 
-  protected onDetailSaved(): void {
-    this.selectedGroup.set(null);
-    this.groupsResource.reload();
+  protected renameGroup(group: Group): void {
+    const orgId = this.orgId();
+    if (orgId === null) return;
+    const data: RenameDialogData = {
+      heading: 'Edit group',
+      name: group.name,
+      rename: (name) => this.groupsService.updateGroup(orgId, group.id, { id: group.id, name }),
+    };
+    this.dialog
+      .open<RenameDialog, RenameDialogData, boolean>(RenameDialog, { data })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) this.groupsResource.reload();
+      });
   }
 
   protected deleteGroup(group: Group): void {
     const orgId = this.orgId();
     if (orgId === null) return;
-    this.deleteStatus.run(this.groupsService.deleteGroup(orgId, group.id), () => {
-      if (this.selectedGroup()?.id === group.id) {
-        this.selectedGroup.set(null);
-      }
-      this.groupsResource.reload();
-    });
+    this.deleteStatus.run(this.groupsService.deleteGroup(orgId, group.id), () =>
+      this.groupsResource.reload(),
+    );
   }
 }

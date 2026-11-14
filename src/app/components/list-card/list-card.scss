@@ -1,0 +1,11 @@
+// In a fixed-height card the create form stays put and only the list scrolls.
+.card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
