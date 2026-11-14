@@ -27,6 +27,7 @@ src/app/
     edit-panel/                card with a heading and close button around an edit form
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
+    password-change/           current/new/confirm password form
     request-feedback/          shows a requestStatus's error or success message
     row-actions/               a table row's edit and delete buttons
   services/                    all services, hand-written and generated
