@@ -48,10 +48,10 @@ interface CallsRequest {
 export class Debug {
   private readonly debugService = inject(DebugService);
 
-  protected readonly httpStatusClass = httpStatusClass;
-
   readonly backends = input.required<string[]>();
   readonly closed = output<void>();
+
+  protected readonly httpStatusClass = httpStatusClass;
 
   protected readonly selectedBackend = signal<string | null>(null);
 

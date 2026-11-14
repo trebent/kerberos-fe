@@ -13,6 +13,7 @@ import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, UsersService } from '../../../../services/admin';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { IdSelection } from '../../../../utils/id-selection';
+import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
 import { GroupEdit } from '../group-edit/group-edit';
 
@@ -44,6 +45,7 @@ export class Groups {
     stream: () => this.usersService.getGroups(),
   });
 
+  protected readonly joinNames = joinNames;
   protected readonly dataSource = resourceDataSource(this.groupsResource);
 
   protected readonly permissionsResource = rxResource({
@@ -63,10 +65,6 @@ export class Groups {
   });
 
   protected readonly selectedGroup = signal<Group | null>(null);
-
-  protected getPermissionIDs(group: Group): string {
-    return (group.permissions ?? []).map((p) => p.id).join(', ');
-  }
 
   private create(): void {
     const { name } = this.createForm().value();

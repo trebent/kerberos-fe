@@ -1,28 +1,16 @@
-<div class="meta-row">
-  <span class="meta-label">ID</span>
-  <span class="meta-value">{{ call().id }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">Method</span>
-  <span class="meta-value mono">{{ call().method }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">Status</span>
-  <span class="meta-value mono" [class]="statusClass()">{{ call().statusCode }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">URL</span>
-  <span class="meta-value mono">{{ call().url }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">Started</span>
-  <span class="meta-value">{{ call().startedAt | date: 'medium' }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">Stopped</span>
-  <span class="meta-value">{{ call().stoppedAt | date: 'medium' }}</span>
-</div>
-<div class="meta-row">
-  <span class="meta-label">Duration</span>
-  <span class="meta-value mono">{{ duration() }}</span>
-</div>
+<dl class="meta-list">
+  <dt>ID</dt>
+  <dd>{{ call().id }}</dd>
+  <dt>Method</dt>
+  <dd class="mono">{{ call().method }}</dd>
+  <dt>Status</dt>
+  <dd class="mono" [class]="statusClass()">{{ call().statusCode }}</dd>
+  <dt>URL</dt>
+  <dd class="mono">{{ call().url }}</dd>
+  <dt>Started</dt>
+  <dd>{{ call().startedAt | date: 'medium' }}</dd>
+  <dt>Stopped</dt>
+  <dd>{{ call().stoppedAt | date: 'medium' }}</dd>
+  <dt>Duration</dt>
+  <dd class="mono">{{ duration() }}</dd>
+</dl>
