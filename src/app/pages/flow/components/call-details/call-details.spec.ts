@@ -25,9 +25,8 @@ describe('CallDetails', () => {
   }
 
   const value = (element: HTMLElement, label: string) =>
-    Array.from(element.querySelectorAll('.meta-row'))
-      .find((row) => row.querySelector('.meta-label')?.textContent === label)
-      ?.querySelector('.meta-value');
+    Array.from(element.querySelectorAll('dt')).find((term) => term.textContent === label)
+      ?.nextElementSibling;
 
   it('shows the duration to the microsecond', async () => {
     const element = await render();

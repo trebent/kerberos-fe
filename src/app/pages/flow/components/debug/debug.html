@@ -1,8 +1,8 @@
 <section aria-labelledby="debug-title">
   <div class="card-header-container">
     <h2 id="debug-title" class="section-title">Debug</h2>
-    <button matIconButton type="button" (click)="closed.emit()" aria-label="Close debug panel">
-      <mat-icon>close</mat-icon>
+    <button matIconButton type="button" aria-label="Close debug panel" (click)="closed.emit()">
+      <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
 
@@ -90,26 +90,16 @@
     <app-request-feedback [status]="deleteStatus" />
     <div class="session-meta">
       @if (selectedSession(); as session) {
-        <div>
-          <div class="meta-row">
-            <span class="meta-label">Session ID</span>
-            <span class="meta-value">{{ session.id }}</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Started</span>
-            <span class="meta-value">{{ session.startedAt | date: 'medium' }}</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Expires</span>
-            <span class="meta-value">{{ session.expiresAt | date: 'medium' }}</span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">Stopped</span>
-            <span class="meta-value">{{
-              session.stoppedAt ? (session.stoppedAt | date: 'medium') : '—'
-            }}</span>
-          </div>
-        </div>
+        <dl class="meta-list">
+          <dt>Session ID</dt>
+          <dd>{{ session.id }}</dd>
+          <dt>Started</dt>
+          <dd>{{ session.startedAt | date: 'medium' }}</dd>
+          <dt>Expires</dt>
+          <dd>{{ session.expiresAt | date: 'medium' }}</dd>
+          <dt>Stopped</dt>
+          <dd>{{ session.stoppedAt ? (session.stoppedAt | date: 'medium') : '—' }}</dd>
+        </dl>
         <div class="meta-actions">
           <button
             matButton="filled"
