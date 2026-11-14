@@ -1,73 +1,77 @@
-<app-list-card
-  heading="Organisations"
-  createHeading="Create organisation"
-  listHeading="All organisations"
-  [resource]="orgsResource"
-  loadError="Failed to load organisations."
->
-  <div create>
-    <app-request-feedback [status]="createStatus" />
-    <form class="compact-form" [formRoot]="createForm">
-      <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput [formField]="createForm.name" />
-      </mat-form-field>
-      <div class="form-actions">
-        <button
-          matButton="filled"
-          type="submit"
-          [disabled]="createForm().invalid() || createStatus.pending()"
-        >
-          Create
-        </button>
-      </div>
-    </form>
+<div class="card-header-container">
+  <h2 class="section-title">Organisations</h2>
+  <button matIconButton type="button" aria-label="Add organisation" (click)="addOrg()">
+    <mat-icon aria-hidden="true">add</mat-icon>
+  </button>
+</div>
 
-    @if (newOrgCredentials(); as credentials) {
-      <section class="credentials-box">
-        <strong
-          >Organisation created — save these admin credentials now, they will not be shown
-          again.</strong
+<!-- Reserves the bar's height, so the list does not move when a reload starts. -->
+<div class="progress-slot">
+  @if (organisations().status() === 'reloading') {
+    <mat-progress-bar mode="indeterminate" aria-label="Refreshing organisations" />
+  }
+</div>
+
+<div class="org-list-body" [attr.aria-busy]="organisations().isLoading()">
+  <p class="visually-hidden" role="status">
+    {{ organisations().isLoading() ? 'Loading organisations…' : '' }}
+  </p>
+
+  @if (organisations().error()) {
+    <app-error-display [errors]="['Failed to load organisations.']" />
+  }
+
+  <!-- On phones, once an organisation is chosen, this picker takes the place of the list. -->
+  <mat-form-field class="org-picker" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Organisation</mat-label>
+    <mat-select [value]="selectedOrgId()" (selectionChange)="select($event.value)">
+      @for (org of orgs(); track org.id) {
+        <mat-option [value]="org.id">{{ org.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <div class="org-browser">
+    <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+      <mat-icon matIconPrefix aria-hidden="true">search</mat-icon>
+      <input
+        matInput
+        type="search"
+        aria-label="Filter organisations"
+        placeholder="Filter"
+        (input)="filter($event)"
+      />
+    </mat-form-field>
+
+    @if (organisations().status() === 'loading') {
+      @for (line of skeletonItems; track line) {
+        <div class="skeleton-item">
+          <app-skeleton [width]="line" />
+          <app-skeleton width="2.5rem" class="skeleton-secondary" />
+        </div>
+      }
+    }
+
+    <mat-nav-list aria-label="Organisations">
+      @for (org of shownOrgs(); track org.id) {
+        <a
+          mat-list-item
+          [routerLink]="[]"
+          [queryParams]="{ org: org.id }"
+          [activated]="org.id === selectedOrgId()"
         >
-        <p>
-          Admin username: <code>{{ credentials.adminUsername }}</code>
-        </p>
-        <p>
-          Admin password: <code>{{ credentials.adminPassword }}</code>
-        </p>
-        <button matButton type="button" (click)="newOrgCredentials.set(null)">Dismiss</button>
-      </section>
+          <span matListItemTitle>{{ org.name }}</span>
+          <span matListItemLine>ID {{ org.id }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    @if (organisations().hasValue() && shownOrgs().length === 0) {
+      <p class="empty-state">
+        {{
+          filterText() ? 'No organisations match “' + filterText() + '”' : 'No organisations yet'
+        }}
+      </p>
     }
   </div>
-
-  <app-request-feedback [status]="deleteStatus" />
-  <app-filtered-table [dataSource]="dataSource" filterExample="my-org">
-    <table mat-table [dataSource]="dataSource">
-      <mat-text-column name="id" headerText="ID" />
-      <mat-text-column name="name" />
-      <ng-container matColumnDef="actions" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
-        <td mat-cell *matCellDef="let o">
-          <div class="org-actions-container">
-            <button
-              type="button"
-              [matButton]="selectedOrgId() === o.id ? 'filled' : 'outlined'"
-              [attr.aria-pressed]="selectedOrgId() === o.id"
-              [attr.aria-label]="'Select organisation ' + o.name"
-              (click)="toggleSelected(o)"
-            >
-              Select
-            </button>
-            <app-row-actions
-              [label]="'organisation ' + o.name"
-              (edit)="renameOrg(o)"
-              (delete)="deleteOrg(o)"
-            />
-          </div>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-  </app-filtered-table>
-</app-list-card>
+</div>

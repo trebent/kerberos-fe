@@ -1,0 +1,44 @@
+<app-edit-dialog heading="Add organisation">
+  @if (credentials(); as credentials) {
+    <section class="credentials-box" aria-labelledby="credentials-heading">
+      <h3 id="credentials-heading">Organisation {{ credentials.name }} created</h3>
+      <p>Save these admin credentials now. They will not be shown again.</p>
+      <dl class="meta-list credentials">
+        <dt>Admin username</dt>
+        <dd>
+          <code>{{ credentials.adminUsername }}</code>
+        </dd>
+        <dt>Admin password</dt>
+        <dd>
+          <code>{{ credentials.adminPassword }}</code>
+        </dd>
+      </dl>
+    </section>
+    <div class="dialog-form">
+      <div class="form-actions">
+        <button matButton="filled" type="button" cdkFocusInitial (click)="close()">
+          I've saved these
+        </button>
+      </div>
+    </div>
+  } @else {
+    <app-request-feedback [status]="createStatus" />
+
+    <form class="dialog-form" [formRoot]="form">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput cdkFocusInitial [formField]="form.name" />
+      </mat-form-field>
+      <div class="form-actions">
+        <button matButton type="button" mat-dialog-close>Cancel</button>
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="form().invalid() || createStatus.pending()"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  }
+</app-edit-dialog>

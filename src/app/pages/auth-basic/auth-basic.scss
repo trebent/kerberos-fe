@@ -1,0 +1,75 @@
+// Below this width the organisation list stacks above the details, and collapses to a picker
+// once one is chosen (see organisations-list.scss).
+$stack-below: 48rem;
+
+// The organisation list is a narrow column of names; the selected organisation's users and
+// groups, which are tables, take the rest of the width.
+.org-layout {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem 1.5rem;
+
+  @media (max-width: $stack-below) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// Stays in view, and scrolls on its own, while the details scroll past.
+.org-list {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100dvh - 2rem);
+
+  @media (max-width: $stack-below) {
+    position: static;
+    max-height: none;
+  }
+}
+
+.org-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 48px;
+
+  // The organisation's name heads both cards below it, so it reads larger than their titles.
+  h2 {
+    margin-inline-end: auto;
+    font: var(--mat-sys-headline-small);
+  }
+}
+
+.empty-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1rem;
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+  }
+
+  h2 {
+    margin: 1rem 0 0.25rem;
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-title-medium);
+  }
+
+  p {
+    margin: 0;
+  }
+}

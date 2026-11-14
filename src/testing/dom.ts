@@ -34,10 +34,17 @@ export function clickLabelled(root: Element, label: string): void {
   element.click();
 }
 
-/** Clicks the button whose text is `text`. */
+/** The text a user reads on `element`, leaving out icon ligatures such as "add". */
+function visibleText(element: Element): string {
+  const copy = element.cloneNode(true) as Element;
+  copy.querySelectorAll('mat-icon').forEach((icon) => icon.remove());
+  return copy.textContent?.trim() ?? '';
+}
+
+/** Clicks the button whose text, without its icon, is `text`. */
 export function clickButton(root: Element, text: string): void {
   const button = Array.from(root.querySelectorAll('button')).find(
-    (candidate) => candidate.textContent?.trim() === text,
+    (candidate) => visibleText(candidate) === text,
   );
   if (!button) throw new Error(`No button "${text}"`);
   button.click();
@@ -58,4 +65,17 @@ export function submitForm(element: Element): void {
   const form = element.closest('form') ?? element.querySelector('form');
   if (!form) throw new Error('No form to submit');
   form.requestSubmit();
+}
+
+/** The open dialog; with several open, the one on top. */
+export function openDialog(): Element {
+  const dialogs = document.querySelectorAll('mat-dialog-container');
+  const dialog = dialogs[dialogs.length - 1];
+  if (!dialog) throw new Error('No dialog is open');
+  return dialog;
+}
+
+/** The text of the snack bar on screen, or undefined. */
+export function snackBarText(): string | undefined {
+  return document.querySelector('mat-snack-bar-container')?.textContent?.trim();
 }

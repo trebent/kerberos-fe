@@ -7,7 +7,7 @@ import {
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MAT_DIALOG_DEFAULT_OPTIONS, MatDialogConfig } from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../environments/environment';
@@ -21,7 +21,12 @@ import { ThemeService } from './services/theme.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    provideRouter(
+      routes,
+      // Pages read route and query parameters as inputs, such as the selected organisation.
+      withComponentInputBinding(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
+    ),
     provideHttpClient(withInterceptors([csrfInterceptor])),
     // Edit dialogs are about 32rem wide, and fill the screen on phones (see `.app-dialog`).
     // Spread the defaults, as this value replaces them rather than merging with them.

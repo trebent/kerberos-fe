@@ -1,18 +1,19 @@
 <app-edit-dialog [heading]="data.heading">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formRoot]="form">
+  <form class="dialog-form" [formRoot]="form">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput cdkFocusInitial [formField]="form.name" />
     </mat-form-field>
     <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
       <button
         matButton="filled"
         type="submit"
         [disabled]="form().invalid() || saveStatus.pending()"
       >
-        Save
+        {{ data.submitLabel }}
       </button>
     </div>
   </form>

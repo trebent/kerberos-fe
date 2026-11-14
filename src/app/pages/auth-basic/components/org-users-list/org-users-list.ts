@@ -1,96 +1,79 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
-import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 
-import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { confirmDelete } from '../../../../components/confirm-delete/confirm-delete';
 import { ListCard } from '../../../../components/list-card/list-card';
-import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/auth-basic';
+import { Notifier } from '../../../../services/notifier.service';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
+import { OrgUserCreate, OrgUserCreateData } from '../org-user-create/org-user-create';
 import { OrgUserDetail, OrgUserDetailData } from '../org-user-detail/org-user-detail';
 
-const NEW_USER = { name: '', password: '' };
-
+/** The users of one organisation. */
 @Component({
-  imports: [
-    ListCard,
-    RequestFeedback,
-    FilteredTable,
-    FormField,
-    FormRoot,
-    MatButton,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ...MAT_TABLE,
-    RowActions,
-  ],
+  imports: [ListCard, RequestFeedback, ...MAT_TABLE, RowActions],
   selector: 'app-org-users-list',
   templateUrl: './org-users-list.html',
 })
 export class OrgUsersList {
   private readonly usersService = inject(UsersService);
   private readonly dialog = inject(MatDialog);
+  private readonly notifier = inject(Notifier);
 
-  readonly orgId = input.required<number | null>();
+  readonly orgId = input.required<number>();
 
   protected readonly displayedColumns = ['id', 'name', 'groups', 'actions'];
 
   protected readonly usersResource = rxResource({
-    // Idle, with no rows, until an organisation is selected.
-    params: () => this.orgId() ?? undefined,
+    params: () => this.orgId(),
     stream: ({ params: orgId }) => this.usersService.listUsers(orgId),
   });
 
   protected readonly joinNames = joinNames;
   protected readonly dataSource = resourceDataSource(this.usersResource);
 
-  protected readonly createStatus = requestStatus({
-    failure: 'Failed to create user. Please try again.',
-  });
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete user. Please try again.',
   });
-  protected readonly createForm = form(
-    signal(NEW_USER),
-    (path) => {
-      required(path.name);
-      required(path.password);
-    },
-    { submission: { action: async () => this.create() } },
-  );
 
-  private create(): void {
-    const orgId = this.orgId();
-    if (orgId === null) return;
-    this.createStatus.run(this.usersService.createUser(orgId, this.createForm().value()), () => {
-      this.createForm().reset(NEW_USER);
-      this.usersResource.reload();
-    });
+  /** The dialogs close with the saved name, or nothing when cancelled. */
+  protected addUser(): void {
+    this.dialog
+      .open<OrgUserCreate, OrgUserCreateData, string>(OrgUserCreate, {
+        data: { orgId: this.orgId() },
+      })
+      .afterClosed()
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`User ${name} created`);
+        this.usersResource.reload();
+      });
   }
 
-  /** Opens the user's edit dialog, and reloads the list when it closes in case it saved. */
   protected editUser(user: User): void {
-    const orgId = this.orgId();
-    if (orgId === null) return;
     this.dialog
-      .open<OrgUserDetail, OrgUserDetailData>(OrgUserDetail, { data: { orgId, user } })
+      .open<OrgUserDetail, OrgUserDetailData, string>(OrgUserDetail, {
+        data: { orgId: this.orgId(), user },
+      })
       .afterClosed()
-      .subscribe(() => this.usersResource.reload());
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`User ${name} updated`);
+        this.usersResource.reload();
+      });
   }
 
   protected deleteUser(user: User): void {
-    const orgId = this.orgId();
-    if (orgId === null) return;
-    this.deleteStatus.run(this.usersService.deleteUser(orgId, user.id), () =>
-      this.usersResource.reload(),
+    confirmDelete(this.dialog, `user ${user.name}`).subscribe(() =>
+      this.deleteStatus.run(this.usersService.deleteUser(this.orgId(), user.id), () => {
+        this.notifier.show(`User ${user.name} deleted`);
+        this.usersResource.reload();
+      }),
     );
   }
 }

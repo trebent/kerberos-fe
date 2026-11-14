@@ -1,93 +1,86 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
-import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 
-import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { confirmDelete } from '../../../../components/confirm-delete/confirm-delete';
 import { ListCard } from '../../../../components/list-card/list-card';
-import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, GroupsService } from '../../../../services/auth-basic';
+import { Notifier } from '../../../../services/notifier.service';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { requestStatus } from '../../../../utils/request-status';
-import { RenameDialog, RenameDialogData } from '../rename-dialog/rename-dialog';
+import { NameDialog, NameDialogData } from '../name-dialog/name-dialog';
 
+/** The groups of one organisation. A group has only a name, so one dialog adds and renames. */
 @Component({
-  imports: [
-    ListCard,
-    RequestFeedback,
-    FilteredTable,
-    FormField,
-    FormRoot,
-    MatButton,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ...MAT_TABLE,
-    RowActions,
-  ],
+  imports: [ListCard, RequestFeedback, ...MAT_TABLE, RowActions],
   selector: 'app-org-groups-list',
   templateUrl: './org-groups-list.html',
 })
 export class OrgGroupsList {
   private readonly groupsService = inject(GroupsService);
   private readonly dialog = inject(MatDialog);
+  private readonly notifier = inject(Notifier);
 
-  readonly orgId = input.required<number | null>();
+  readonly orgId = input.required<number>();
 
   protected readonly displayedColumns = ['id', 'name', 'actions'];
 
   protected readonly groupsResource = rxResource({
-    // Idle, with no rows, until an organisation is selected.
-    params: () => this.orgId() ?? undefined,
+    params: () => this.orgId(),
     stream: ({ params: orgId }) => this.groupsService.listGroups(orgId),
   });
 
   protected readonly dataSource = resourceDataSource(this.groupsResource);
 
-  protected readonly createStatus = requestStatus({
-    failure: 'Failed to create group. Please try again.',
-  });
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete group. Please try again.',
   });
-  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
-    submission: { action: async () => this.create() },
-  });
 
-  private create(): void {
+  /** The dialog closes with the saved name, or nothing when cancelled. */
+  protected addGroup(): void {
     const orgId = this.orgId();
-    if (orgId === null) return;
-    this.createStatus.run(this.groupsService.createGroup(orgId, this.createForm().value()), () => {
-      this.createForm().reset({ name: '' });
-      this.groupsResource.reload();
-    });
+    const data: NameDialogData = {
+      heading: 'Add group',
+      submitLabel: 'Create',
+      name: '',
+      save: (name) => this.groupsService.createGroup(orgId, { name }),
+    };
+    this.dialog
+      .open<NameDialog, NameDialogData, string>(NameDialog, { data })
+      .afterClosed()
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`Group ${name} created`);
+        this.groupsResource.reload();
+      });
   }
 
   protected renameGroup(group: Group): void {
     const orgId = this.orgId();
-    if (orgId === null) return;
-    const data: RenameDialogData = {
+    const data: NameDialogData = {
       heading: 'Edit group',
+      submitLabel: 'Save',
       name: group.name,
-      rename: (name) => this.groupsService.updateGroup(orgId, group.id, { id: group.id, name }),
+      save: (name) => this.groupsService.updateGroup(orgId, group.id, { id: group.id, name }),
     };
     this.dialog
-      .open<RenameDialog, RenameDialogData, boolean>(RenameDialog, { data })
+      .open<NameDialog, NameDialogData, string>(NameDialog, { data })
       .afterClosed()
-      .subscribe((saved) => {
-        if (saved) this.groupsResource.reload();
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`Group ${name} updated`);
+        this.groupsResource.reload();
       });
   }
 
   protected deleteGroup(group: Group): void {
-    const orgId = this.orgId();
-    if (orgId === null) return;
-    this.deleteStatus.run(this.groupsService.deleteGroup(orgId, group.id), () =>
-      this.groupsResource.reload(),
+    confirmDelete(this.dialog, `group ${group.name}`).subscribe(() =>
+      this.deleteStatus.run(this.groupsService.deleteGroup(this.orgId(), group.id), () => {
+        this.notifier.show(`Group ${group.name} deleted`);
+        this.groupsResource.reload();
+      }),
     );
   }
 }

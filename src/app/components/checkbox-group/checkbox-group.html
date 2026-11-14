@@ -1,8 +1,20 @@
-<fieldset class="checkbox-fieldset">
+<fieldset class="checkbox-fieldset" [attr.aria-busy]="loading()">
   <legend>{{ legend() }}</legend>
-  @for (item of items(); track item.id) {
-    <mat-checkbox [checked]="selection().has(item.id)" (change)="selection().toggle(item.id)">
-      {{ item.name }}
-    </mat-checkbox>
+  @if (loading()) {
+    <p class="visually-hidden" role="status">Loading {{ legend().toLowerCase() }}…</p>
+    @for (line of skeletonLines; track line) {
+      <div class="skeleton-line">
+        <app-skeleton shape="rect" width="18px" height="18px" />
+        <app-skeleton [width]="line" />
+      </div>
+    }
+  } @else {
+    @for (item of items(); track item.id) {
+      <mat-checkbox [checked]="selection().has(item.id)" (change)="selection().toggle(item.id)">
+        {{ item.name }}
+      </mat-checkbox>
+    } @empty {
+      <p class="empty">None to choose from yet.</p>
+    }
   }
 </fieldset>

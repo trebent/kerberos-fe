@@ -1,108 +1,172 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { MATERIAL_ANIMATIONS } from '@angular/material/core';
+import { provideRouter, Router, withComponentInputBinding } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 
 import { expectNoAxeViolations } from '../../../testing/axe';
 import {
   clickButton,
   clickLabelled,
   fillIn,
+  openDialog,
+  snackBarText,
   submitForm,
   toggleCheckbox,
 } from '../../../testing/dom';
 import { AuthBasic } from './auth-basic';
 
 const ORGS = '/api/auth/basic/organisations';
+const orgs = [
+  { id: 7, name: 'acme' },
+  { id: 8, name: 'globex' },
+];
 
 describe('AuthBasic', () => {
-  let fixture: ComponentFixture<AuthBasic>;
-  let element: HTMLElement;
+  let harness: RouterTestingHarness;
   let http: HttpTestingController;
+  let element: HTMLElement;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideRouter([{ path: 'auth-basic', component: AuthBasic }], withComponentInputBinding()),
         // Dialogs open and close without waiting for animations.
         { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       ],
     });
     http = TestBed.inject(HttpTestingController);
-
-    fixture = TestBed.createComponent(AuthBasic);
-    element = fixture.nativeElement;
-    // Resources stay pending until their requests are flushed, so don't wait for stability yet.
-    TestBed.tick();
-    flushGet(ORGS, [
-      { id: 7, name: 'acme' },
-      { id: 8, name: 'globex' },
-    ]);
-    await fixture.whenStable();
+    harness = await RouterTestingHarness.create();
   });
 
   afterEach(() => http.verify());
 
-  function flushGet(url: string, body: object | null, status = 200): void {
-    http
-      .expectOne((req) => req.method === 'GET' && req.url.endsWith(url))
-      .flush(body, status === 200 ? {} : { status, statusText: 'Error' });
-  }
-
-  /** Answers the list reload a closing dialog triggers, once the dialog has finished closing. */
-  async function flushReload(url: string, body: object): Promise<void> {
+  /** Answers the one GET for `url`, once the page has sent it. */
+  async function flushGet(url: string, body: object | null, status = 200): Promise<void> {
     await vi.waitFor(() => {
       TestBed.tick();
-      flushGet(url, body);
+      http
+        .expectOne((req) => req.method === 'GET' && req.url.endsWith(url))
+        .flush(body, status === 200 ? {} : { status, statusText: 'Error' });
     });
-    await fixture.whenStable();
   }
 
   /** Answers the one request with this method and URL, and returns its body. */
-  function expectRequest(method: string, url: string, response: object | null = null): unknown {
-    const request = http.expectOne((req) => req.method === method && req.url.endsWith(url));
-    request.flush(response);
-    return request.request.body;
+  async function expectRequest(
+    method: string,
+    url: string,
+    response: object | null = null,
+  ): Promise<unknown> {
+    let body: unknown;
+    await vi.waitFor(() => {
+      const request = http.expectOne((req) => req.method === method && req.url.endsWith(url));
+      request.flush(response);
+      body = request.request.body;
+    });
+    return body;
   }
 
-  /** Selects an organisation and answers its user and group lists. */
-  async function selectOrg(name: string, id: number, users: object[] = []): Promise<void> {
-    clickLabelled(element, `Select organisation ${name}`);
-    TestBed.tick();
-    flushGet(`${ORGS}/${id}/users`, users);
-    flushGet(`${ORGS}/${id}/groups`, []);
-    await fixture.whenStable();
+  /** Answers the user and group lists of organisation `id`. */
+  async function flushOrg(id: number, users: object[] = [], groups: object[] = []): Promise<void> {
+    await flushGet(`${ORGS}/${id}/users`, users);
+    await flushGet(`${ORGS}/${id}/groups`, groups);
+    await harness.fixture.whenStable();
+  }
+
+  /** Opens the page with no organisation selected, and answers the organisation list. */
+  async function open(): Promise<void> {
+    const navigation = harness.navigateByUrl('/auth-basic');
+    await flushGet(ORGS, orgs);
+    await navigation;
+    await harness.fixture.whenStable();
+    element = harness.routeNativeElement!;
+  }
+
+  /** Opens the page on acme, and answers the organisation list and acme's lists. */
+  async function openAcme(users: object[] = [], groups: object[] = []): Promise<void> {
+    const navigation = harness.navigateByUrl('/auth-basic?org=7');
+    await flushGet(ORGS, orgs);
+    await flushOrg(7, users, groups);
+    await navigation;
+    element = harness.routeNativeElement!;
   }
 
   /** Opens bob's edit dialog in acme, where he is in staff and ops also exists. */
   async function openBob(): Promise<Element> {
-    await selectOrg('acme', 7, [{ id: 1, name: 'bob', groups: [] }]);
+    await openAcme([{ id: 1, name: 'bob', groups: [] }]);
     clickLabelled(element, 'Edit user bob');
-    TestBed.tick();
-    flushGet(`${ORGS}/7/groups`, [
+    await flushGet(`${ORGS}/7/groups`, [
       { id: 2, name: 'staff' },
       { id: 3, name: 'ops' },
     ]);
-    flushGet(`${ORGS}/7/users/1/groups`, [{ id: 2, name: 'staff' }]);
-    await fixture.whenStable();
-    return document.querySelector('mat-dialog-container')!;
+    await flushGet(`${ORGS}/7/users/1/groups`, [{ id: 2, name: 'staff' }]);
+    await harness.fixture.whenStable();
+    return openDialog();
   }
 
-  it('asks for an organisation before showing its users and groups', async () => {
-    expect(element.querySelector('h1')?.textContent).toContain('Basic authentication');
-    expect(element.textContent).toContain('acme');
-    expect(element.textContent).toContain('Select an organisation to manage its users.');
-    await expectNoAxeViolations(fixture);
+  const orgLink = (name: string) =>
+    Array.from(element.querySelectorAll<HTMLAnchorElement>('mat-nav-list a')).find((link) =>
+      link.textContent?.includes(name),
+    )!;
+
+  it('shows placeholders while the organisations load', async () => {
+    const navigation = harness.navigateByUrl('/auth-basic');
+    await vi.waitFor(() => {
+      TestBed.tick();
+      expect(document.querySelectorAll('app-organisations-list .skeleton-item').length).toBe(4);
+    });
+    await flushGet(ORGS, orgs);
+    await navigation;
+    await harness.fixture.whenStable();
+
+    expect(harness.routeNativeElement!.querySelector('.skeleton-item')).toBeNull();
   });
 
-  it('creates an organisation and shows its admin credentials once', async () => {
-    const create = element.querySelector('app-organisations-list [create]')!;
-    fillIn(create, { Name: 'initech' });
-    submitForm(create.querySelector('input')!);
+  it('asks for an organisation before showing its users and groups', async () => {
+    await open();
 
+    expect(element.querySelector('h1')?.textContent).toContain('Basic authentication');
+    expect(orgLink('acme').textContent).toContain('ID 7');
+    expect(element.textContent).toContain('Select an organisation to manage its users and groups.');
+    expect(element.querySelector('app-org-users-list')).toBeNull();
+    await expectNoAxeViolations(harness.fixture, element);
+  });
+
+  it('loads the organisation named in the URL', async () => {
+    await openAcme(
+      [{ id: 1, name: 'bob', groups: [{ id: 2, name: 'staff' }] }],
+      [{ id: 2, name: 'staff' }],
+    );
+
+    expect(element.querySelector('#org-detail-heading')?.textContent?.trim()).toBe('acme');
+    expect(orgLink('acme').getAttribute('aria-current')).toBe('page');
+    expect(element.querySelector('app-org-users-list')?.textContent).toContain('bob');
+    await expectNoAxeViolations(harness.fixture, element);
+  });
+
+  it('selects an organisation through its link', async () => {
+    await open();
+
+    orgLink('globex').click();
+    await flushOrg(8);
+
+    expect(TestBed.inject(Router).url).toBe('/auth-basic?org=8');
+    expect(element.querySelector('#org-detail-heading')?.textContent?.trim()).toBe('globex');
+  });
+
+  it('creates an organisation, shows its admin credentials once, then selects it', async () => {
+    await open();
+    clickLabelled(element, 'Add organisation');
+    await harness.fixture.whenStable();
+    const dialog = openDialog();
+
+    fillIn(dialog, { Name: 'initech' });
+    submitForm(dialog.querySelector('input')!);
     expect(
-      expectRequest('POST', ORGS, {
+      await expectRequest('POST', ORGS, {
         id: 9,
         name: 'initech',
         adminUserId: 1,
@@ -110,70 +174,55 @@ describe('AuthBasic', () => {
         adminPassword: 's3cret',
       }),
     ).toEqual({ name: 'initech' });
-    TestBed.tick();
-    flushGet(ORGS, [{ id: 9, name: 'initech' }]);
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
-    expect(create.textContent).toContain('s3cret');
-    await expectNoAxeViolations(fixture);
+    expect(dialog.textContent).toContain('s3cret');
+    await expectNoAxeViolations(harness.fixture, dialog);
 
-    clickButton(create, 'Dismiss');
-    await fixture.whenStable();
-    expect(create.textContent).not.toContain('s3cret');
-  });
+    clickButton(dialog, "I've saved these");
+    await flushGet(ORGS, [...orgs, { id: 9, name: 'initech' }]);
+    await flushOrg(9);
 
-  it('loads the users and groups of the selected organisation', async () => {
-    clickLabelled(element, 'Select organisation acme');
-    TestBed.tick();
-    flushGet(`${ORGS}/7/users`, [{ id: 1, name: 'bob', groups: [{ id: 2, name: 'staff' }] }]);
-    flushGet(`${ORGS}/7/groups`, [{ id: 2, name: 'staff' }]);
-    await fixture.whenStable();
-
-    expect(element.textContent).toContain('bob');
-    expect(
-      element
-        .querySelector('[aria-label="Select organisation acme"]')
-        ?.getAttribute('aria-pressed'),
-    ).toBe('true');
-    await expectNoAxeViolations(fixture);
+    expect(TestBed.inject(Router).url).toBe('/auth-basic?org=9');
+    expect(document.querySelector('app-org-create')).toBeNull();
   });
 
   it('creates a user in the selected organisation', async () => {
-    await selectOrg('acme', 7);
+    await openAcme();
+    clickButton(element.querySelector('app-org-users-list')!, 'Add user');
+    await harness.fixture.whenStable();
+    const dialog = openDialog();
 
-    const create = element.querySelector('app-org-users-list [create]')!;
-    fillIn(create, { Name: 'carol', Password: 'secret' });
-    submitForm(create.querySelector('input')!);
+    fillIn(dialog, { Name: 'carol', Password: 'secret' });
+    submitForm(dialog.querySelector('input')!);
 
-    expect(expectRequest('POST', `${ORGS}/7/users`)).toEqual({ name: 'carol', password: 'secret' });
-    TestBed.tick();
-    flushGet(`${ORGS}/7/users`, []);
-    await fixture.whenStable();
+    expect(await expectRequest('POST', `${ORGS}/7/users`)).toEqual({
+      name: 'carol',
+      password: 'secret',
+    });
+    await flushGet(`${ORGS}/7/users`, [{ id: 2, name: 'carol', groups: [] }]);
+    await harness.fixture.whenStable();
+    expect(snackBarText()).toContain('User carol created');
   });
 
-  it("saves a user's name and groups, and reloads the users when the dialog closes", async () => {
+  it("saves a user's name and groups with one Save, and reloads the users", async () => {
     const detail = await openBob();
-    await expectNoAxeViolations(fixture, detail);
+    await expectNoAxeViolations(harness.fixture, detail);
 
     fillIn(detail, { Name: 'robert' });
-    submitForm(detail.querySelector('input')!);
-    expect(expectRequest('PUT', `${ORGS}/7/users/1`)).toEqual({ id: 1, name: 'robert' });
-    await fixture.whenStable();
-    // The dialog holds several forms, so it stays open after a save.
-    expect(detail.textContent).toContain('Name updated successfully.');
-
     toggleCheckbox(detail, 'ops');
-    clickButton(detail, 'Save groups');
-    expect(expectRequest('PUT', `${ORGS}/7/users/1/groups`)).toEqual([
+    submitForm(detail.querySelector('input')!);
+
+    expect(await expectRequest('PUT', `${ORGS}/7/users/1`)).toEqual({ id: 1, name: 'robert' });
+    expect(await expectRequest('PUT', `${ORGS}/7/users/1/groups`)).toEqual([
       { id: 2, name: 'staff' },
       { id: 3, name: 'ops' },
     ]);
-    await fixture.whenStable();
-    expect(detail.textContent).toContain('Groups updated successfully.');
+    await flushGet(`${ORGS}/7/users`, [{ id: 1, name: 'robert', groups: [] }]);
+    await harness.fixture.whenStable();
 
-    clickLabelled(detail, 'Close dialog');
-    await flushReload(`${ORGS}/7/users`, [{ id: 1, name: 'robert', groups: [] }]);
     expect(document.querySelector('app-org-user-detail')).toBeNull();
+    expect(snackBarText()).toContain('User robert updated');
     expect(element.textContent).toContain('robert');
   });
 
@@ -185,45 +234,63 @@ describe('AuthBasic', () => {
       'New password': 'new',
       'Confirm new password': 'new',
     });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
     clickButton(detail, 'Change password');
 
-    expect(expectRequest('PUT', `${ORGS}/7/users/1/password`)).toEqual({
+    expect(await expectRequest('PUT', `${ORGS}/7/users/1/password`)).toEqual({
       oldPassword: 'old',
       password: 'new',
     });
   });
 
   it("drops the previous organisation's users when the next one fails to load", async () => {
-    await selectOrg('acme', 7, [{ id: 1, name: 'bob', groups: [] }]);
+    await openAcme([{ id: 1, name: 'bob', groups: [] }]);
     expect(element.textContent).toContain('bob');
 
-    clickLabelled(element, 'Select organisation globex');
-    TestBed.tick();
-    flushGet(`${ORGS}/8/users`, null, 500);
-    flushGet(`${ORGS}/8/groups`, []);
-    await fixture.whenStable();
+    orgLink('globex').click();
+    await flushGet(`${ORGS}/8/users`, null, 500);
+    await flushGet(`${ORGS}/8/groups`, []);
+    await harness.fixture.whenStable();
 
     expect(element.textContent).toContain('Failed to load users.');
     expect(element.textContent).not.toContain('bob');
-    await expectNoAxeViolations(fixture);
+    await expectNoAxeViolations(harness.fixture, element);
   });
 
-  it('renames an organisation', async () => {
-    clickLabelled(element, 'Edit organisation acme');
-    await fixture.whenStable();
+  it('renames the selected organisation', async () => {
+    await openAcme();
+    clickLabelled(element, 'Rename organisation acme');
+    await harness.fixture.whenStable();
 
-    const dialog = document.querySelector('mat-dialog-container')!;
-    expect(dialog.querySelector('h2')?.textContent).toBe('Edit organisation');
+    const dialog = openDialog();
+    expect(dialog.querySelector('h2')?.textContent).toBe('Rename organisation');
     expect(dialog.querySelector('input')?.value).toBe('acme');
-    await expectNoAxeViolations(fixture, dialog);
+    await expectNoAxeViolations(harness.fixture, dialog);
     fillIn(dialog, { Name: 'acme-corp' });
     submitForm(dialog.querySelector('input')!);
 
-    expect(expectRequest('PUT', `${ORGS}/7`)).toEqual({ id: 7, name: 'acme-corp' });
-    await flushReload(ORGS, [{ id: 7, name: 'acme-corp' }]);
+    expect(await expectRequest('PUT', `${ORGS}/7`)).toEqual({ id: 7, name: 'acme-corp' });
+    await flushGet(ORGS, [{ id: 7, name: 'acme-corp' }]);
+    await harness.fixture.whenStable();
 
-    expect(document.querySelector('app-rename-dialog')).toBeNull();
-    await expectNoAxeViolations(fixture);
+    expect(document.querySelector('app-name-dialog')).toBeNull();
+    expect(element.querySelector('#org-detail-heading')?.textContent?.trim()).toBe('acme-corp');
+  });
+
+  it('deletes the selected organisation once confirmed, and clears the selection', async () => {
+    await openAcme();
+    clickLabelled(element, 'Delete organisation acme');
+    await harness.fixture.whenStable();
+
+    const dialog = openDialog();
+    expect(dialog.querySelector('h2')?.textContent).toBe('Delete organisation acme?');
+    clickButton(dialog, 'Delete');
+
+    await expectRequest('DELETE', `${ORGS}/7`);
+    await flushGet(ORGS, [orgs[1]]);
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/auth-basic');
+    expect(snackBarText()).toContain('Organisation acme deleted');
   });
 });

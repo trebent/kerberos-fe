@@ -1,23 +1,30 @@
 <div class="card-header-container">
   <h2 class="section-title">Permissions</h2>
 </div>
-<div class="card-content">
-  <h3>All permissions</h3>
-
-  @if (permissionsResource.isLoading()) {
-    <mat-spinner diameter="32" aria-label="Loading" />
-  }
+<div class="list-body" [attr.aria-busy]="permissionsResource.isLoading()">
+  <p class="visually-hidden" role="status">
+    {{ permissionsResource.isLoading() ? 'Loading permissions…' : '' }}
+  </p>
 
   @if (permissionsResource.error()) {
-    <app-error-display [errors]="['Failed to load permissions.']" />
+    <div class="messages">
+      <app-error-display [errors]="['Failed to load permissions.']" />
+    </div>
   }
 
-  @if (permissionsResource.hasValue()) {
-    <table mat-table [dataSource]="permissionsResource.value()">
-      <mat-text-column name="id" headerText="ID" />
-      <mat-text-column name="name" />
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+  <table mat-table [dataSource]="permissionsResource.value() ?? []">
+    <mat-text-column name="id" headerText="ID" />
+    <mat-text-column name="name" />
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  @if (permissionsResource.isLoading()) {
+    @for (row of skeletonRows; track row) {
+      <div class="skeleton-row">
+        <app-skeleton width="1.5rem" />
+        <app-skeleton [width]="row" />
+      </div>
+    }
   }
 </div>

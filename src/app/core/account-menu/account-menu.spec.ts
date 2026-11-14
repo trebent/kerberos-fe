@@ -38,6 +38,8 @@ describe('AccountMenu', () => {
   async function openDialog(item: RegExp): Promise<Element> {
     const menu = await loader.getHarness(MatMenuHarness);
     await menu.clickItem({ text: item });
+    // The dialog's code loads on first use.
+    await vi.waitFor(() => expect(document.querySelector('mat-dialog-container')).not.toBeNull());
     await fixture.whenStable();
     return document.querySelector('mat-dialog-container')!;
   }

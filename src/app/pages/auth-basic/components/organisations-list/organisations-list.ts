@@ -1,103 +1,82 @@
-import { Component, inject, model, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
-import { MatButton } from '@angular/material/button';
+import { Component, computed, inject, input, ResourceRef, signal } from '@angular/core';
+import { MatIconButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatFormField, MatLabel, MatPrefix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
+import { MatListItem, MatListItemLine, MatListItemTitle, MatNavList } from '@angular/material/list';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { Router, RouterLink } from '@angular/router';
 
-import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
-import { ListCard } from '../../../../components/list-card/list-card';
-import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
-import { RowActions } from '../../../../components/row-actions/row-actions';
-import {
-  CreateOrganisation201Response,
-  Organisation,
-  OrganisationsService,
-} from '../../../../services/auth-basic';
-import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
-import { requestStatus } from '../../../../utils/request-status';
-import { RenameDialog, RenameDialogData } from '../rename-dialog/rename-dialog';
+import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { Skeleton } from '../../../../components/skeleton/skeleton';
+import { Organisation } from '../../../../services/auth-basic';
+import { OrgCreate } from '../org-create/org-create';
 
+/**
+ * The organisations to choose from. Each is a link that puts its ID in the `org` query
+ * parameter, which the page reads; on phones, once one is chosen, a select replaces the list.
+ */
 @Component({
+  host: { class: 'section-card', '[class.has-selection]': 'selectedOrgId() !== undefined' },
   imports: [
-    ListCard,
-    RequestFeedback,
-    FilteredTable,
-    FormField,
-    FormRoot,
-    MatButton,
+    ErrorDisplay,
     MatFormField,
+    MatIcon,
+    MatIconButton,
     MatInput,
     MatLabel,
-    ...MAT_TABLE,
-    RowActions,
+    MatListItem,
+    MatListItemLine,
+    MatListItemTitle,
+    MatNavList,
+    MatOption,
+    MatPrefix,
+    MatProgressBar,
+    MatSelect,
+    RouterLink,
+    Skeleton,
   ],
   selector: 'app-organisations-list',
   styleUrl: './organisations-list.scss',
   templateUrl: './organisations-list.html',
 })
 export class OrganisationsList {
-  private readonly orgsService = inject(OrganisationsService);
+  private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
-  /** The organisation whose users and groups the page manages. */
-  readonly selectedOrgId = model<number | null>(null);
+  /** Owned by the page, which also shows the selected organisation's name. */
+  readonly organisations = input.required<ResourceRef<Organisation[] | undefined>>();
+  readonly selectedOrgId = input.required<number | undefined>();
 
-  protected readonly displayedColumns = ['id', 'name', 'actions'];
+  protected readonly filterText = signal('');
+  protected readonly skeletonItems = ['8rem', '6rem', '9rem', '7rem'];
 
-  protected readonly orgsResource = rxResource({
-    stream: () => this.orgsService.listOrganisations(),
-  });
+  protected readonly orgs = computed(() =>
+    this.organisations().hasValue() ? (this.organisations().value() ?? []) : [],
+  );
+  protected readonly shownOrgs = computed(() =>
+    this.orgs().filter((org) => org.name.toLowerCase().includes(this.filterText())),
+  );
 
-  protected readonly dataSource = resourceDataSource(this.orgsResource);
-
-  protected readonly createStatus = requestStatus({
-    failure: 'Failed to create organisation. Please try again.',
-  });
-  protected readonly deleteStatus = requestStatus({
-    failure: 'Failed to delete organisation. Please try again.',
-  });
-  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
-    submission: { action: async () => this.create() },
-  });
-
-  protected readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
-
-  private create(): void {
-    const request$ = this.orgsService.createOrganisation(this.createForm().value());
-    this.createStatus.run(request$, (credentials) => {
-      this.createForm().reset({ name: '' });
-      this.newOrgCredentials.set(credentials);
-      this.orgsResource.reload();
-    });
+  protected filter(event: Event): void {
+    this.filterText.set((event.target as HTMLInputElement).value.trim().toLowerCase());
   }
 
-  /** Selects an organisation, or clears the selection when it is already selected. */
-  protected toggleSelected(org: Organisation): void {
-    this.selectedOrgId.update((id) => (id === org.id ? null : org.id));
+  protected select(orgId: number): void {
+    void this.router.navigate([], { queryParams: { org: orgId } });
   }
 
-  protected renameOrg(org: Organisation): void {
-    const data: RenameDialogData = {
-      heading: 'Edit organisation',
-      name: org.name,
-      rename: (name) => this.orgsService.updateOrganisation(org.id, { id: org.id, name }),
-    };
+  /** Creates an organisation, then selects it. The dialog closes with its ID once created. */
+  protected addOrg(): void {
     this.dialog
-      .open<RenameDialog, RenameDialogData, boolean>(RenameDialog, { data })
+      .open<OrgCreate, void, number>(OrgCreate, { disableClose: true })
       .afterClosed()
-      .subscribe((saved) => {
-        if (saved) this.orgsResource.reload();
+      .subscribe((orgId) => {
+        if (orgId === undefined) return;
+        this.organisations().reload();
+        this.select(orgId);
       });
-  }
-
-  protected deleteOrg(org: Organisation): void {
-    this.deleteStatus.run(this.orgsService.deleteOrganisation(org.id), () => {
-      if (this.selectedOrgId() === org.id) {
-        this.selectedOrgId.set(null);
-      }
-      this.orgsResource.reload();
-    });
   }
 }

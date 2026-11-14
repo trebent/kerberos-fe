@@ -5,7 +5,16 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { createAuthStub, provideAuthStub } from '../../../testing/auth-stub';
 import { expectNoAxeViolations } from '../../../testing/axe';
-import { clickLabelled, fillIn, submitForm, toggleCheckbox } from '../../../testing/dom';
+import {
+  clickButton,
+  clickLabelled,
+  fillIn,
+  openDialog,
+  snackBarText,
+  submitForm,
+  toggleCheckbox,
+  typeInto,
+} from '../../../testing/dom';
 import { UserMgmt } from './user-mgmt';
 
 const permissions = [
@@ -69,14 +78,25 @@ describe('UserMgmt', () => {
     await fixture.whenStable();
   }
 
-  /** Clicks an edit button, answers the list its dialog loads, and returns the dialog. */
-  async function openEditor(label: string, url: string, body: object[]): Promise<Element> {
-    clickLabelled(element, label);
+  /** Opens a dialog from the page, answers the list it loads, and returns it. */
+  async function openFromPage(open: () => void, url?: string, body?: object[]): Promise<Element> {
+    open();
     TestBed.tick();
-    flushGets(url, body);
+    if (url && body) flushGets(url, body);
     await fixture.whenStable();
-    return document.querySelector('mat-dialog-container')!;
+    return openDialog();
   }
+
+  it('shows placeholder rows while the lists load', async () => {
+    const users = element.querySelector('app-users')!;
+    expect(users.querySelectorAll('.skeleton-row').length).toBe(5);
+    expect(users.querySelector('[aria-busy="true"] [role="status"]')?.textContent).toContain(
+      'Loading users…',
+    );
+
+    await loadPage();
+    expect(users.querySelector('.skeleton-row')).toBeNull();
+  });
 
   it('lists users, groups and permissions', async () => {
     await loadPage();
@@ -92,42 +112,78 @@ describe('UserMgmt', () => {
     await expectNoAxeViolations(fixture);
   });
 
-  it('creates a user and reloads the list', async () => {
+  it('says when the filter matches nothing', async () => {
     await loadPage();
+    const usersCard = element.querySelector('app-users')!;
 
-    const create = element.querySelector('app-users [create]')!;
-    fillIn(create, { Username: 'bob', Password: 'secret' });
-    submitForm(create.querySelector('input')!);
+    typeInto(usersCard.querySelector('input[aria-label="Filter users"]')!, 'zed');
+    await fixture.whenStable();
+
+    expect(usersCard.textContent).toContain('No users match “zed”');
+    await expectNoAxeViolations(fixture);
+  });
+
+  it('creates a user in a dialog, reloads the list and confirms it', async () => {
+    await loadPage();
+    const dialog = await openFromPage(() =>
+      clickButton(element.querySelector('app-users')!, 'Add user'),
+    );
+    await expectNoAxeViolations(fixture, dialog);
+
+    fillIn(dialog, { Username: 'bob', Password: 'secret' });
+    submitForm(dialog.querySelector('input')!);
 
     expect(expectRequest('POST', '/api/admin/users')).toEqual({
       username: 'bob',
       password: 'secret',
     });
-    TestBed.tick();
-    flushGets('/api/admin/users', users);
-    await fixture.whenStable();
+    await flushReload('/api/admin/users', users);
+    expect(document.querySelector('app-user-create')).toBeNull();
+    expect(snackBarText()).toContain('User bob created');
   });
 
   it('creates a group with the ticked permissions', async () => {
     await loadPage();
+    const dialog = await openFromPage(
+      () => clickButton(element.querySelector('app-groups')!, 'Add group'),
+      '/api/admin/permissions',
+      permissions,
+    );
 
-    const create = element.querySelector('app-groups [create]')!;
-    fillIn(create, { Name: 'writers' });
-    toggleCheckbox(create, 'users:write');
-    submitForm(create.querySelector('input')!);
+    fillIn(dialog, { Name: 'writers' });
+    toggleCheckbox(dialog, 'users:write');
+    submitForm(dialog.querySelector('input')!);
 
     expect(expectRequest('POST', '/api/admin/groups')).toEqual({
       name: 'writers',
       permissionIDs: [2],
     });
+    await flushReload('/api/admin/groups', groups);
+    expect(snackBarText()).toContain('Group writers created');
+  });
+
+  it('shows placeholder checkboxes while the editor loads its groups', async () => {
+    await loadPage();
+    clickLabelled(element, 'Edit user alice');
+    // The groups request is still pending, so render without waiting for stability.
     TestBed.tick();
+    fixture.detectChanges();
+
+    const dialog = openDialog();
+    expect(dialog.querySelectorAll('.skeleton-line').length).toBe(3);
+    expect(dialog.querySelector('[role="status"]')?.textContent).toContain('Loading groups…');
     flushGets('/api/admin/groups', groups);
     await fixture.whenStable();
+    expect(dialog.querySelector('.skeleton-line')).toBeNull();
   });
 
   it('opens the user editor in a dialog', async () => {
     await loadPage();
-    const dialog = await openEditor('Edit user alice', '/api/admin/groups', groups);
+    const dialog = await openFromPage(
+      () => clickLabelled(element, 'Edit user alice'),
+      '/api/admin/groups',
+      groups,
+    );
 
     expect(dialog.querySelector('app-user-edit')).not.toBeNull();
     expect(dialog.querySelector('input')?.value).toBe('alice');
@@ -136,7 +192,11 @@ describe('UserMgmt', () => {
 
   it('saves the username, then the group membership', async () => {
     await loadPage();
-    const editor = await openEditor('Edit user alice', '/api/admin/groups', groups);
+    const editor = await openFromPage(
+      () => clickLabelled(element, 'Edit user alice'),
+      '/api/admin/groups',
+      groups,
+    );
 
     fillIn(editor, { Username: 'alicia' });
     toggleCheckbox(editor, 'admins');
@@ -147,11 +207,16 @@ describe('UserMgmt', () => {
     await flushReload('/api/admin/users', users);
 
     expect(document.querySelector('app-user-edit')).toBeNull();
+    expect(snackBarText()).toContain('User alicia updated');
   });
 
   it('opens the group editor for a group listed without its permissions', async () => {
     await loadPage({ groups: [{ id: 2, name: 'staff' }] });
-    const editor = await openEditor('Edit group staff', '/api/admin/permissions', permissions);
+    const editor = await openFromPage(
+      () => clickLabelled(element, 'Edit group staff'),
+      '/api/admin/permissions',
+      permissions,
+    );
 
     expect(editor.querySelector('input')?.value).toBe('staff');
     await expectNoAxeViolations(fixture, editor);
@@ -159,7 +224,11 @@ describe('UserMgmt', () => {
 
   it('saves a group with its name and ticked permissions', async () => {
     await loadPage();
-    const editor = await openEditor('Edit group admins', '/api/admin/permissions', permissions);
+    const editor = await openFromPage(
+      () => clickLabelled(element, 'Edit group admins'),
+      '/api/admin/permissions',
+      permissions,
+    );
 
     fillIn(editor, { Name: 'owners' });
     toggleCheckbox(editor, 'users:read');
@@ -174,13 +243,40 @@ describe('UserMgmt', () => {
     expect(document.querySelector('app-group-edit')).toBeNull();
   });
 
+  it('asks before deleting, and does nothing when cancelled', async () => {
+    await loadPage();
+    const dialog = await openFromPage(() => clickLabelled(element, 'Delete user alice'));
+
+    expect(dialog.querySelector('h2')?.textContent).toBe('Delete user alice?');
+    await expectNoAxeViolations(fixture, dialog);
+
+    clickButton(dialog, 'Cancel');
+    await fixture.whenStable();
+    expect(document.querySelector('app-confirm-delete')).toBeNull();
+  });
+
+  it('deletes a user once confirmed', async () => {
+    await loadPage();
+    const dialog = await openFromPage(() => clickLabelled(element, 'Delete user alice'));
+
+    clickButton(dialog, 'Delete');
+    await vi.waitFor(() => expectRequest('DELETE', '/api/admin/users/1'));
+    await flushReload('/api/admin/users', []);
+
+    expect(snackBarText()).toContain('User alice deleted');
+    expect(element.querySelector('app-users')?.textContent).toContain('No users yet');
+  });
+
   it('explains a failed delete', async () => {
     await loadPage();
+    const dialog = await openFromPage(() => clickLabelled(element, 'Delete user alice'));
 
-    clickLabelled(element, 'Delete user alice');
-    http
-      .expectOne((req) => req.method === 'DELETE' && req.url.endsWith('/api/admin/users/1'))
-      .flush(null, { status: 403, statusText: 'Forbidden' });
+    clickButton(dialog, 'Delete');
+    await vi.waitFor(() =>
+      http
+        .expectOne((req) => req.method === 'DELETE' && req.url.endsWith('/api/admin/users/1'))
+        .flush(null, { status: 403, statusText: 'Forbidden' }),
+    );
     await fixture.whenStable();
 
     expect(element.textContent).toContain('Failed to delete user.');

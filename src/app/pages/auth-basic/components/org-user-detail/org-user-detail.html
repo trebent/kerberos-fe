@@ -1,52 +1,36 @@
 <app-edit-dialog heading="Edit user">
-  <h3>Name</h3>
+  <app-request-feedback [status]="saveStatus" />
 
-  <app-request-feedback [status]="nameStatus" />
-
-  <form class="compact-form" [formRoot]="nameForm">
+  <form class="dialog-form" [formRoot]="form">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput cdkFocusInitial [formField]="nameForm.name" autocomplete="username" />
+      <input matInput cdkFocusInitial [formField]="form.name" autocomplete="off" />
     </mat-form-field>
+
+    <app-checkbox-group
+      legend="Groups"
+      [items]="groupsResource.value()?.all ?? []"
+      [loading]="groupsResource.isLoading()"
+      [selection]="selectedGroups"
+    />
+    @if (groupsResource.error()) {
+      <app-error-display [errors]="['Failed to load groups. Saving changes only the name.']" />
+    }
+
     <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
       <button
         matButton="filled"
         type="submit"
-        [disabled]="nameForm().invalid() || nameStatus.pending()"
+        [disabled]="form().invalid() || saveStatus.pending() || groupsResource.isLoading()"
       >
-        Save name
+        Save
       </button>
     </div>
   </form>
 
-  <h3>Groups</h3>
+  <mat-divider />
 
-  @if (groupsResource.isLoading()) {
-    <mat-spinner diameter="24" aria-label="Loading" />
-  }
-  @if (groupsResource.error()) {
-    <app-error-display [errors]="['Failed to load groups.']" />
-  }
-  <app-request-feedback [status]="groupsStatus" />
-
-  @if (groupsResource.hasValue() && groupsResource.value().all.length) {
-    <app-checkbox-group
-      legend="Select groups"
-      [items]="groupsResource.value().all"
-      [selection]="selectedGroups"
-    />
-    <div class="form-actions">
-      <button
-        matButton="filled"
-        type="button"
-        [disabled]="groupsStatus.pending()"
-        (click)="saveGroups()"
-      >
-        Save groups
-      </button>
-    </div>
-  }
-
-  <h3>Change password</h3>
+  <h3 class="password-heading">Change password</h3>
   <app-password-change [change]="changePassword" />
 </app-edit-dialog>

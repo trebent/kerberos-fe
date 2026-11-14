@@ -1,0 +1,29 @@
+.credentials-box {
+  margin-block-end: 1rem;
+  padding: 1rem;
+  border-radius: var(--mat-sys-corner-small);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font: var(--mat-sys-title-medium);
+  }
+
+  p {
+    margin: 0 0 0.75rem;
+  }
+}
+
+// The credentials are what the box is for, so they are larger than a usual meta list.
+.credentials {
+  font: var(--mat-sys-body-medium);
+
+  dt {
+    color: inherit;
+  }
+}
+
+code {
+  font-family: var(--app-font-mono);
+}

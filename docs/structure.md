@@ -22,19 +22,23 @@ src/app/
     flow/
       components/              debug, flow-pipeline, oas, call-details, transition-badges
     user-mgmt/
-      components/              users, user-edit, groups, group-edit, permissions-list
+      components/              users, user-create, user-edit, groups, group-create, group-edit,
+                               permissions-list
     auth-basic/
-      components/              organisations-list, org-users-list, org-user-detail, org-groups-list,
-                               rename-dialog
+      components/              organisations-list, org-create, org-users-list, org-user-create,
+                               org-user-detail, org-groups-list, name-dialog
   components/                  shared components used by two or more pages
     checkbox-group/            labelled checkboxes that tick IDs in an IdSelection
+    confirm-delete/            asks before a delete: confirmDelete(dialog, 'user alice')
     edit-dialog/               title, close button and scrolling body of an edit dialog
     error-display/             lists error messages and announces them
-    filtered-table/            filter field and paginator around a projected mat-table
-    list-card/                 card for one kind of record: create section above the list
+    list-card/                 card for one kind of record: title, filter and add button above
+                               a projected mat-table, with loading, empty and paging states
     password-change/           current/new/confirm password form
     request-feedback/          shows a requestStatus's error or success message
     row-actions/               a table row's edit and delete buttons
+    skeleton/                  pulsing placeholder for loading content, copied from the
+                               angular-material skill
   services/                    all services, hand-written and generated
     auth.service.ts
     notifier.service.ts        transient confirmations in a snack bar

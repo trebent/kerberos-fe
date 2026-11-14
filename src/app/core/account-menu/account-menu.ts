@@ -7,8 +7,6 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
-import { ChangePasswordDialog } from '../change-password-dialog/change-password-dialog';
-import { ChangeUsernameDialog } from '../change-username-dialog/change-username-dialog';
 
 /**
  * The signed-in user's menu in the header: their own username and password, and logging out.
@@ -29,11 +27,16 @@ export class AccountMenu {
     this.auth.isSuperuser() ? 'Superuser' : (this.auth.username() ?? ''),
   );
 
-  protected changeUsername(): void {
+  // The header is on every page, so its dialogs and their forms load only when first opened.
+  protected async changeUsername(): Promise<void> {
+    const { ChangeUsernameDialog } =
+      await import('../change-username-dialog/change-username-dialog');
     this.dialog.open(ChangeUsernameDialog);
   }
 
-  protected changePassword(): void {
+  protected async changePassword(): Promise<void> {
+    const { ChangePasswordDialog } =
+      await import('../change-password-dialog/change-password-dialog');
     this.dialog.open(ChangePasswordDialog);
   }
 

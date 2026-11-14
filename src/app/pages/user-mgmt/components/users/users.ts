@@ -1,43 +1,28 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
-import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 
-import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { confirmDelete } from '../../../../components/confirm-delete/confirm-delete';
 import { ListCard } from '../../../../components/list-card/list-card';
-import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/admin';
+import { Notifier } from '../../../../services/notifier.service';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
+import { UserCreate } from '../user-create/user-create';
 import { UserEdit } from '../user-edit/user-edit';
 
-const NEW_USER = { username: '', password: '' };
-
 @Component({
-  imports: [
-    ListCard,
-    RequestFeedback,
-    FilteredTable,
-    FormField,
-    FormRoot,
-    MatButton,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ...MAT_TABLE,
-    RowActions,
-  ],
+  imports: [ListCard, RequestFeedback, ...MAT_TABLE, RowActions],
   selector: 'app-users',
   templateUrl: './users.html',
 })
 export class Users {
   private readonly usersService = inject(UsersService);
   private readonly dialog = inject(MatDialog);
+  private readonly notifier = inject(Notifier);
 
   protected readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
 
@@ -48,38 +33,39 @@ export class Users {
   protected readonly joinNames = joinNames;
   protected readonly dataSource = resourceDataSource(this.usersResource);
 
-  protected readonly createStatus = requestStatus({
-    failure: 'Failed to create user. Please try again.',
-  });
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete user. Please try again.',
   });
-  protected readonly createForm = form(
-    signal(NEW_USER),
-    (path) => {
-      required(path.username);
-      required(path.password);
-    },
-    { submission: { action: async () => this.create() } },
-  );
 
-  protected editUser(user: User): void {
+  /** The dialogs close with the saved username, or nothing when cancelled. */
+  protected addUser(): void {
     this.dialog
-      .open<UserEdit, User, boolean>(UserEdit, { data: user })
+      .open<UserCreate, void, string>(UserCreate)
       .afterClosed()
-      .subscribe((saved) => {
-        if (saved) this.usersResource.reload();
+      .subscribe((username) => {
+        if (username === undefined) return;
+        this.notifier.show(`User ${username} created`);
+        this.usersResource.reload();
       });
   }
 
-  private create(): void {
-    this.createStatus.run(this.usersService.createUser(this.createForm().value()), () => {
-      this.createForm().reset(NEW_USER);
-      this.usersResource.reload();
-    });
+  protected editUser(user: User): void {
+    this.dialog
+      .open<UserEdit, User, string>(UserEdit, { data: user })
+      .afterClosed()
+      .subscribe((username) => {
+        if (username === undefined) return;
+        this.notifier.show(`User ${username} updated`);
+        this.usersResource.reload();
+      });
   }
 
   protected deleteUser(user: User): void {
-    this.deleteStatus.run(this.usersService.deleteUser(user.id), () => this.usersResource.reload());
+    confirmDelete(this.dialog, `user ${user.username}`).subscribe(() =>
+      this.deleteStatus.run(this.usersService.deleteUser(user.id), () => {
+        this.notifier.show(`User ${user.username} deleted`);
+        this.usersResource.reload();
+      }),
+    );
   }
 }

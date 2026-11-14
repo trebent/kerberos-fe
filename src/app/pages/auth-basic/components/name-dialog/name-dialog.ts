@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { Observable } from 'rxjs';
@@ -10,17 +10,19 @@ import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { requestStatus } from '../../../../utils/request-status';
 
-export interface RenameDialogData {
+export interface NameDialogData {
   heading: string;
-  /** The current name. */
+  /** The submit button's text, such as "Create" or "Save". */
+  submitLabel: string;
+  /** The current name; empty for a new record. */
   name: string;
-  /** Saves the new name. */
-  rename: (name: string) => Observable<unknown>;
+  /** Sends the name: creates or renames the record. */
+  save: (name: string) => Observable<unknown>;
 }
 
 /**
- * Renames a record whose only editable field is its name: an organisation or a group. Open it
- * with `MatDialog`; it closes with `true` once saved.
+ * Creates or renames a record whose only field is its name: a group, or an organisation's
+ * rename. Open it with `MatDialog`; it closes with the saved name.
  */
 @Component({
   imports: [
@@ -28,17 +30,18 @@ export interface RenameDialogData {
     FormField,
     FormRoot,
     MatButton,
+    MatDialogClose,
     MatFormField,
     MatInput,
     MatLabel,
     RequestFeedback,
   ],
-  selector: 'app-rename-dialog',
-  templateUrl: './rename-dialog.html',
+  selector: 'app-name-dialog',
+  templateUrl: './name-dialog.html',
 })
-export class RenameDialog {
-  private readonly dialogRef = inject<MatDialogRef<RenameDialog, boolean>>(MatDialogRef);
-  protected readonly data = inject<RenameDialogData>(MAT_DIALOG_DATA);
+export class NameDialog {
+  private readonly dialogRef = inject<MatDialogRef<NameDialog, string>>(MatDialogRef);
+  protected readonly data = inject<NameDialogData>(MAT_DIALOG_DATA);
 
   protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
@@ -47,7 +50,7 @@ export class RenameDialog {
   });
 
   private save(): void {
-    const request$ = this.data.rename(this.form().value().name);
-    this.saveStatus.run(request$, () => this.dialogRef.close(true));
+    const { name } = this.form().value();
+    this.saveStatus.run(this.data.save(name), () => this.dialogRef.close(name));
   }
 }

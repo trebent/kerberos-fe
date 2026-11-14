@@ -1,0 +1,54 @@
+:host {
+  // A tint of the text colour, so it stays visible on any surface in light and dark mode.
+  --_color: var(
+    --app-skeleton-color,
+    color-mix(in srgb, var(--mat-sys-on-surface, #000) 12%, transparent)
+  );
+  --_radius: var(--app-skeleton-radius, var(--mat-sys-corner-extra-small, 4px));
+
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.bar {
+  display: block;
+  border-radius: var(--_radius);
+  background-color: var(--_color);
+  animation: app-skeleton-pulse 1.5s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+// One bar per line of text: as tall as the font, centred in the line box (`1lh`), so the
+// placeholder takes up exactly the space the text will.
+:host(.app-skeleton-text) .bar {
+  height: 1em;
+  margin-block: calc((1lh - 1em) / 2);
+
+  &:last-child:not(:first-child) {
+    width: 60%;
+  }
+}
+
+:host(.app-skeleton-rect) .bar {
+  height: var(--app-skeleton-height);
+}
+
+:host(.app-skeleton-circle) .bar {
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+@keyframes app-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}

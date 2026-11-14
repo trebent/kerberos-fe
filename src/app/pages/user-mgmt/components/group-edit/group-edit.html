@@ -1,24 +1,24 @@
 <app-edit-dialog heading="Edit group">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formRoot]="editForm">
+  <form class="dialog-form" [formRoot]="editForm">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput cdkFocusInitial [formField]="editForm.name" />
     </mat-form-field>
 
-    @if (permissionsResource.isLoading()) {
-      <mat-spinner diameter="24" aria-label="Loading" />
-    }
-    @if (permissionsResource.hasValue()) {
-      <app-checkbox-group
-        legend="Permissions"
-        [items]="permissionsResource.value()"
-        [selection]="selectedPermissions"
-      />
+    <app-checkbox-group
+      legend="Permissions"
+      [items]="permissionsResource.value() ?? []"
+      [loading]="permissionsResource.isLoading()"
+      [selection]="selectedPermissions"
+    />
+    @if (permissionsResource.error()) {
+      <app-error-display [errors]="['Failed to load permissions.']" />
     }
 
     <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
       <button
         matButton="filled"
         type="submit"

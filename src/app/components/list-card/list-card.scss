@@ -1,11 +1,68 @@
-// In a fixed-height card the create form stays put and only the list scrolls.
-.card-content {
-  display: flex;
-  flex-direction: column;
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
 }
 
-.list {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+// Title on the left, filter and add button on the right; on narrow cards the tools wrap under
+// the title and the filter takes the remaining width.
+.list-card-header {
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding-block: 0.75rem;
+}
+
+.header-tools {
+  display: flex;
+  flex: 1 1 22rem;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.header-tools button {
+  flex: none;
+  white-space: nowrap;
+}
+
+.filter-field {
+  flex: 0 1 16rem;
+  min-width: 0;
+
+  @include mat.form-field-density(-4);
+}
+
+.progress-slot {
+  height: 4px;
+}
+
+.messages {
+  padding-inline: 1rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+// One placeholder per row while the list loads, sized like a table row with its first columns.
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 52px;
+  padding-inline: 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.empty-state {
+  margin: 0;
+  padding: 1.5rem 1rem;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  text-align: center;
 }

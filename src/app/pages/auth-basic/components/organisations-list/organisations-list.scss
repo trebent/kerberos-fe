@@ -1,25 +1,70 @@
-.org-actions-container {
+@use '@angular/material' as mat;
+
+// Below this width the page stacks the list above the details (see auth-basic.scss).
+$stack-below: 48rem;
+
+.progress-slot {
+  height: 4px;
+}
+
+.org-list-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-block-end: 0.5rem;
+
+  app-error-display {
+    display: block;
+    margin: 0.5rem 1rem 0;
+  }
+}
+
+.filter-field {
+  width: calc(100% - 2rem);
+  margin: 0.5rem 1rem;
+
+  @include mat.form-field-density(-4);
+}
+
+// A two-line list item: the name, and the ID below it in a smaller font.
+.skeleton-item {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  height: 64px;
+  padding-inline: 1rem;
 }
 
-.credentials-box {
-  margin: 0.5rem 0 1rem;
+.skeleton-secondary {
+  font: var(--mat-sys-body-small);
+}
+
+.empty-state {
+  margin: 0;
   padding: 1rem;
-  border: 2px solid var(--mat-sys-primary);
-  border-radius: var(--mat-sys-corner-small);
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
 }
 
-.credentials-box p {
-  margin: 0.5rem 0;
+// Keeps the selected item's rounded highlight clear of the card's edges.
+mat-nav-list {
+  padding-inline: 0.5rem;
 }
 
-code {
-  font-family: var(--app-font-mono);
-  font-size: 0.95em;
+.org-picker {
+  display: none;
+  width: calc(100% - 2rem);
+  margin: 0.75rem 1rem;
+}
+
+@media (max-width: $stack-below) {
+  :host(.has-selection) {
+    .org-picker {
+      display: block;
+    }
+
+    .org-browser {
+      display: none;
+    }
+  }
 }

@@ -1,9 +1,0 @@
-<mat-form-field class="filter-field">
-  <mat-label>Filter</mat-label>
-  <input matInput [placeholder]="'Ex. ' + filterExample()" (input)="filter($event)" />
-</mat-form-field>
-
-<div class="table-wrapper">
-  <ng-content />
-  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons />
-</div>

@@ -1,3 +1,8 @@
-form {
-  margin-bottom: 0.5rem;
+mat-divider {
+  margin-block: 0.5rem 1rem;
+}
+
+.password-heading {
+  margin: 0 0 1rem;
+  font: var(--mat-sys-title-small);
 }

@@ -1,9 +1,61 @@
-<div class="page page-wide">
+<div class="page">
   <h1 class="page-title">Basic authentication</h1>
 
-  <div class="card-grid">
-    <app-organisations-list [(selectedOrgId)]="selectedOrgId" />
-    <app-org-users-list [orgId]="selectedOrgId()" />
-    <app-org-groups-list [orgId]="selectedOrgId()" />
+  <div class="org-layout">
+    <app-organisations-list
+      class="org-list"
+      [organisations]="orgsResource"
+      [selectedOrgId]="selectedOrgId()"
+    />
+
+    <section class="org-detail" aria-labelledby="org-detail-heading">
+      @let orgId = selectedOrgId();
+      @if (orgId === undefined) {
+        <div class="empty-detail">
+          <mat-icon aria-hidden="true">domain</mat-icon>
+          <h2 id="org-detail-heading">No organisation selected</h2>
+          <p>Select an organisation to manage its users and groups.</p>
+        </div>
+      } @else {
+        @let org = selectedOrg();
+        <div class="detail-header">
+          <h2 id="org-detail-heading" class="section-title">
+            @if (org) {
+              {{ org.name }}
+            } @else if (orgsResource.isLoading()) {
+              <app-skeleton width="10rem" />
+              <span class="visually-hidden">Loading organisation…</span>
+            } @else {
+              Organisation not found
+            }
+          </h2>
+          @if (org) {
+            <button
+              matIconButton
+              type="button"
+              [attr.aria-label]="'Rename organisation ' + org.name"
+              (click)="renameOrg(org)"
+            >
+              <mat-icon aria-hidden="true">edit</mat-icon>
+            </button>
+            <button
+              matIconButton
+              type="button"
+              [attr.aria-label]="'Delete organisation ' + org.name"
+              (click)="deleteOrg(org)"
+            >
+              <mat-icon aria-hidden="true">delete</mat-icon>
+            </button>
+          }
+        </div>
+
+        <app-request-feedback [status]="deleteStatus" />
+
+        @if (org || orgsResource.isLoading()) {
+          <app-org-users-list [orgId]="orgId" />
+          <app-org-groups-list [orgId]="orgId" />
+        }
+      }
+    </section>
   </div>
 </div>

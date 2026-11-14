@@ -1,0 +1,24 @@
+<app-edit-dialog heading="Add user">
+  <app-request-feedback [status]="createStatus" />
+
+  <form class="dialog-form" [formRoot]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput cdkFocusInitial [formField]="form.username" autocomplete="off" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [formField]="form.password" autocomplete="new-password" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="form().invalid() || createStatus.pending()"
+      >
+        Create
+      </button>
+    </div>
+  </form>
+</app-edit-dialog>

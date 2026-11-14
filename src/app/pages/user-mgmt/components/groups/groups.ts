@@ -1,44 +1,28 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { form, FormField, FormRoot, required } from '@angular/forms/signals';
-import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 
-import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
-import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { confirmDelete } from '../../../../components/confirm-delete/confirm-delete';
 import { ListCard } from '../../../../components/list-card/list-card';
-import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, UsersService } from '../../../../services/admin';
+import { Notifier } from '../../../../services/notifier.service';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
-import { IdSelection } from '../../../../utils/id-selection';
 import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
+import { GroupCreate } from '../group-create/group-create';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
-  imports: [
-    CheckboxGroup,
-    ListCard,
-    RequestFeedback,
-    FilteredTable,
-    FormField,
-    FormRoot,
-    MatButton,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ...MAT_TABLE,
-    RowActions,
-  ],
+  imports: [ListCard, RequestFeedback, ...MAT_TABLE, RowActions],
   selector: 'app-groups',
   templateUrl: './groups.html',
 })
 export class Groups {
   private readonly usersService = inject(UsersService);
   private readonly dialog = inject(MatDialog);
+  private readonly notifier = inject(Notifier);
 
   protected readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
 
@@ -49,44 +33,39 @@ export class Groups {
   protected readonly joinNames = joinNames;
   protected readonly dataSource = resourceDataSource(this.groupsResource);
 
-  protected readonly permissionsResource = rxResource({
-    stream: () => this.usersService.getPermissions(),
-  });
-
-  protected readonly createPermissions = new IdSelection();
-
-  protected readonly createStatus = requestStatus({
-    failure: 'Failed to create group. Please try again.',
-  });
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete group. Please try again.',
   });
-  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
-    submission: { action: async () => this.create() },
-  });
 
-  private create(): void {
-    const { name } = this.createForm().value();
-    const permissionIDs = [...this.createPermissions.selected()];
-    this.createStatus.run(this.usersService.createGroup({ name, permissionIDs }), () => {
-      this.createForm().reset({ name: '' });
-      this.createPermissions.set([]);
-      this.groupsResource.reload();
-    });
+  /** The dialogs close with the saved group name, or nothing when cancelled. */
+  protected addGroup(): void {
+    this.dialog
+      .open<GroupCreate, void, string>(GroupCreate)
+      .afterClosed()
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`Group ${name} created`);
+        this.groupsResource.reload();
+      });
   }
 
   protected editGroup(group: Group): void {
     this.dialog
-      .open<GroupEdit, Group, boolean>(GroupEdit, { data: group })
+      .open<GroupEdit, Group, string>(GroupEdit, { data: group })
       .afterClosed()
-      .subscribe((saved) => {
-        if (saved) this.groupsResource.reload();
+      .subscribe((name) => {
+        if (name === undefined) return;
+        this.notifier.show(`Group ${name} updated`);
+        this.groupsResource.reload();
       });
   }
 
   protected deleteGroup(group: Group): void {
-    this.deleteStatus.run(this.usersService.deleteGroup(group.id), () =>
-      this.groupsResource.reload(),
+    confirmDelete(this.dialog, `group ${group.name}`).subscribe(() =>
+      this.deleteStatus.run(this.usersService.deleteGroup(group.id), () => {
+        this.notifier.show(`Group ${group.name} deleted`);
+        this.groupsResource.reload();
+      }),
     );
   }
 }

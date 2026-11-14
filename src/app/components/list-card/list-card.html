@@ -1,25 +1,62 @@
-<div class="card-header-container">
+<div class="card-header-container list-card-header">
   <h2 class="section-title">{{ heading() }}</h2>
+  <div class="header-tools">
+    <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
+      <mat-icon matIconPrefix aria-hidden="true">search</mat-icon>
+      <input
+        matInput
+        type="search"
+        [attr.aria-label]="'Filter ' + noun()"
+        [placeholder]="'Filter, e.g. ' + filterExample()"
+        (input)="filter($event)"
+      />
+    </mat-form-field>
+    <button matButton="tonal" type="button" (click)="add.emit()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      {{ addLabel() }}
+    </button>
+  </div>
 </div>
-<div class="card-content">
-  @if (prompt(); as prompt) {
-    <p class="prompt-message">
-      <i>{{ prompt }}</i>
-    </p>
-  } @else {
-    <h3>{{ createHeading() }}</h3>
-    <ng-content select="[create]" />
 
-    <mat-divider />
-    <h3>{{ listHeading() }}</h3>
-    @if (resource().isLoading()) {
-      <mat-spinner diameter="32" aria-label="Loading" />
-    }
-    @if (resource().error()) {
-      <app-error-display [errors]="[loadError()]" />
-    }
-    <div class="list">
-      <ng-content />
-    </div>
+<!-- Reserves the bar's height, so the list does not move when a reload starts. -->
+<div class="progress-slot">
+  @if (resource().status() === 'reloading') {
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'Refreshing ' + noun()" />
   }
+</div>
+
+<div class="list-body" [attr.aria-busy]="resource().isLoading()">
+  <p class="visually-hidden" role="status">
+    {{ resource().isLoading() ? 'Loading ' + noun() + '…' : '' }}
+  </p>
+
+  <div class="messages">
+    @if (resource().error()) {
+      <app-error-display [errors]="['Failed to load ' + noun() + '.']" />
+    }
+    <ng-content select="app-request-feedback" />
+  </div>
+
+  <!-- Scrolls sideways when a row is wider than the card, rather than widening the page. -->
+  <div class="table-wrapper">
+    <ng-content />
+
+    @if (resource().status() === 'loading') {
+      @for (row of skeletonRows; track row) {
+        <div class="skeleton-row">
+          <app-skeleton width="1.5rem" />
+          <app-skeleton width="25%" />
+          <app-skeleton width="35%" />
+        </div>
+      }
+    } @else if (resource().hasValue() && isEmpty()) {
+      <p class="empty-state">
+        {{
+          filterText() ? 'No ' + noun() + ' match “' + filterText() + '”' : 'No ' + noun() + ' yet'
+        }}
+      </p>
+    }
+  </div>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons />
 </div>

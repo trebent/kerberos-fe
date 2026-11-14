@@ -1,9 +1,11 @@
-<div class="page page-wide">
+<div class="page">
   <h1 class="page-title">User management</h1>
 
-  <div class="card-grid">
-    <app-users />
-    <app-groups />
-    <app-permissions-list />
+  <div class="mgmt-layout">
+    <div class="main-column">
+      <app-users />
+      <app-groups />
+    </div>
+    <app-permissions-list class="side-column" />
   </div>
 </div>

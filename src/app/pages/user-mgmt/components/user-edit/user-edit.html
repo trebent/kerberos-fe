@@ -1,25 +1,24 @@
 <app-edit-dialog heading="Edit user">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formRoot]="editForm">
+  <form class="dialog-form" [formRoot]="editForm">
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
       <input matInput cdkFocusInitial [formField]="editForm.username" autocomplete="username" />
     </mat-form-field>
 
-    @if (groupsResource.isLoading()) {
-      <mat-spinner diameter="24" aria-label="Loading" />
-    }
-
-    @if (groupsResource.hasValue()) {
-      <app-checkbox-group
-        legend="Groups"
-        [items]="groupsResource.value()"
-        [selection]="selectedGroups"
-      />
+    <app-checkbox-group
+      legend="Groups"
+      [items]="groupsResource.value() ?? []"
+      [loading]="groupsResource.isLoading()"
+      [selection]="selectedGroups"
+    />
+    @if (groupsResource.error()) {
+      <app-error-display [errors]="['Failed to load groups.']" />
     }
 
     <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
       <button
         matButton="filled"
         type="submit"

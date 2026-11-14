@@ -1,0 +1,19 @@
+// Users and groups are wide tables, so they share the main column; the permissions are a short
+// reference list beside them. On narrow screens the reference list drops below.
+.mgmt-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+  align-items: start;
+  gap: 1rem;
+
+  @media (max-width: 56rem) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
