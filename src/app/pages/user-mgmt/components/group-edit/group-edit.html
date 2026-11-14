@@ -11,17 +11,11 @@
       <mat-spinner diameter="24" aria-label="Loading" />
     }
     @if (permissionsResource.hasValue()) {
-      <fieldset class="checkbox-fieldset">
-        <legend>Permissions</legend>
-        @for (p of permissionsResource.value(); track p.id) {
-          <mat-checkbox
-            [checked]="selectedPermissions.has(p.id)"
-            (change)="selectedPermissions.toggle(p.id)"
-          >
-            {{ p.name }}
-          </mat-checkbox>
-        }
-      </fieldset>
+      <app-checkbox-group
+        legend="Permissions"
+        [items]="permissionsResource.value()"
+        [selection]="selectedPermissions"
+      />
     }
 
     <div class="form-actions">

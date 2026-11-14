@@ -24,6 +24,7 @@ src/app/
       components/              organisations-list, org-users-list, org-user-detail, org-groups-list,
                                rename-panel
   components/                  shared components used by two or more pages
+    checkbox-group/            labelled checkboxes that tick IDs in an IdSelection
     edit-panel/                card with a heading and close button around an edit form
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
