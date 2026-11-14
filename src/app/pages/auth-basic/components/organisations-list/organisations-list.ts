@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
@@ -40,7 +40,8 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
 export class OrganisationsList {
   private readonly orgsService = inject(OrganisationsService);
 
-  readonly orgSelected = output<number | null>();
+  /** The organisation whose users and groups the page manages. */
+  readonly selectedOrgId = model<number | null>(null);
 
   protected readonly displayedColumns = ['id', 'name', 'actions'];
 
@@ -65,7 +66,6 @@ export class OrganisationsList {
 
   protected readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
   protected readonly selectedOrg = signal<Organisation | null>(null);
-  protected readonly selectedOrgId = signal<number | null>(null);
 
   private create(): void {
     const request$ = this.orgsService.createOrganisation(this.createForm().value());
@@ -76,15 +76,9 @@ export class OrganisationsList {
     });
   }
 
-  protected toggleManage(org: Organisation): void {
-    const current = this.selectedOrgId();
-    if (current === org.id) {
-      this.selectedOrgId.set(null);
-      this.orgSelected.emit(null);
-    } else {
-      this.selectedOrgId.set(org.id);
-      this.orgSelected.emit(org.id);
-    }
+  /** Selects an organisation, or clears the selection when it is already selected. */
+  protected toggleSelected(org: Organisation): void {
+    this.selectedOrgId.update((id) => (id === org.id ? null : org.id));
   }
 
   protected onDetailSaved(): void {
@@ -96,7 +90,6 @@ export class OrganisationsList {
     this.deleteStatus.run(this.orgsService.deleteOrganisation(org.id), () => {
       if (this.selectedOrgId() === org.id) {
         this.selectedOrgId.set(null);
-        this.orgSelected.emit(null);
       }
       if (this.selectedOrg()?.id === org.id) {
         this.selectedOrg.set(null);

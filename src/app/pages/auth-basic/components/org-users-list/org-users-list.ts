@@ -4,7 +4,6 @@ import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { of } from 'rxjs';
 
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { ListCard } from '../../../../components/list-card/list-card';
@@ -44,13 +43,9 @@ export class OrgUsersList {
   protected readonly displayedColumns = ['id', 'name', 'groups', 'actions'];
 
   protected readonly usersResource = rxResource({
-    params: () => this.orgId(),
-    stream: ({ params: orgId }) => {
-      if (orgId === null) {
-        return of<User[]>([]);
-      }
-      return this.usersService.listUsers(orgId);
-    },
+    // Idle, with no rows, until an organisation is selected.
+    params: () => this.orgId() ?? undefined,
+    stream: ({ params: orgId }) => this.usersService.listUsers(orgId),
   });
 
   protected readonly joinNames = joinNames;

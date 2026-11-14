@@ -4,7 +4,7 @@ import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { of, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { ListCard } from '../../../../components/list-card/list-card';
@@ -41,13 +41,9 @@ export class OrgGroupsList {
   protected readonly displayedColumns = ['id', 'name', 'actions'];
 
   protected readonly groupsResource = rxResource({
-    params: () => this.orgId(),
-    stream: ({ params: orgId }) => {
-      if (orgId === null) {
-        return of<Group[]>([]);
-      }
-      return this.groupsService.listGroups(orgId);
-    },
+    // Idle, with no rows, until an organisation is selected.
+    params: () => this.orgId() ?? undefined,
+    stream: ({ params: orgId }) => this.groupsService.listGroups(orgId),
   });
 
   protected readonly dataSource = resourceDataSource(this.groupsResource);
