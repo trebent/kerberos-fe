@@ -41,7 +41,9 @@ export class UserEdit {
     stream: () => this.usersService.getGroups(),
   });
 
-  protected readonly selectedGroups = new IdSelection((this.user.groups ?? []).map((g) => g.id));
+  protected readonly selectedGroups = new IdSelection(() =>
+    (this.user.groups ?? []).map((g) => g.id),
+  );
   protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
   protected readonly editForm = form(

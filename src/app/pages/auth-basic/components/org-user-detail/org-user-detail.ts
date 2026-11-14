@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
@@ -51,8 +51,9 @@ export interface OrgUserDetailData {
 export class OrgUserDetail {
   private readonly usersService = inject(UsersService);
   private readonly groupsService = inject(GroupsService);
-  private readonly orgId = inject<OrgUserDetailData>(MAT_DIALOG_DATA).orgId;
-  private readonly user = inject<OrgUserDetailData>(MAT_DIALOG_DATA).user;
+  private readonly data = inject<OrgUserDetailData>(MAT_DIALOG_DATA);
+  private readonly orgId = this.data.orgId;
+  private readonly user = this.data.user;
 
   /** The organisation's groups, and the ones this user is in. */
   protected readonly groupsResource = rxResource({
@@ -62,7 +63,12 @@ export class OrgUserDetail {
         member: this.usersService.getUserGroups(this.orgId, this.user.id),
       }),
   });
-  protected readonly selectedGroups = new IdSelection();
+  /** Ticks the groups the user is in once they have loaded. */
+  protected readonly selectedGroups = new IdSelection(() =>
+    this.groupsResource.hasValue()
+      ? this.groupsResource.value().member.map((group) => group.id)
+      : [],
+  );
 
   protected readonly nameStatus = requestStatus({
     failure: 'Failed to update name. Please try again.',
@@ -84,14 +90,6 @@ export class OrgUserDetail {
       oldPassword,
       password: newPassword,
     });
-
-  constructor() {
-    effect(() => {
-      if (this.groupsResource.hasValue()) {
-        this.selectedGroups.set(this.groupsResource.value().member.map((group) => group.id));
-      }
-    });
-  }
 
   private saveName(): void {
     const { id } = this.user;
