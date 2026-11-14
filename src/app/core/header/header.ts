@@ -1,13 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatToolbar } from '@angular/material/toolbar';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
 import { ThemeMode, ThemeService } from '../../services/theme.service';
+import { AccountMenu } from '../account-menu/account-menu';
 
 interface NavLink {
   path: string;
@@ -23,8 +23,8 @@ interface ThemeOption {
 
 @Component({
   imports: [
+    AccountMenu,
     MatButton,
-    MatDivider,
     MatIcon,
     MatIconButton,
     MatMenu,
@@ -39,7 +39,6 @@ interface ThemeOption {
   templateUrl: './header.html',
 })
 export class Header {
-  private readonly router = inject(Router);
   protected readonly auth = inject(AuthService);
   protected readonly theme = inject(ThemeService);
 
@@ -59,8 +58,4 @@ export class Header {
     () =>
       this.themeOptions.find((option) => option.mode === this.theme.mode()) ?? this.themeOptions[0],
   );
-
-  protected logout(): void {
-    this.auth.logout().subscribe(() => void this.router.navigateByUrl('/login'));
-  }
 }

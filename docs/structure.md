@@ -11,6 +11,9 @@ src/app/
   app.routes.ts                lazy routes and guards
   core/                        app-wide pieces, wired up once by the root files
     header/                    app shell, rendered on every page
+    account-menu/              the header's account button: own username, password, log out
+    change-username-dialog/
+    change-password-dialog/
     footer/
     guards/                    route guards (authGuard, guestGuard)
     interceptors/              HTTP interceptors (credentials + CSRF header)
@@ -19,7 +22,7 @@ src/app/
     flow/
       components/              debug, flow-pipeline, oas, call-details, transition-badges
     user-mgmt/
-      components/              profile, users, user-edit, groups, group-edit, permissions-list
+      components/              users, user-edit, groups, group-edit, permissions-list
     auth-basic/
       components/              organisations-list, org-users-list, org-user-detail, org-groups-list,
                                rename-dialog
@@ -34,6 +37,7 @@ src/app/
     row-actions/               a table row's edit and delete buttons
   services/                    all services, hand-written and generated
     auth.service.ts
+    notifier.service.ts        transient confirmations in a snack bar
     theme.service.ts           light/dark/system preference, saved in localStorage
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml

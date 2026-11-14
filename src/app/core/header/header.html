@@ -46,12 +46,9 @@
     </mat-menu>
 
     @if (auth.isLoggedIn()) {
-      <span class="user-info">Logged in as {{ auth.username() }}</span>
-      <button class="logout-button" matButton="outlined" type="button" (click)="logout()">
-        Log out
-      </button>
+      <app-account-menu />
 
-      <!-- On narrow screens the navigation and account actions collapse into this menu. -->
+      <!-- On narrow screens the navigation collapses into this menu. -->
       <button
         class="mobile-menu-button"
         matIconButton
@@ -62,7 +59,6 @@
         <mat-icon>menu</mat-icon>
       </button>
       <mat-menu #mobileMenu="matMenu" xPosition="before" aria-label="Main menu">
-        <div class="mobile-menu-user" aria-hidden="true">{{ auth.username() }}</div>
         @for (link of links; track link.path) {
           <a
             mat-menu-item
@@ -74,11 +70,6 @@
             <span>{{ link.label }}</span>
           </a>
         }
-        <mat-divider />
-        <button mat-menu-item type="button" (click)="logout()">
-          <mat-icon aria-hidden="true">logout</mat-icon>
-          <span>Log out {{ auth.username() }}</span>
-        </button>
       </mat-menu>
     }
   </mat-toolbar>

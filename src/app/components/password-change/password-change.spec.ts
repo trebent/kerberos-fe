@@ -37,11 +37,14 @@ describe('PasswordChange', () => {
   });
 
   it('sends the change and confirms it', async () => {
+    const changed = vi.fn();
+    fixture.componentInstance.changed.subscribe(changed);
     await fill('old', 'new', 'new');
     submitButton().click();
     await fixture.whenStable();
 
     expect(change).toHaveBeenCalledWith('old', 'new');
+    expect(changed).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('[role="status"]')?.textContent).toContain(
       'Password changed successfully.',
     );

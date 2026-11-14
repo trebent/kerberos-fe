@@ -83,7 +83,6 @@ describe('UserMgmt', () => {
 
     expect(element.querySelector('h1')?.textContent).toContain('User management');
     expect(Array.from(element.querySelectorAll('h2')).map((h) => h.textContent?.trim())).toEqual([
-      'Profile',
       'Users',
       'Groups',
       'Permissions',
@@ -185,21 +184,6 @@ describe('UserMgmt', () => {
     await fixture.whenStable();
 
     expect(element.textContent).toContain('Failed to delete user.');
-    await expectNoAxeViolations(fixture);
-  });
-
-  it('confirms a username change', async () => {
-    await loadPage();
-
-    const profile = element.querySelector('app-profile')!;
-    fillIn(profile, { 'New username': 'alicia' });
-    await fixture.whenStable();
-    submitForm(profile.querySelector('input')!);
-    await fixture.whenStable();
-
-    expect(profile.querySelector('[role="status"]')?.textContent).toContain(
-      'Username updated successfully.',
-    );
     await expectNoAxeViolations(fixture);
   });
 });

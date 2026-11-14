@@ -30,26 +30,27 @@ describe('Header', () => {
     Array.from<HTMLAnchorElement>(fixture.nativeElement.querySelectorAll('nav a')).map((link) =>
       link.textContent?.trim(),
     );
-  const logoutButton = () =>
-    Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button')).find(
-      (button) => button.textContent?.trim() === 'Log out',
-    );
+  const accountButton = () =>
+    fixture.nativeElement.querySelector('[aria-label^="Account"]') as HTMLButtonElement | null;
 
   it('shows only the brand to guests', async () => {
     expect(navLinks()).toEqual([]);
-    expect(logoutButton()).toBeUndefined();
+    expect(accountButton()).toBeNull();
     await expectNoAxeViolations(fixture);
   });
 
-  it('shows navigation and logs a user out', async () => {
+  it('shows navigation and logs a user out from the account menu', async () => {
     auth.signIn('alice');
     await fixture.whenStable();
 
     expect(navLinks()).toEqual(['Flow', 'Users', 'Basic authentication']);
-    expect(fixture.nativeElement.textContent).toContain('Logged in as alice');
+    expect(accountButton()?.getAttribute('aria-label')).toBe('Account: alice');
     await expectNoAxeViolations(fixture);
 
-    logoutButton()?.click();
+    const menu = await loader.getHarness(
+      MatMenuHarness.with({ selector: '[aria-label^="Account"]' }),
+    );
+    await menu.clickItem({ text: /Log out/ });
 
     expect(auth.logout).toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('/login');

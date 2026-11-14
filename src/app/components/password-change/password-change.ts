@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { form, FormField, FormRoot, required, validate } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
@@ -13,7 +13,7 @@ export type ChangePassword = (oldPassword: string, newPassword: string) => Obser
 
 const EMPTY = { oldPassword: '', newPassword: '', confirmPassword: '' };
 
-/** A current/new/confirm password form that reports how the change went. */
+/** A current/new/confirm password form that reports how the change went, and emits `changed`. */
 @Component({
   imports: [
     MatButton,
@@ -30,6 +30,8 @@ const EMPTY = { oldPassword: '', newPassword: '', confirmPassword: '' };
 })
 export class PasswordChange {
   readonly change = input.required<ChangePassword>();
+  /** Emits once a change has gone through. */
+  readonly changed = output<void>();
 
   protected readonly status = requestStatus({
     failure: 'Failed to change password. Please check your current password and try again.',
@@ -51,6 +53,9 @@ export class PasswordChange {
 
   private submit(): void {
     const { oldPassword, newPassword } = this.form().value();
-    this.status.run(this.change()(oldPassword, newPassword), () => this.form().reset(EMPTY));
+    this.status.run(this.change()(oldPassword, newPassword), () => {
+      this.form().reset(EMPTY);
+      this.changed.emit();
+    });
   }
 }

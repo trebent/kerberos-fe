@@ -1,4 +1,4 @@
-// Below this width the inline navigation and account actions collapse into a menu.
+// Below this width the inline navigation collapses into a menu.
 $collapse-below: 56rem;
 
 .toolbar {
@@ -38,21 +38,8 @@ $collapse-below: 56rem;
   flex: 1;
 }
 
-.user-info {
-  margin-inline-end: 0.5rem;
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-body-small);
-  white-space: nowrap;
-}
-
 .mobile-menu-button {
   display: none;
-}
-
-.mobile-menu-user {
-  padding: 0.5rem 1rem;
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-label-medium);
 }
 
 @media (max-width: $collapse-below) {
@@ -66,9 +53,7 @@ $collapse-below: 56rem;
     padding-inline-start: 0.5rem;
   }
 
-  .nav-links,
-  .user-info,
-  .logout-button {
+  .nav-links {
     display: none;
   }
 

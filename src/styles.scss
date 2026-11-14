@@ -186,6 +186,24 @@ a {
   }
 }
 
+// Forms in dialogs: fields take the dialog's full width, and the buttons sit at the end of a
+// `.form-actions` row, the submit button last.
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-block: 0.25rem 0.5rem;
+  }
+}
+
 // A labelled group of checkboxes, such as a group's permissions or a user's groups.
 .checkbox-fieldset {
   display: flex;

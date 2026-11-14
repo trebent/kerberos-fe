@@ -1,0 +1,11 @@
+.account-name {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 1rem 0.75rem;
+  font: var(--mat-sys-title-small);
+
+  .signed-in-as {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-small);
+  }
+}

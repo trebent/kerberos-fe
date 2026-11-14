@@ -1,0 +1,20 @@
+<app-edit-dialog heading="Change username">
+  <app-request-feedback [status]="saveStatus" />
+
+  <form class="dialog-form" [formRoot]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput cdkFocusInitial [formField]="form.username" autocomplete="username" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button matButton type="button" mat-dialog-close>Cancel</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="form().invalid() || saveStatus.pending()"
+      >
+        Save
+      </button>
+    </div>
+  </form>
+</app-edit-dialog>

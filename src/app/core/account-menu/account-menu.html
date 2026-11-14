@@ -1,0 +1,31 @@
+<button
+  matIconButton
+  type="button"
+  [matMenuTriggerFor]="accountMenu"
+  [attr.aria-label]="'Account: ' + displayName()"
+>
+  <mat-icon>account_circle</mat-icon>
+</button>
+<mat-menu #accountMenu="matMenu" xPosition="before" aria-label="Account">
+  <!-- The trigger's label already names the account; a menu may only contain items. -->
+  <div class="account-name" aria-hidden="true">
+    <span class="signed-in-as">Signed in as</span>
+    <span>{{ displayName() }}</span>
+  </div>
+  <mat-divider />
+  @if (!auth.isSuperuser()) {
+    <button mat-menu-item type="button" (click)="changeUsername()">
+      <mat-icon aria-hidden="true">badge</mat-icon>
+      <span>Change username…</span>
+    </button>
+  }
+  <button mat-menu-item type="button" (click)="changePassword()">
+    <mat-icon aria-hidden="true">password</mat-icon>
+    <span>Change password…</span>
+  </button>
+  <mat-divider />
+  <button mat-menu-item type="button" (click)="logout()">
+    <mat-icon aria-hidden="true">logout</mat-icon>
+    <span>Log out</span>
+  </button>
+</mat-menu>
