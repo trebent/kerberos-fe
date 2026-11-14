@@ -54,7 +54,7 @@
               [matButton]="selectedOrgId() === o.id ? 'filled' : 'outlined'"
               [attr.aria-pressed]="selectedOrgId() === o.id"
               [attr.aria-label]="'Select organisation ' + o.name"
-              (click)="toggleManage(o)"
+              (click)="toggleSelected(o)"
             >
               Select
             </button>
