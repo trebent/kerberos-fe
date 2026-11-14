@@ -2,7 +2,7 @@
   <h1 class="page-title">Basic authentication</h1>
 
   <div class="subsection-container">
-    <app-organisations-list (orgSelected)="selectedOrgId.set($event)" />
+    <app-organisations-list [(selectedOrgId)]="selectedOrgId" />
     <app-org-users-list [orgId]="selectedOrgId()" />
     <app-org-groups-list [orgId]="selectedOrgId()" />
   </div>
