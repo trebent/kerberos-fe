@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .flow-card {
@@ -15,7 +15,7 @@
   max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 0.75rem;
+  border-radius: var(--mat-sys-corner-medium);
   background: var(--mat-sys-surface-container);
   padding: 1.25rem;
 }
@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-right: 20px;
+  padding-right: 1.25rem;
 }
 
 .divider {
@@ -37,13 +37,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-left: 20px;
+  padding-left: 1.25rem;
   flex-shrink: 0;
 }
 
 .section-heading {
-  margin: 0 0 12px 0;
-  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+  font: var(--mat-sys-title-small);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -57,36 +57,41 @@
   align-items: center;
   justify-content: center;
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .flow-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .transitions-row {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 0.25rem;
   justify-content: center;
-  min-height: 22px;
+  min-height: 1.375rem;
 }
 
-.flow-box {
+// The boxes for flow components and backends.
+.flow-box,
+.backend-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
+  border-radius: var(--mat-sys-corner-small);
   background: var(--mat-sys-surface-container-high);
   font-weight: 500;
-  cursor: default;
   white-space: nowrap;
+}
+
+.flow-box {
+  padding: 0.75rem 1.25rem;
+  cursor: default;
   transition:
     opacity 200ms ease,
     filter 200ms ease,
@@ -99,11 +104,6 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
 }
 
-.flow-box.dimmed {
-  opacity: 0.35;
-  filter: grayscale(1);
-}
-
 .arrow {
   color: var(--mat-sys-on-surface-variant);
   flex-shrink: 0;
@@ -112,6 +112,8 @@
     filter 200ms ease;
 }
 
+// Components and arrows off the highlighted backend's path.
+.flow-box.dimmed,
 .arrow.dimmed {
   opacity: 0.35;
   filter: grayscale(1);
@@ -120,24 +122,16 @@
 .backends-stack {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .backend-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
-  background: var(--mat-sys-surface-container-high);
-  font-weight: 500;
+  padding: 0.625rem 1rem;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .no-backends {
-  font-size: 0.85rem;
+  font: var(--mat-sys-body-small);
   color: var(--mat-sys-on-surface-variant);
   font-style: italic;
 }
@@ -165,7 +159,7 @@
 
   .pipeline {
     flex-direction: column;
-    gap: 4px;
+    gap: 0.25rem;
   }
 
   .flow-col {

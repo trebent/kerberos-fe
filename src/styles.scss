@@ -130,7 +130,7 @@ a {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 0.75rem;
+  border-radius: var(--mat-sys-corner-medium);
   background: var(--mat-sys-surface-container);
 }
 
@@ -181,7 +181,7 @@ a {
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 0.25rem;
+  border-radius: var(--mat-sys-corner-extra-small);
 
   legend {
     padding: 0 0.25rem;
@@ -263,17 +263,12 @@ a {
   color: var(--mat-sys-error);
 }
 
-.flow-meta-tooltip {
+// Tooltips that show multi-line data, such as a flow component's configuration.
+.flow-meta-tooltip .mdc-tooltip__surface {
   white-space: pre-wrap;
+  font: var(--mat-sys-body-small);
   font-family: var(--app-font-mono);
-  font-size: 12px;
-  text-align: left;
-
-  .mdc-tooltip__surface {
-    font-family: var(--app-font-mono);
-    font-size: 12px;
-    text-align: left;
-  }
+  text-align: start;
 }
 
 .visually-hidden {

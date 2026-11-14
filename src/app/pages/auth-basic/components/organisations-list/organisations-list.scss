@@ -10,7 +10,7 @@
   margin: 0.5rem 0 1rem;
   padding: 1rem;
   border: 2px solid var(--mat-sys-primary);
-  border-radius: 0.5rem;
+  border-radius: var(--mat-sys-corner-small);
   background: var(--mat-sys-primary-container);
   color: var(--mat-sys-on-primary-container);
 }
