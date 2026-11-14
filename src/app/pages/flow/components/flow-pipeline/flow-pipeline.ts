@@ -20,9 +20,11 @@ import {
   FlowMetaDataRouterBackend,
   FlowTransition,
 } from '../../../../services/admin';
-import { flowComponentData } from '../../../../utils/flow-meta';
+import { componentsOnPath, describeFlowData, flowComponentData } from '../../../../utils/flow-meta';
 import { CallDetails } from '../call-details/call-details';
 import { Placeholder, TransitionBadges } from '../transition-badges/transition-badges';
+
+type Direction = 'inbound' | 'outbound';
 
 @Component({
   imports: [CallDetails, MatIcon, MatTooltip, TransitionBadges],
@@ -52,9 +54,38 @@ export class FlowPipeline {
   /** The width the pipeline needed the last time it was laid out horizontally. */
   private horizontalWidth = 0;
 
-  protected readonly effectiveBackend = computed<string | null>(
+  /** The backend whose path is shown: the debugged call's, else the hovered one. */
+  private readonly effectiveBackend = computed<string | null>(
     () => this.callBackend() ?? this.hoveredBackend(),
   );
+
+  /** The components each backend's requests pass through, by backend name. */
+  private readonly componentsOnPath = computed(
+    () =>
+      new Map(
+        this.backends().map((backend) => [
+          backend.name,
+          componentsOnPath(this.flowMetas(), backend.name),
+        ]),
+      ),
+  );
+
+  /** The selected call's transitions, by component and direction. */
+  private readonly transitionsByComponent = computed(() => {
+    const byComponent = new Map<string, Record<Direction, FlowTransition[]>>();
+    for (const transition of this.selectedCall()?.flowTransitions ?? []) {
+      let entry = byComponent.get(transition.component);
+      if (!entry) {
+        entry = { inbound: [], outbound: [] };
+        byComponent.set(transition.component, entry);
+      }
+      const inbound = transition.direction === FlowTransition.DirectionEnum.Inbound;
+      entry[inbound ? 'inbound' : 'outbound'].push(transition);
+    }
+    return byComponent;
+  });
+
+  protected readonly describeFlowData = describeFlowData;
 
   constructor() {
     this.watchAvailableWidth();
@@ -96,51 +127,13 @@ export class FlowPipeline {
     inject(DestroyRef).onDestroy(() => observer.disconnect());
   }
 
-  private static readonly ALWAYS_INVOLVED = new Set(['obs', 'router', 'forwarder']);
+  private isOnPath(backend: string, component: string): boolean {
+    return this.componentsOnPath().get(backend)?.has(component) ?? false;
+  }
 
-  protected readonly transitionsByComponent = computed<
-    Map<string, { inbound: FlowTransition[]; outbound: FlowTransition[] }>
-  >(() => {
-    const call = this.selectedCall();
-    const map = new Map<string, { inbound: FlowTransition[]; outbound: FlowTransition[] }>();
-    if (!call) return map;
-
-    for (const t of call.flowTransitions) {
-      if (!map.has(t.component)) {
-        map.set(t.component, { inbound: [], outbound: [] });
-      }
-      const entry = map.get(t.component)!;
-      if (t.direction === FlowTransition.DirectionEnum.Inbound) {
-        entry.inbound.push(t);
-      } else {
-        entry.outbound.push(t);
-      }
-    }
-    return map;
-  });
-
-  protected readonly involvedMap = computed<Map<string, Set<string>>>(() => {
-    const flow = this.flowMetas();
-    const map = new Map<string, Set<string>>();
-    for (const backend of this.backends()) {
-      const involved = new Set<string>();
-      for (const comp of flow) {
-        if (
-          FlowPipeline.ALWAYS_INVOLVED.has(comp.name) ||
-          this.hasBackendInTree(comp.data, backend.name)
-        ) {
-          involved.add(comp.name);
-        }
-      }
-      map.set(backend.name, involved);
-    }
-    return map;
-  });
-
-  protected isComponentDimmed(compName: string): boolean {
+  protected isComponentDimmed(component: string): boolean {
     const hovered = this.hoveredBackend();
-    if (!hovered) return false;
-    return !(this.involvedMap().get(hovered)?.has(compName) ?? false);
+    return hovered !== null && !this.isOnPath(hovered, component);
   }
 
   protected isArrowDimmed(index: number): boolean {
@@ -152,82 +145,18 @@ export class FlowPipeline {
    * What to show in a component's badge row when it recorded no transitions for the selected call:
    * "n/a" when the call's backend does not pass through it, "none" when it does.
    */
-  protected placeholder(compName: string, direction: 'inbound' | 'outbound'): Placeholder | null {
+  protected placeholder(component: string, direction: Direction): Placeholder | null {
     const backend = this.effectiveBackend();
     if (!this.selectedCall() || !backend) return null;
-    if (!(this.involvedMap().get(backend)?.has(compName) ?? false)) return 'n/a';
-    return this.getTransitions(compName, direction).length === 0 ? 'none' : null;
+    if (!this.isOnPath(backend, component)) return 'n/a';
+    return this.transitions(component, direction).length === 0 ? 'none' : null;
   }
 
-  protected getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
-    const entry = this.transitionsByComponent().get(compName);
-    return entry ? entry[direction] : [];
+  protected transitions(component: string, direction: Direction): FlowTransition[] {
+    return this.transitionsByComponent().get(component)?.[direction] ?? [];
   }
 
-  private hasBackendInTree(data: unknown, name: string): boolean {
-    if (data === null || data === undefined || typeof data !== 'object') return false;
-    if (Array.isArray(data)) {
-      return data.some((item) => this.hasBackendInTree(item, name));
-    }
-    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
-      if (key === 'backend' && value === name) return true;
-      if (key === 'backends' && Array.isArray(value) && value.includes(name)) return true;
-      if (this.hasBackendInTree(value, name)) return true;
-    }
-    return false;
-  }
-
-  protected formatBackend(backend: FlowMetaDataRouterBackend): string {
+  protected describeBackend(backend: FlowMetaDataRouterBackend): string {
     return `host: ${backend.host}\nport: ${backend.port}`;
-  }
-
-  protected formatData(data: unknown): string {
-    if (data === null || data === undefined) return '';
-    if (typeof data !== 'object' || Array.isArray(data)) return String(data);
-    return this.renderObject(data as Record<string, unknown>, '');
-  }
-
-  private renderObject(obj: Record<string, unknown>, indent: string): string {
-    return Object.entries(obj)
-      .map(([k, v]) => this.renderEntry(k, v, indent))
-      .join('\n');
-  }
-
-  private renderEntry(key: string, value: unknown, indent: string): string {
-    if (value === null || value === undefined) {
-      return `${indent}${key}:`;
-    }
-    if (typeof value !== 'object') {
-      return `${indent}${key}: ${value}`;
-    }
-    if (Array.isArray(value)) {
-      if (value.length === 0) return `${indent}${key}: []`;
-      const childIndent = `${indent}  `;
-      return `${indent}${key}:\n${value.map((item) => this.renderArrayItem(item, childIndent)).join('\n')}`;
-    }
-    return `${indent}${key}:\n${this.renderObject(value as Record<string, unknown>, `${indent}  `)}`;
-  }
-
-  private renderArrayItem(item: unknown, indent: string): string {
-    if (item === null || item === undefined || typeof item !== 'object' || Array.isArray(item)) {
-      return `${indent}- ${item ?? 'null'}`;
-    }
-    const entries = Object.entries(item as Record<string, unknown>);
-    if (entries.length === 0) return `${indent}-`;
-
-    return entries
-      .map(([k, v], i) => {
-        const prefix = i === 0 ? `${indent}- ` : `${indent}  `;
-        if (v !== null && typeof v === 'object') {
-          if (Array.isArray(v)) {
-            if (v.length === 0) return `${prefix}${k}: []`;
-            const subIndent = `${indent}    `;
-            return `${prefix}${k}:\n${v.map((sub) => this.renderArrayItem(sub, subIndent)).join('\n')}`;
-          }
-          return `${prefix}${k}:\n${this.renderObject(v as Record<string, unknown>, `${indent}    `)}`;
-        }
-        return `${prefix}${k}: ${v ?? 'null'}`;
-      })
-      .join('\n');
   }
 }
