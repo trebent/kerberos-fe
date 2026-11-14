@@ -25,6 +25,17 @@ html {
   --app-font-mono: 'Roboto Mono', 'Courier New', monospace;
 }
 
+// An open dialog blocks page scroll with this class. The CDK pins `html` with `position: fixed`
+// and a negative `top`, which resets the window scroll to 0, so sticky elements (the
+// organisation list, the flow pipeline) jump back to their place in the flow, often off screen.
+// Hiding overflow instead keeps the scroll position, and sticky elements with it. The CDK only
+// blocks a page that has a scrollbar, so the stable gutter stops the content from shifting.
+html.cdk-global-scrollblock {
+  position: static;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background-color: var(--mat-sys-surface);
