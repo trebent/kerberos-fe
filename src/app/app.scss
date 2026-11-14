@@ -4,8 +4,11 @@
   min-height: 100dvh;
 }
 
+// A column, so a routed page that needs the full height (the Flow page) can grow into it.
 main {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   outline: none;
 }
 
