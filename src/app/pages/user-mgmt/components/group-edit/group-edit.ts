@@ -2,11 +2,11 @@ import { Component, effect, inject, input, linkedSignal, output } from '@angular
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
+import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
 import { EditPanel } from '../../../../components/edit-panel/edit-panel';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { Group, UsersService } from '../../../../services/admin';
@@ -15,11 +15,11 @@ import { requestStatus } from '../../../../utils/request-status';
 
 @Component({
   imports: [
+    CheckboxGroup,
     EditPanel,
     FormField,
     FormRoot,
     MatButton,
-    MatCheckbox,
     MatFormField,
     MatInput,
     MatLabel,

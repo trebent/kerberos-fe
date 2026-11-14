@@ -2,10 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
+import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { ListCard } from '../../../../components/list-card/list-card';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
@@ -18,6 +18,7 @@ import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
   imports: [
+    CheckboxGroup,
     ListCard,
     RequestFeedback,
     FilteredTable,
@@ -30,7 +31,6 @@ import { GroupEdit } from '../group-edit/group-edit';
     ...MAT_TABLE,
     RowActions,
     GroupEdit,
-    MatCheckbox,
   ],
   selector: 'app-groups',
   templateUrl: './groups.html',

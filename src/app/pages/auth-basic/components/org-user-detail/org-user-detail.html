@@ -30,14 +30,11 @@
   <app-request-feedback [status]="groupsStatus" />
 
   @if (groupsResource.hasValue() && groupsResource.value().all.length) {
-    <fieldset class="checkbox-fieldset">
-      <legend>Select groups</legend>
-      @for (g of groupsResource.value().all; track g.id) {
-        <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
-          {{ g.name }}
-        </mat-checkbox>
-      }
-    </fieldset>
+    <app-checkbox-group
+      legend="Select groups"
+      [items]="groupsResource.value().all"
+      [selection]="selectedGroups"
+    />
     <div class="form-actions">
       <button
         matButton="filled"
