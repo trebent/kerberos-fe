@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 import { expectNoAxeViolations } from '../../../testing/axe';
+import { fillIn } from '../../../testing/dom';
 import { PasswordChange } from './password-change';
 
 describe('PasswordChange', () => {
@@ -16,17 +17,11 @@ describe('PasswordChange', () => {
   });
 
   async function fill(oldPassword: string, newPassword: string, confirm: string): Promise<void> {
-    const element: HTMLElement = fixture.nativeElement;
-    for (const [name, value] of [
-      ['oldPassword', oldPassword],
-      ['newPassword', newPassword],
-      ['confirmPassword', confirm],
-    ]) {
-      const input = element.querySelector<HTMLInputElement>(`[formControlName="${name}"]`)!;
-      input.value = value;
-      input.dispatchEvent(new Event('input'));
-      input.dispatchEvent(new Event('blur'));
-    }
+    fillIn(fixture.nativeElement, {
+      'Current password': oldPassword,
+      'New password': newPassword,
+      'Confirm new password': confirm,
+    });
     await fixture.whenStable();
   }
 
