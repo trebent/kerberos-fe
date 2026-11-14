@@ -52,14 +52,33 @@ describe('AuthService', () => {
     expect(localStorage.getItem('sessionExpiry')).toBeNull();
   });
 
+  it('signs a user out through the user endpoint', () => {
+    auth.login('alice', 'secret').subscribe();
+    expectRequest('/api/admin/login').flush(null);
+    expectRequest('/api/admin/me').flush({
+      isSuperuser: false,
+      user: { id: 4, username: 'alice' },
+    });
+
+    auth.logout().subscribe();
+    expectRequest('/api/admin/logout').flush(null);
+
+    expect(auth.isLoggedIn()).toBe(false);
+    expect(auth.username()).toBeNull();
+  });
+
   it('signs a superuser out locally even when the backend rejects the logout', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     auth.superLogin('admin', 'secret').subscribe();
     expectRequest('/api/admin/superuser/login').flush(null);
     expect(auth.isSuperuser()).toBe(true);
+    expect(auth.username()).toBe('superuser');
 
-    auth.superLogout().subscribe({ error: () => undefined });
+    const signedOut = vi.fn();
+    auth.logout().subscribe(signedOut);
     expectRequest('/api/admin/superuser/logout').flush(null, serverError);
 
+    expect(signedOut).toHaveBeenCalled();
     expect(auth.isLoggedIn()).toBe(false);
     expect(auth.isSuperuser()).toBe(false);
   });
