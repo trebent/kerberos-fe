@@ -24,20 +24,3 @@ form {
 mat-divider {
   margin: 0.5rem 0;
 }
-
-.filter-field {
-  width: 100%;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-
-td.mat-column-actions,
-th.mat-column-actions {
-  background: var(--mat-table-background-color, var(--mat-sys-surface));
-  white-space: nowrap;
-  text-align: center;
-  width: 10rem;
-}

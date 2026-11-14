@@ -1,36 +1,34 @@
-import { Component, effect, inject, input, linkedSignal, signal, viewChild } from '@angular/core';
+import { Component, inject, input, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { of } from 'rxjs';
-import { MatTableDataSource } from '@angular/material/table';
-
-import { MAT_TABLE } from '../../../../utils/material-table';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/auth-basic';
+import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
+import { joinNames } from '../../../../utils/names';
 import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 
 @Component({
   imports: [
     ErrorDisplay,
+    FilteredTable,
     MatButton,
     MatDivider,
     MatFormField,
-    MatIcon,
-    MatIconButton,
     MatInput,
     MatLabel,
-    MatPaginator,
     MatProgressSpinner,
     ...MAT_TABLE,
     ReactiveFormsModule,
+    RowActions,
     OrgUserDetail,
   ],
   selector: 'app-org-users-list',
@@ -55,20 +53,8 @@ export class OrgUsersList {
     },
   });
 
-  protected readonly dataSource = new MatTableDataSource<User>();
-
-  private readonly paginator = viewChild(MatPaginator);
-
-  constructor() {
-    // The paginator only exists once the table is rendered.
-    effect(() => {
-      this.dataSource.paginator = this.paginator() ?? null;
-    });
-
-    effect(() => {
-      this.dataSource.data = this.usersResource.value() ?? [];
-    });
-  }
+  protected readonly joinNames = joinNames;
+  protected readonly dataSource = resourceDataSource(this.usersResource);
 
   protected readonly createErrors = signal<string[]>([]);
   protected readonly createForm = this.fb.nonNullable.group({
@@ -80,12 +66,7 @@ export class OrgUsersList {
   protected readonly selectedUser = linkedSignal<number | null, User | null>({
     source: this.orgId,
     computation: () => null,
-    equal: () => false,
   });
-
-  protected applyFilter(event: Event): void {
-    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  }
 
   protected submitCreate(): void {
     if (this.createForm.invalid || this.orgId() === null) return;
@@ -102,16 +83,8 @@ export class OrgUsersList {
     });
   }
 
-  protected openEdit(user: User): void {
-    this.selectedUser.set(user);
-  }
-
   protected onDataChanged(): void {
     this.usersResource.reload();
-  }
-
-  protected onDetailClosed(): void {
-    this.selectedUser.set(null);
   }
 
   protected deleteUser(userId: number): void {

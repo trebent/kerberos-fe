@@ -24,13 +24,18 @@ src/app/
       components/              organisations-list, organisation-detail, org-users-list,
                                org-user-detail, org-groups-list, org-group-detail
   components/                  shared components used by two or more pages
-    error-display/
+    error-display/             lists error messages and announces them
+    filtered-table/            filter field and paginator around a projected mat-table
+    row-actions/               a table row's edit and delete buttons
   services/                    all services, hand-written and generated
     auth.service.ts
     theme.service.ts           light/dark/system preference, saved in localStorage
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
-  utils/                       validation rules, Material table imports
+  utils/                       plain functions and classes, no components or services
+    material-table.ts          MAT_TABLE imports, resourceDataSource
+    names.ts                   joinNames, for name lists in table cells
+    validation.ts              password match validator and error state matcher
 src/testing/                   test helpers: AuthService stub, axe-core check
 openapi/                       API specs the clients are generated from (vendored from Kerberos)
 ```

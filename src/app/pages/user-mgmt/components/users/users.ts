@@ -1,35 +1,33 @@
-import { Component, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
-
-import { MAT_TABLE } from '../../../../utils/material-table';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
+import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/admin';
+import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
+import { joinNames } from '../../../../utils/names';
 import { UserEdit } from '../user-edit/user-edit';
 
 @Component({
   imports: [
     ErrorDisplay,
+    FilteredTable,
     MatButton,
     MatDivider,
     MatFormField,
-    MatIcon,
-    MatIconButton,
     MatInput,
     MatLabel,
-    MatPaginator,
     MatProgressSpinner,
     ...MAT_TABLE,
     ReactiveFormsModule,
+    RowActions,
     UserEdit,
   ],
   selector: 'app-users',
@@ -46,24 +44,8 @@ export class Users {
     stream: () => this.usersService.getUsers(),
   });
 
-  protected readonly dataSource = new MatTableDataSource<User>();
-
-  private readonly paginator = viewChild(MatPaginator);
-
-  constructor() {
-    // The paginator only exists once the table is rendered.
-    effect(() => {
-      this.dataSource.paginator = this.paginator() ?? null;
-    });
-
-    effect(() => {
-      if (this.usersResource.hasValue()) {
-        this.dataSource.data = this.usersResource.value();
-      } else {
-        this.dataSource.data = [];
-      }
-    });
-  }
+  protected readonly joinNames = joinNames;
+  protected readonly dataSource = resourceDataSource(this.usersResource);
 
   protected readonly createErrors = signal<string[]>([]);
   protected readonly createForm = this.fb.nonNullable.group({
@@ -71,19 +53,7 @@ export class Users {
     password: ['', Validators.required],
   });
 
-  protected readonly selectedUser = signal<User | null>(null, { equal: () => false });
-
-  protected readonly groupName = (g: { name: string }) => g.name;
-
-  protected applyFilter(event: Event): void {
-    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  }
-
-  protected openCreate(): void {
-    this.createForm.reset();
-    this.createErrors.set([]);
-    this.selectedUser.set(null);
-  }
+  protected readonly selectedUser = signal<User | null>(null);
 
   protected submitCreate(): void {
     if (this.createForm.invalid) return;
@@ -100,17 +70,9 @@ export class Users {
     });
   }
 
-  protected openEdit(user: User): void {
-    this.selectedUser.set(user);
-  }
-
   protected onDetailSaved(): void {
     this.selectedUser.set(null);
     this.usersResource.reload();
-  }
-
-  protected onDetailClosed(): void {
-    this.selectedUser.set(null);
   }
 
   protected deleteUser(userId: number): void {
