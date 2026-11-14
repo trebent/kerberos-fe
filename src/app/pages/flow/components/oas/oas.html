@@ -1,8 +1,8 @@
 <section aria-labelledby="oas-title">
   <div class="card-header-container">
     <h2 id="oas-title" class="section-title">OpenAPI specification: {{ backend() }}</h2>
-    <button matIconButton type="button" (click)="closed.emit()" aria-label="Close OAS viewer">
-      <mat-icon>close</mat-icon>
+    <button matIconButton type="button" aria-label="Close OAS viewer" (click)="closed.emit()">
+      <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
   <div class="oas-body">
