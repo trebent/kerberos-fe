@@ -50,9 +50,10 @@ export class GroupEdit {
 
   constructor() {
     effect(() => {
-      const g = this.group();
-      this.editForm.reset({ name: g.name });
-      this.selectedPermissionIds.set(g.permissions!.map((p) => p.id));
+      const group = this.group();
+      this.editForm.reset({ name: group.name });
+      // Not every endpoint includes a group's permissions.
+      this.selectedPermissionIds.set((group.permissions ?? []).map((p) => p.id));
     });
   }
 

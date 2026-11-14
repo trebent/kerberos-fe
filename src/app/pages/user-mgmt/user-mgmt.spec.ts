@@ -70,4 +70,19 @@ describe('UserMgmt', () => {
     expect(fixture.nativeElement.querySelector('app-user-edit')).not.toBeNull();
     await expectNoAxeViolations(fixture);
   });
+  it('opens the group editor for a group listed without its permissions', async () => {
+    flushAll('/api/admin/users', users);
+    flushAll('/api/admin/groups', [{ id: 2, name: 'staff' }]);
+    flushAll('/api/admin/permissions', permissions);
+    await fixture.whenStable();
+
+    fixture.nativeElement.querySelector('[aria-label="Edit group staff"]').click();
+    TestBed.tick();
+    flushAll('/api/admin/permissions', permissions);
+    await fixture.whenStable();
+
+    const nameInput = fixture.nativeElement.querySelector('app-group-edit input');
+    expect(nameInput?.value).toBe('staff');
+    await expectNoAxeViolations(fixture);
+  });
 });
