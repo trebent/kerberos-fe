@@ -56,25 +56,80 @@ export class AuthService {
     }
 
     const restore$ = this.storedIsSuper()
-      ? this.usersService
-          .refreshSuperuserSession()
-          .pipe(tap(() => this.onLogin('superuser', 0, true)))
+      ? this.usersService.refreshSuperuserSession().pipe(tap(() => this.startSuperuserSession()))
       : this.usersService.refreshUserSession().pipe(
-          tap(() => this.onLogin('', 0, false)),
-          switchMap(() => this.getMe()),
+          tap(() => this.startSession(false)),
+          switchMap(() => this.loadCurrentUser()),
         );
 
     return restore$.pipe(
       map(() => null),
       catchError((error: unknown) => {
         console.error('Could not restore the session:', error);
-        this.onLogout();
+        this.endSession();
         return of(null);
       }),
     );
   }
 
-  getMe(): Observable<null> {
+  login(username: string, password: string): Observable<null> {
+    return this.usersService.login({ username, password }).pipe(
+      tap(() => this.startSession(false)),
+      // The login response has no user ID, so load the current user.
+      switchMap(() => this.loadCurrentUser()),
+      // Without the current user the session is unusable, so don't leave it half signed in.
+      catchError((error: unknown) => {
+        this.endSession();
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  superLogin(clientId: string, clientSecret: string): Observable<null> {
+    return this.usersService
+      .loginSuperuser({ clientId, clientSecret })
+      .pipe(tap(() => this.startSuperuserSession()));
+  }
+
+  /**
+   * Ends the session through the endpoint for the signed-in kind of user. Signs out locally
+   * whether or not the backend accepted it, so it never errors.
+   */
+  logout(): Observable<null> {
+    const logout$ = this._isSuperuser()
+      ? this.usersService.logoutSuperuser()
+      : this.usersService.logout();
+
+    return logout$.pipe(
+      catchError((error: unknown) => {
+        console.error('The backend did not accept the logout:', error);
+        return of(null);
+      }),
+      tap(() => this.endSession()),
+    );
+  }
+
+  updateUsername(newUsername: string): Observable<null> {
+    return this.withUserID((userID) =>
+      this.usersService.updateUser(userID, { username: newUsername }),
+    ).pipe(
+      tap(() => this._username.set(newUsername)),
+      map(() => null),
+    );
+  }
+
+  /** Changes the signed-in user's own password, through the superuser endpoint for the superuser. */
+  changeOwnPassword(oldPassword: string, newPassword: string): Observable<null> {
+    if (this._isSuperuser()) {
+      return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
+    }
+    return this.withUserID((userID) =>
+      this.usersService.changeUserPassword(userID, { newPassword, oldPassword }),
+    );
+  }
+
+  /** Loads the signed-in regular user's ID and name. */
+  private loadCurrentUser(): Observable<null> {
     return this.usersService.getMe().pipe(
       tap((response) => {
         if (!response.isSuperuser && response.user) {
@@ -86,80 +141,30 @@ export class AuthService {
     );
   }
 
-  login(username: string, password: string): Observable<null> {
-    return this.usersService.login({ username, password }).pipe(
-      tap(() => this.onLogin(username, 0, false)),
-      // The login response has no user ID, so load the current user.
-      switchMap(() => this.getMe()),
-      // Without the current user the session is unusable, so don't leave it half signed in.
-      catchError((error: unknown) => {
-        this.onLogout();
-        return throwError(() => error);
-      }),
-    );
-  }
-
-  logout(): Observable<null> {
-    return this.usersService.logout().pipe(this.signOutLocally());
-  }
-
-  updateUsername(newUsername: string): Observable<null> {
+  /** Runs a request for the signed-in user, or fails if their ID has not been loaded. */
+  private withUserID<T>(request: (userID: number) => Observable<T>): Observable<T> {
     const userID = this._userID();
-    if (userID === null) {
-      return throwError(() => new Error('No user ID available'));
-    }
-
-    return this.usersService.updateUser(userID, { username: newUsername }).pipe(
-      tap(() => this._username.set(newUsername)),
-      map(() => null),
-    );
+    return userID === null ? throwError(() => new Error('No user ID available')) : request(userID);
   }
 
-  superLogin(clientId: string, clientSecret: string): Observable<null> {
-    return this.usersService
-      .loginSuperuser({ clientId, clientSecret })
-      .pipe(tap(() => this.onLogin('superuser', 0, true)));
+  /** The superuser has no user record, so the name is fixed. */
+  private startSuperuserSession(): void {
+    this.startSession(true);
+    this._username.set('superuser');
   }
 
-  superLogout(): Observable<null> {
-    return this.usersService.logoutSuperuser().pipe(this.signOutLocally());
-  }
-
-  /** Changes the signed-in user's own password, through the superuser endpoint for the superuser. */
-  changeOwnPassword(oldPassword: string, newPassword: string): Observable<null> {
-    if (this._isSuperuser()) {
-      return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
-    }
-
-    const userID = this._userID();
-    if (userID === null) {
-      return throwError(() => new Error('No user ID available'));
-    }
-    return this.usersService.changeUserPassword(userID, { newPassword, oldPassword });
-  }
-
-  /** Signs out locally whether or not the backend accepted the logout. */
-  private signOutLocally() {
-    return tap<null>({
-      next: () => this.onLogout(),
-      error: () => this.onLogout(),
-    });
-  }
-
-  private onLogin(username: string, userID: number, isSuper: boolean): void {
+  private startSession(isSuper: boolean): void {
     this.storeExpiry();
     localStorage.setItem(SESSION_SUPER_KEY, isSuper.toString());
 
     this._isLoggedIn.set(true);
-    this._username.set(username);
     this._isSuperuser.set(isSuper);
-    this._userID.set(userID);
 
     clearInterval(this.refreshTimer);
     this.refreshTimer = setInterval(() => this.refreshSession(), REFRESH_INTERVAL_MS);
   }
 
-  private onLogout(): void {
+  private endSession(): void {
     localStorage.removeItem(SESSION_EXPIRY_KEY);
     localStorage.removeItem(SESSION_SUPER_KEY);
 
@@ -181,7 +186,7 @@ export class AuthService {
       next: () => this.storeExpiry(),
       error: () => {
         console.error('Failed to refresh the session.');
-        this.onLogout();
+        this.endSession();
         // The current page needs a session, so send the user back to log in.
         void this.router.navigateByUrl('/login');
       },

@@ -52,18 +52,7 @@ describe('Header', () => {
     logoutButton()?.click();
 
     expect(auth.logout).toHaveBeenCalled();
-    expect(auth.superLogout).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('/login');
-  });
-
-  it('logs a superuser out through the superuser endpoint', async () => {
-    auth.signIn('superuser', true);
-    await fixture.whenStable();
-
-    logoutButton()?.click();
-
-    expect(auth.superLogout).toHaveBeenCalled();
-    expect(auth.logout).not.toHaveBeenCalled();
   });
 
   it('switches the color theme', async () => {

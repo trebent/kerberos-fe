@@ -5,7 +5,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { Observable } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { ThemeMode, ThemeService } from '../../services/theme.service';
@@ -62,14 +61,6 @@ export class Header {
   );
 
   protected logout(): void {
-    const logout$: Observable<null> = this.auth.isSuperuser()
-      ? this.auth.superLogout()
-      : this.auth.logout();
-
-    // Go to the login page whether or not the backend accepted the logout.
-    logout$.subscribe({
-      complete: () => void this.router.navigateByUrl('/login'),
-      error: () => void this.router.navigateByUrl('/login'),
-    });
+    this.auth.logout().subscribe(() => void this.router.navigateByUrl('/login'));
   }
 }
