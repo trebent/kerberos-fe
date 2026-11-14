@@ -1,34 +1,35 @@
 import { DatePipe } from '@angular/common';
-import {
-  Component,
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { outputFromObservable, rxResource, toObservable } from '@angular/core/rxjs-interop';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatOption, MatSelect } from '@angular/material/select';
-import { Subscription } from 'rxjs';
+import { map } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { DebugService, DebugSession, DebugSessionCall } from '../../../../services/admin';
 import { httpStatusClass } from '../../../../utils/http-status';
+import { requestStatus } from '../../../../utils/request-status';
 
+/** Which session's recorded calls to list. A new object fetches them again. */
+interface CallsRequest {
+  backend: string;
+  sessionId: number;
+}
+
+/**
+ * Starts, stops and deletes a backend's debug sessions, and lists the calls a session recorded.
+ * Selecting a call loads its flow transitions and emits it, so the pipeline can show them.
+ */
 @Component({
   host: { class: 'section-card' },
   imports: [
     DatePipe,
     ErrorDisplay,
-    FormsModule,
     MatButton,
     MatDivider,
     MatFormField,
@@ -38,6 +39,7 @@ import { httpStatusClass } from '../../../../utils/http-status';
     MatOption,
     MatProgressSpinner,
     MatSelect,
+    RequestFeedback,
   ],
   selector: 'app-debug',
   styleUrl: './debug.scss',
@@ -45,36 +47,30 @@ import { httpStatusClass } from '../../../../utils/http-status';
 })
 export class Debug {
   private readonly debugService = inject(DebugService);
-  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly httpStatusClass = httpStatusClass;
 
   readonly backends = input.required<string[]>();
   readonly closed = output<void>();
-  readonly callSelected = output<DebugSessionCall | null>();
-  readonly backendChange = output<string | null>();
 
   protected readonly selectedBackend = signal<string | null>(null);
-  protected readonly sessions = signal<DebugSession[]>([]);
-  protected readonly selectedSessionId = signal<number | null>(null);
-  protected readonly isLoadingSession = signal(false);
-  protected readonly isStarting = signal(false);
-  protected readonly isStopping = signal(false);
-  protected readonly isDeleting = signal(false);
-  protected readonly calls = signal<DebugSessionCall[]>([]);
-  protected readonly callsFetched = signal(false);
-  protected readonly isFetchingCalls = signal(false);
-  protected readonly callsFetchError = signal(false);
-  protected readonly selectedCallId = signal<number | null>(null);
-  protected readonly isFetchingCallDetail = signal(false);
-  protected readonly callDetailError = signal(false);
 
-  private callDetailSub: Subscription | null = null;
+  /** The selected backend's sessions, oldest first. Changing backend cancels a load in flight. */
+  protected readonly sessionsResource = rxResource({
+    params: () => this.selectedBackend() ?? undefined,
+    stream: ({ params: backend }) =>
+      this.debugService.listDebugSessions(backend).pipe(map(oldestFirst)),
+  });
 
-  protected readonly selectedSession = computed<DebugSession | null>(() => {
+  protected readonly selectedSessionId = linkedSignal<string | null, number | null>({
+    source: this.selectedBackend,
+    computation: () => null,
+  });
+
+  protected readonly selectedSession = computed(() => {
     const id = this.selectedSessionId();
-    if (id === null) return null;
-    return this.sessions().find((s) => s.id === id) ?? null;
+    if (id === null || !this.sessionsResource.hasValue()) return null;
+    return this.sessionsResource.value().find((session) => session.id === id) ?? null;
   });
 
   protected readonly isSessionRunning = computed(() => {
@@ -82,161 +78,109 @@ export class Debug {
     return !!session && !session.stoppedAt && new Date(session.expiresAt) > new Date();
   });
 
-  constructor() {
-    effect(() => {
+  /** Set by "Fetch calls", and cleared when another session is selected. */
+  private readonly callsRequest = linkedSignal<number | null, CallsRequest | undefined>({
+    source: this.selectedSessionId,
+    computation: () => undefined,
+  });
+
+  /** The fetched calls, newest first. */
+  protected readonly callsResource = rxResource({
+    params: () => this.callsRequest(),
+    stream: ({ params: { backend, sessionId } }) =>
+      this.debugService.listDebugSessionCalls(backend, sessionId, false).pipe(map(newestFirst)),
+  });
+
+  protected readonly selectedCallId = linkedSignal<number | null, number | null>({
+    source: this.selectedSessionId,
+    computation: () => null,
+  });
+
+  /** The selected call with its flow transitions, which the call list does not include. */
+  private readonly callDetailResource = rxResource({
+    params: () => {
       const backend = this.selectedBackend();
-      this.backendChange.emit(backend);
-      this.sessions.set([]);
-      this.selectedSessionId.set(null);
-      this._resetCallState();
+      const sessionId = this.selectedSessionId();
+      const callId = this.selectedCallId();
+      if (backend === null || sessionId === null || callId === null) return undefined;
+      return { backend, sessionId, callId };
+    },
+    stream: ({ params: { backend, sessionId, callId } }) =>
+      this.debugService.getDebugSessionCall(backend, sessionId, callId),
+  });
+  protected readonly callDetailLoading = this.callDetailResource.isLoading;
+  protected readonly callDetailFailed = computed(() => !!this.callDetailResource.error());
 
-      if (!backend) return;
+  /** The backend being debugged, so the pipeline can highlight its path. */
+  readonly backendChange = outputFromObservable(toObservable(this.selectedBackend));
+  /** The selected call once its transitions have loaded, or null. */
+  readonly callSelected = outputFromObservable(
+    toObservable(
+      computed(() =>
+        this.callDetailResource.hasValue() ? (this.callDetailResource.value() ?? null) : null,
+      ),
+    ),
+  );
 
-      this.isLoadingSession.set(true);
-      this.debugService
-        .listDebugSessions(backend)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (sessions) => {
-            this.sessions.set([...sessions].sort((a, b) => a.id - b.id));
-            this.isLoadingSession.set(false);
-          },
-          error: () => this.isLoadingSession.set(false),
-        });
-    });
-  }
-
-  protected onSessionSelect(id: number | null): void {
-    this.selectedSessionId.set(id);
-    this._resetCallState();
-  }
+  protected readonly startStatus = requestStatus({ failure: 'Failed to start a debug session.' });
+  protected readonly stopStatus = requestStatus({ failure: 'Failed to stop the debug session.' });
+  protected readonly deleteStatus = requestStatus({
+    failure: 'Failed to delete the debug session.',
+  });
 
   protected startSession(): void {
     const backend = this.selectedBackend();
-    if (!backend || this.isStarting()) return;
-
-    this.isStarting.set(true);
-    this.debugService
-      .startDebugSession(backend)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (session) => {
-          this.sessions.update((list) => [...list, session].sort((a, b) => a.id - b.id));
-          this.selectedSessionId.set(session.id);
-          this._resetCallState();
-          this.isStarting.set(false);
-        },
-        error: () => this.isStarting.set(false),
-      });
+    if (backend === null) return;
+    this.startStatus.run(this.debugService.startDebugSession(backend), (session) => {
+      if (this.selectedBackend() !== backend) return;
+      this.sessionsResource.update((sessions) => oldestFirst([...(sessions ?? []), session]));
+      this.selectedSessionId.set(session.id);
+    });
   }
 
   protected stopSession(): void {
-    const session = this.selectedSession();
     const backend = this.selectedBackend();
-    if (!session || !backend || this.isStopping()) return;
-
-    this.isStopping.set(true);
-    this.debugService
-      .stopDebugSession(backend, session.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          const stopped = { ...session, stoppedAt: new Date().toISOString() };
-          this.sessions.update((list) => list.map((s) => (s.id === stopped.id ? stopped : s)));
-          this.isStopping.set(false);
-        },
-        error: () => this.isStopping.set(false),
-      });
+    const session = this.selectedSession();
+    if (backend === null || session === null) return;
+    this.stopStatus.run(this.debugService.stopDebugSession(backend, session.id), () => {
+      if (this.selectedBackend() !== backend) return;
+      const stoppedAt = new Date().toISOString();
+      this.sessionsResource.update((sessions) =>
+        sessions?.map((other) => (other.id === session.id ? { ...other, stoppedAt } : other)),
+      );
+    });
   }
 
   protected deleteSession(): void {
-    const session = this.selectedSession();
     const backend = this.selectedBackend();
-    if (!session || !backend || this.isDeleting()) return;
-
-    this.isDeleting.set(true);
-    this.debugService
-      .deleteDebugSession(backend, session.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.sessions.update((list) => list.filter((s) => s.id !== session.id));
-          this.selectedSessionId.set(null);
-          this._resetCallState();
-          this.isDeleting.set(false);
-        },
-        error: () => this.isDeleting.set(false),
-      });
+    const session = this.selectedSession();
+    if (backend === null || session === null) return;
+    this.deleteStatus.run(this.debugService.deleteDebugSession(backend, session.id), () => {
+      if (this.selectedBackend() !== backend) return;
+      this.sessionsResource.update((sessions) =>
+        sessions?.filter((other) => other.id !== session.id),
+      );
+      this.selectedSessionId.set(null);
+    });
   }
 
   protected fetchCalls(): void {
-    const session = this.selectedSession();
     const backend = this.selectedBackend();
-    if (!session || !backend || this.isFetchingCalls()) return;
-
-    this.isFetchingCalls.set(true);
-    this.callsFetchError.set(false);
-    this.debugService
-      .listDebugSessionCalls(backend, session.id, false)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (calls) => {
-          const sorted = [...calls].sort(
-            (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
-          );
-          this.calls.set(sorted);
-          this.callsFetched.set(true);
-          this.isFetchingCalls.set(false);
-        },
-        error: () => {
-          this.callsFetchError.set(true);
-          this.isFetchingCalls.set(false);
-        },
-      });
+    const sessionId = this.selectedSessionId();
+    if (backend === null || sessionId === null) return;
+    this.callsRequest.set({ backend, sessionId });
   }
 
-  protected onCallClick(call: DebugSessionCall): void {
-    const session = this.selectedSession();
-    const backend = this.selectedBackend();
-    if (!session || !backend || this.isFetchingCallDetail()) return;
-
-    if (this.selectedCallId() === call.id) {
-      this.selectedCallId.set(null);
-      this.callSelected.emit(null);
-      return;
-    }
-
-    this.selectedCallId.set(call.id);
-    this.isFetchingCallDetail.set(true);
-    this.callDetailError.set(false);
-    this.callDetailSub?.unsubscribe();
-
-    this.callDetailSub = this.debugService
-      .getDebugSessionCall(backend, session.id, call.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (fullCall) => {
-          this.isFetchingCallDetail.set(false);
-          this.callSelected.emit(fullCall);
-        },
-        error: () => {
-          this.isFetchingCallDetail.set(false);
-          this.callDetailError.set(true);
-          this.selectedCallId.set(null);
-          this.callSelected.emit(null);
-        },
-      });
+  /** Selects a call, or clears the selection when it is already selected. */
+  protected toggleCall(call: DebugSessionCall): void {
+    this.selectedCallId.update((id) => (id === call.id ? null : call.id));
   }
+}
 
-  private _resetCallState(): void {
-    this.calls.set([]);
-    this.callsFetched.set(false);
-    this.callsFetchError.set(false);
-    this.selectedCallId.set(null);
-    this.isFetchingCallDetail.set(false);
-    this.callDetailError.set(false);
-    this.callDetailSub?.unsubscribe();
-    this.callDetailSub = null;
-    this.callSelected.emit(null);
-  }
+function oldestFirst(sessions: DebugSession[]): DebugSession[] {
+  return [...sessions].sort((a, b) => a.id - b.id);
+}
+
+function newestFirst(calls: DebugSessionCall[]): DebugSessionCall[] {
+  return [...calls].sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt));
 }

@@ -7,6 +7,8 @@ import { ErrorDisplay } from '../error-display/error-display';
 @Component({
   imports: [ErrorDisplay],
   selector: 'app-request-feedback',
+  // Only a wrapper: with nothing to show it takes no space, even as a flex or grid item.
+  styles: ':host { display: contents; }',
   templateUrl: './request-feedback.html',
 })
 export class RequestFeedback {
