@@ -192,6 +192,13 @@ describe('AuthBasic', () => {
     clickButton(element.querySelector('app-org-users-list')!, 'Add user');
     await harness.fixture.whenStable();
     const dialog = openDialog();
+    // Password managers offer to save the new login only when they can pair these two fields.
+    expect(dialog.querySelector('input:not([type])')?.getAttribute('autocomplete')).toBe(
+      'username',
+    );
+    expect(dialog.querySelector('input[type="password"]')?.getAttribute('autocomplete')).toBe(
+      'new-password',
+    );
 
     fillIn(dialog, { Name: 'carol', Password: 'secret' });
     submitForm(dialog.querySelector('input')!);

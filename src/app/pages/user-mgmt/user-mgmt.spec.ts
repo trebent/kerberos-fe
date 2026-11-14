@@ -129,6 +129,13 @@ describe('UserMgmt', () => {
       clickButton(element.querySelector('app-users')!, 'Add user'),
     );
     await expectNoAxeViolations(fixture, dialog);
+    // Password managers offer to save the new login only when they can pair these two fields.
+    expect(dialog.querySelector('input:not([type])')?.getAttribute('autocomplete')).toBe(
+      'username',
+    );
+    expect(dialog.querySelector('input[type="password"]')?.getAttribute('autocomplete')).toBe(
+      'new-password',
+    );
 
     fillIn(dialog, { Username: 'bob', Password: 'secret' });
     submitForm(dialog.querySelector('input')!);
