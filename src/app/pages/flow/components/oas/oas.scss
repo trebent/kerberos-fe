@@ -2,19 +2,19 @@
   flex: 1;
   max-height: 70dvh;
   overflow: auto;
-  padding: 16px;
+  padding: 1rem;
 }
 
 .oas-loading {
   display: flex;
   justify-content: center;
-  padding: 32px;
+  padding: 2rem;
 }
 
 .oas-pre {
   margin: 0;
+  font: var(--mat-sys-body-small);
   font-family: var(--app-font-mono);
-  font-size: 0.8rem;
   line-height: 1.5;
   white-space: pre;
   color: var(--mat-sys-on-surface);
