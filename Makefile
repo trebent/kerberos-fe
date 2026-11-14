@@ -35,10 +35,10 @@ serve:
 
 serve/staging:
 	test/certs/make_certs.sh
-
 	ng serve --configuration staging
 
-# Everything CI runs, in order.
+# The checks CI runs on a pull request, in one go. CI also regenerates the API clients and
+# fails if they differ from the committed ones.
 check: format/check lint/ci build/prod test
 
 .PHONY: default install install/cli codegen format format/check lint lint/ci build/dev build/prod test serve serve/staging check
