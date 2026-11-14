@@ -117,4 +117,30 @@ describe('AuthBasic', () => {
     expect(element.textContent).not.toContain('bob');
     await expectNoAxeViolations(fixture);
   });
+
+  it('renames an organisation', async () => {
+    const element: HTMLElement = fixture.nativeElement;
+    element.querySelector<HTMLButtonElement>('[aria-label="Edit organisation acme"]')!.click();
+    await fixture.whenStable();
+
+    const input = element.querySelector<HTMLInputElement>('app-rename-panel input')!;
+    expect(input.value).toBe('acme');
+    input.value = 'acme-corp';
+    input.dispatchEvent(new Event('input'));
+    input.form!.requestSubmit();
+
+    const request = http.expectOne((req) => req.url.endsWith('/api/auth/basic/organisations/7'));
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ id: 7, name: 'acme-corp' });
+    request.flush(null);
+    // Saving reloads the list, which the resource requests on the next tick.
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/auth/basic/organisations'))
+      .flush([{ id: 7, name: 'acme-corp' }]);
+    await fixture.whenStable();
+
+    expect(element.querySelector('app-rename-panel')).toBeNull();
+    await expectNoAxeViolations(fixture);
+  });
 });

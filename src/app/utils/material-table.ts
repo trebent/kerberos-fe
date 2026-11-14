@@ -11,6 +11,7 @@ import {
   MatRowDef,
   MatTable,
   MatTableDataSource,
+  MatTextColumn,
 } from '@angular/material/table';
 
 /** Everything a basic `mat-table` template needs, as standalone imports. */
@@ -25,6 +26,7 @@ export const MAT_TABLE = [
   MatRow,
   MatRowDef,
   MatTable,
+  MatTextColumn,
 ] as const;
 
 /**

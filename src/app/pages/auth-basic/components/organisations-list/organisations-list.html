@@ -1,62 +1,50 @@
-<div class="card-header-container">
-  <h2 class="section-title">Organisations</h2>
-</div>
-<div class="card-content">
-  <h3>Create Organisation</h3>
-  <app-request-feedback [status]="createStatus" />
-  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
-    <mat-form-field appearance="outline">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
-    </mat-form-field>
-    <div class="form-actions">
-      <button
-        matButton="filled"
-        type="submit"
-        [disabled]="createForm.invalid || createStatus.pending()"
-      >
-        Create
-      </button>
-    </div>
-  </form>
+<app-list-card
+  heading="Organisations"
+  createHeading="Create organisation"
+  listHeading="All organisations"
+  [resource]="orgsResource"
+  loadError="Failed to load organisations."
+>
+  <div create>
+    <app-request-feedback [status]="createStatus" />
+    <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+      <div class="form-actions">
+        <button
+          matButton="filled"
+          type="submit"
+          [disabled]="createForm.invalid || createStatus.pending()"
+        >
+          Create
+        </button>
+      </div>
+    </form>
 
-  @if (newOrgCredentials()) {
-    <section class="credentials-box">
-      <strong
-        >Organisation created — save these admin credentials now, they will not be shown
-        again.</strong
-      >
-      <p>
-        Admin username: <code>{{ newOrgCredentials()!.adminUsername }}</code>
-      </p>
-      <p>
-        Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code>
-      </p>
-      <button matButton type="button" (click)="newOrgCredentials.set(null)">Dismiss</button>
-    </section>
-  }
-
-  <mat-divider />
-  <h3>All organisations</h3>
-
-  @if (orgsResource.error()) {
-    <app-error-display [errors]="['Failed to load organisations.']" />
-  }
-  @if (orgsResource.isLoading()) {
-    <mat-spinner diameter="32" aria-label="Loading" />
-  }
+    @if (newOrgCredentials(); as credentials) {
+      <section class="credentials-box">
+        <strong
+          >Organisation created — save these admin credentials now, they will not be shown
+          again.</strong
+        >
+        <p>
+          Admin username: <code>{{ credentials.adminUsername }}</code>
+        </p>
+        <p>
+          Admin password: <code>{{ credentials.adminPassword }}</code>
+        </p>
+        <button matButton type="button" (click)="newOrgCredentials.set(null)">Dismiss</button>
+      </section>
+    }
+  </div>
 
   <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="my-org">
     <table mat-table [dataSource]="dataSource">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let o">{{ o.id }}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let o">{{ o.name }}</td>
-      </ng-container>
+      <mat-text-column name="id" headerText="ID" />
+      <mat-text-column name="name" />
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Actions</span></th>
         <td mat-cell *matCellDef="let o">
@@ -83,11 +71,13 @@
     </table>
   </app-filtered-table>
 
-  @if (selectedOrg()) {
-    <app-organisation-detail
-      [organisation]="selectedOrg()!"
+  @if (selectedOrg(); as org) {
+    <app-rename-panel
+      heading="Edit organisation"
+      [item]="org"
+      [rename]="renameOrganisation"
       (saved)="onDetailSaved()"
       (closed)="selectedOrg.set(null)"
     />
   }
-</div>
+</app-list-card>

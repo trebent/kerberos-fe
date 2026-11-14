@@ -2,37 +2,32 @@ import { Component, inject, input, linkedSignal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
-import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { ListCard } from '../../../../components/list-card/list-card';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, GroupsService } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { requestStatus } from '../../../../utils/request-status';
-import { OrgGroupDetail } from '../org-group-detail/org-group-detail';
+import { Rename, RenamePanel } from '../rename-panel/rename-panel';
 
 @Component({
-  host: { class: 'section-card' },
   imports: [
+    ListCard,
     RequestFeedback,
-    ErrorDisplay,
     FilteredTable,
     MatButton,
-    MatDivider,
     MatFormField,
     MatInput,
     MatLabel,
-    MatProgressSpinner,
     ...MAT_TABLE,
     ReactiveFormsModule,
     RowActions,
-    OrgGroupDetail,
+    RenamePanel,
   ],
   selector: 'app-org-groups-list',
   templateUrl: './org-groups-list.html',
@@ -66,6 +61,14 @@ export class OrgGroupsList {
   protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
+
+  protected readonly renameGroup: Rename = (id, name) => {
+    const orgId = this.orgId();
+    if (orgId === null) {
+      return throwError(() => new Error('No organisation selected'));
+    }
+    return this.groupsService.updateGroup(orgId, id, { id, name });
+  };
 
   /** The group being edited. Switching organisation closes the edit panel. */
   protected readonly selectedGroup = linkedSignal<number | null, Group | null>({

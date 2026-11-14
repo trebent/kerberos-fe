@@ -1,0 +1,23 @@
+<div class="card-header-container">
+  <h2 class="section-title">{{ heading() }}</h2>
+</div>
+<div class="card-content">
+  @if (prompt(); as prompt) {
+    <p class="prompt-message">
+      <i>{{ prompt }}</i>
+    </p>
+  } @else {
+    <h3>{{ createHeading() }}</h3>
+    <ng-content select="[create]" />
+
+    <mat-divider />
+    <h3>{{ listHeading() }}</h3>
+    @if (resource().isLoading()) {
+      <mat-spinner diameter="32" aria-label="Loading" />
+    }
+    @if (resource().error()) {
+      <app-error-display [errors]="[loadError()]" />
+    }
+    <ng-content />
+  }
+</div>

@@ -21,12 +21,13 @@ src/app/
     user-mgmt/
       components/              profile, users, user-edit, groups, group-edit, permissions-list
     auth-basic/
-      components/              organisations-list, organisation-detail, org-users-list,
-                               org-user-detail, org-groups-list, org-group-detail
+      components/              organisations-list, org-users-list, org-user-detail, org-groups-list,
+                               rename-panel
   components/                  shared components used by two or more pages
     edit-panel/                card with a heading and close button around an edit form
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
+    list-card/                 card for one kind of record: create section above the list
     password-change/           current/new/confirm password form
     request-feedback/          shows a requestStatus's error or success message
     row-actions/               a table row's edit and delete buttons
