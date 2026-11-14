@@ -1,0 +1,8 @@
+<fieldset class="checkbox-fieldset">
+  <legend>{{ legend() }}</legend>
+  @for (item of items(); track item.id) {
+    <mat-checkbox [checked]="selection().has(item.id)" (change)="selection().toggle(item.id)">
+      {{ item.name }}
+    </mat-checkbox>
+  }
+</fieldset>

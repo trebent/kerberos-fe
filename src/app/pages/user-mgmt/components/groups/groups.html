@@ -14,17 +14,11 @@
         <input matInput [formField]="createForm.name" />
       </mat-form-field>
       @if (permissionsResource.hasValue()) {
-        <fieldset class="checkbox-fieldset">
-          <legend>Permissions</legend>
-          @for (p of permissionsResource.value(); track p.id) {
-            <mat-checkbox
-              [checked]="createPermissions.has(p.id)"
-              (change)="createPermissions.toggle(p.id)"
-            >
-              {{ p.name }}
-            </mat-checkbox>
-          }
-        </fieldset>
+        <app-checkbox-group
+          legend="Permissions"
+          [items]="permissionsResource.value()"
+          [selection]="createPermissions"
+        />
       }
       <div class="form-actions">
         <button
