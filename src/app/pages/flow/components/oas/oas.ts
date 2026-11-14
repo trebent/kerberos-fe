@@ -10,6 +10,7 @@ import { OasService } from '../../../../services/admin';
 
 /** Shows the OpenAPI specification Kerberos validates a backend's requests against. */
 @Component({
+  host: { class: 'section-card' },
   imports: [ErrorDisplay, MatIcon, MatIconButton, MatProgressSpinner],
   selector: 'app-oas',
   styleUrl: './oas.scss',

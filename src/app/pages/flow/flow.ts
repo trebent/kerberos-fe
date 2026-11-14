@@ -3,14 +3,11 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ErrorDisplay } from '../../components/error-display/error-display';
-import {
-  DebugSessionCall,
-  FlowMetaDataOAS,
-  FlowMetaDataRouter,
-  FlowService,
-} from '../../services/admin';
+import { DebugSessionCall, FlowService } from '../../services/admin';
+import { flowComponentData } from '../../utils/flow-meta';
 import { Debug } from './components/debug/debug';
 import { FlowPipeline } from './components/flow-pipeline/flow-pipeline';
 import { Oas } from './components/oas/oas';
@@ -25,6 +22,7 @@ import { Oas } from './components/oas/oas';
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
+    MatProgressSpinner,
     Oas,
   ],
   selector: 'app-flow',
@@ -38,22 +36,21 @@ export class Flow {
     stream: () => this.flowService.getFlow(),
   });
 
+  /** The loaded flow, or no components while it loads or if it failed. */
+  private readonly flow = computed(() =>
+    this.flowResource.hasValue() ? this.flowResource.value() : [],
+  );
+
+  /** Backends the OAS validator has a specification for. */
   protected readonly oasBackends = computed<string[]>(() => {
-    if (!this.flowResource.hasValue()) return [];
-    const flow = this.flowResource.value();
-    if (!flow) return [];
-    const oasComp = flow.find((c) => c.name === 'oas-validator');
-    if (!oasComp) return [];
-    return (oasComp.data as unknown as FlowMetaDataOAS).backends ?? [];
+    const oas = flowComponentData(this.flow(), 'oas-validator');
+    return oas?.backends ?? [];
   });
 
+  /** Backends the router forwards to. */
   protected readonly routerBackends = computed<string[]>(() => {
-    if (!this.flowResource.hasValue()) return [];
-    const flow = this.flowResource.value();
-    if (!flow) return [];
-    const routerComp = flow.find((c) => c.name === 'router');
-    if (!routerComp) return [];
-    return (routerComp.data as unknown as FlowMetaDataRouter).backends?.map((b) => b.name) ?? [];
+    const router = flowComponentData(this.flow(), 'router');
+    return router?.backends?.map((backend) => backend.name) ?? [];
   });
 
   protected readonly selectedOASBackend = signal<string | null>(null);

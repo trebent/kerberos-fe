@@ -21,8 +21,10 @@ import { Subscription } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { DebugService, DebugSession, DebugSessionCall } from '../../../../services/admin';
+import { httpStatusClass } from '../../../../utils/http-status';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     DatePipe,
     ErrorDisplay,
@@ -44,6 +46,8 @@ import { DebugService, DebugSession, DebugSessionCall } from '../../../../servic
 export class Debug {
   private readonly debugService = inject(DebugService);
   private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly httpStatusClass = httpStatusClass;
 
   readonly backends = input.required<string[]>();
   readonly closed = output<void>();
@@ -222,10 +226,6 @@ export class Debug {
           this.callSelected.emit(null);
         },
       });
-  }
-
-  protected statusClass(code: number): string {
-    return code >= 200 && code < 300 ? 'status-ok' : 'status-err';
   }
 
   private _resetCallState(): void {
