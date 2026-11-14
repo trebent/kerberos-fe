@@ -1,25 +1,31 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 
 import { RequestFeedback } from '../../components/request-feedback/request-feedback';
 import { AuthService } from '../../services/auth.service';
 import { requestStatus } from '../../utils/request-status';
 
+interface Credentials {
+  superLogin: boolean;
+  username: string;
+  password: string;
+}
+
 @Component({
   imports: [
-    RequestFeedback,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     MatSlideToggle,
-    ReactiveFormsModule,
+    RequestFeedback,
   ],
   selector: 'app-login',
   styleUrl: './login.scss',
@@ -33,20 +39,20 @@ export class Login {
     failure: 'Could not sign in. Check your credentials and try again.',
   });
 
-  protected readonly form = inject(FormBuilder).nonNullable.group({
-    superLogin: [false],
-    username: ['', [Validators.required]],
-    password: ['', [Validators.required]],
-  });
+  protected readonly form = form(
+    signal<Credentials>({ superLogin: false, username: '', password: '' }),
+    (path) => {
+      required(path.username);
+      required(path.password);
+    },
+    { submission: { action: async (login) => this.signIn(login().value()) } },
+  );
 
-  protected submit(): void {
-    if (this.form.invalid || this.signInStatus.pending()) return;
-
-    const { superLogin, username, password } = this.form.getRawValue();
-    const login$: Observable<null> = superLogin
+  private signIn({ superLogin, username, password }: Credentials): void {
+    if (this.signInStatus.pending()) return;
+    const login$ = superLogin
       ? this.auth.superLogin(username, password)
       : this.auth.login(username, password);
-
     this.signInStatus.run(login$, () => void this.router.navigateByUrl('/'));
   }
 }

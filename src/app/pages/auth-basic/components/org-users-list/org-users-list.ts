@@ -1,6 +1,6 @@
-import { Component, inject, input, linkedSignal } from '@angular/core';
+import { Component, inject, input, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -16,17 +16,20 @@ import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
 import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 
+const NEW_USER = { name: '', password: '' };
+
 @Component({
   imports: [
     ListCard,
     RequestFeedback,
     FilteredTable,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     ...MAT_TABLE,
-    ReactiveFormsModule,
     RowActions,
     OrgUserDetail,
   ],
@@ -35,7 +38,6 @@ import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 })
 export class OrgUsersList {
   private readonly usersService = inject(UsersService);
-  private readonly fb = inject(FormBuilder);
 
   readonly orgId = input.required<number | null>();
 
@@ -60,10 +62,14 @@ export class OrgUsersList {
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete user. Please try again.',
   });
-  protected readonly createForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
-    password: ['', Validators.required],
-  });
+  protected readonly createForm = form(
+    signal(NEW_USER),
+    (path) => {
+      required(path.name);
+      required(path.password);
+    },
+    { submission: { action: async () => this.create() } },
+  );
 
   /** The user being edited. Switching organisation closes the edit panel. */
   protected readonly selectedUser = linkedSignal<number | null, User | null>({
@@ -71,16 +77,13 @@ export class OrgUsersList {
     computation: () => null,
   });
 
-  protected submitCreate(): void {
+  private create(): void {
     const orgId = this.orgId();
-    if (this.createForm.invalid || orgId === null) return;
-    this.createStatus.run(
-      this.usersService.createUser(orgId, this.createForm.getRawValue()),
-      () => {
-        this.createForm.reset();
-        this.usersResource.reload();
-      },
-    );
+    if (orgId === null) return;
+    this.createStatus.run(this.usersService.createUser(orgId, this.createForm().value()), () => {
+      this.createForm().reset(NEW_USER);
+      this.usersResource.reload();
+    });
   }
 
   protected deleteUser(user: User): void {

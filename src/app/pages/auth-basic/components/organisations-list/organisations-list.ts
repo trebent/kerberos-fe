@@ -1,6 +1,6 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -23,12 +23,13 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
     ListCard,
     RequestFeedback,
     FilteredTable,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     ...MAT_TABLE,
-    ReactiveFormsModule,
     RowActions,
     RenamePanel,
   ],
@@ -38,7 +39,6 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
 })
 export class OrganisationsList {
   private readonly orgsService = inject(OrganisationsService);
-  private readonly fb = inject(FormBuilder);
 
   readonly orgSelected = output<number | null>();
 
@@ -56,8 +56,8 @@ export class OrganisationsList {
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete organisation. Please try again.',
   });
-  protected readonly createForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
+  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
+    submission: { action: async () => this.create() },
   });
 
   protected readonly renameOrganisation: Rename = (id, name) =>
@@ -67,11 +67,10 @@ export class OrganisationsList {
   protected readonly selectedOrg = signal<Organisation | null>(null);
   protected readonly selectedOrgId = signal<number | null>(null);
 
-  protected submitCreate(): void {
-    if (this.createForm.invalid) return;
-    const request$ = this.orgsService.createOrganisation(this.createForm.getRawValue());
+  private create(): void {
+    const request$ = this.orgsService.createOrganisation(this.createForm().value());
     this.createStatus.run(request$, (credentials) => {
-      this.createForm.reset();
+      this.createForm().reset({ name: '' });
       this.newOrgCredentials.set(credentials);
       this.orgsResource.reload();
     });

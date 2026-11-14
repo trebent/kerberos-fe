@@ -1,10 +1,10 @@
 <app-edit-panel heading="Edit group" (closed)="closed.emit()">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formGroup]="editForm" (ngSubmit)="save()">
+  <form class="compact-form" [formRoot]="editForm">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
+      <input matInput [formField]="editForm.name" />
     </mat-form-field>
 
     @if (permissionsResource.isLoading()) {
@@ -28,7 +28,7 @@
       <button
         matButton="filled"
         type="submit"
-        [disabled]="editForm.invalid || saveStatus.pending()"
+        [disabled]="editForm().invalid() || saveStatus.pending()"
       >
         Save
       </button>

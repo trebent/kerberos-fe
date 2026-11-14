@@ -12,16 +12,16 @@
 
     <app-request-feedback [status]="usernameStatus" />
 
-    <form class="compact-form" [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+    <form class="compact-form" [formRoot]="usernameForm">
       <mat-form-field appearance="outline">
         <mat-label>New username</mat-label>
-        <input matInput formControlName="newUsername" autocomplete="username" />
+        <input matInput [formField]="usernameForm.newUsername" autocomplete="username" />
       </mat-form-field>
 
       <button
         matButton="filled"
         type="submit"
-        [disabled]="usernameForm.invalid || usernameStatus.pending()"
+        [disabled]="usernameForm().invalid() || usernameStatus.pending()"
       >
         Update username
       </button>

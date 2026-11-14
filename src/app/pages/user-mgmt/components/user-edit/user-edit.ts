@@ -1,6 +1,6 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, linkedSignal, output } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -16,22 +16,22 @@ import { requestStatus } from '../../../../utils/request-status';
 
 @Component({
   imports: [
-    RequestFeedback,
     EditPanel,
+    FormField,
+    FormRoot,
     MatButton,
     MatCheckbox,
     MatFormField,
     MatInput,
     MatLabel,
     MatProgressSpinner,
-    ReactiveFormsModule,
+    RequestFeedback,
   ],
   selector: 'app-user-edit',
   templateUrl: './user-edit.html',
 })
 export class UserEdit {
   private readonly usersService = inject(UsersService);
-  private readonly fb = inject(FormBuilder);
 
   readonly user = input.required<User>();
 
@@ -45,25 +45,22 @@ export class UserEdit {
   protected readonly selectedGroups = new IdSelection();
   protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
-  protected readonly editForm = this.fb.nonNullable.group({
-    username: ['', Validators.required],
-  });
+  protected readonly editForm = form(
+    linkedSignal(() => ({ username: this.user().username })),
+    (path) => required(path.username),
+    { submission: { action: async () => this.save() } },
+  );
 
   constructor() {
-    effect(() => {
-      const u = this.user();
-      this.editForm.reset({ username: u.username });
-      this.selectedGroups.set((u.groups ?? []).map((g) => g.id));
-    });
+    effect(() => this.selectedGroups.set((this.user().groups ?? []).map((g) => g.id)));
   }
 
   /** Saves the username, then the group membership. */
-  protected save(): void {
-    if (this.editForm.invalid) return;
+  private save(): void {
     const userId = this.user().id;
     const groupIDs = [...this.selectedGroups.selected()];
     const request$ = this.usersService
-      .updateUser(userId, this.editForm.getRawValue())
+      .updateUser(userId, this.editForm().value())
       .pipe(switchMap(() => this.usersService.updateUserGroups(userId, { groupIDs })));
     this.saveStatus.run(request$, () => this.saved.emit());
   }

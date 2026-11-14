@@ -1,6 +1,6 @@
+import { Component, effect, inject, input, linkedSignal, output } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { Component, effect, inject, input, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -21,17 +21,18 @@ import { requestStatus } from '../../../../utils/request-status';
 
 @Component({
   imports: [
-    PasswordChange,
-    ErrorDisplay,
-    RequestFeedback,
     EditPanel,
+    ErrorDisplay,
+    FormField,
+    FormRoot,
     MatButton,
     MatCheckbox,
     MatFormField,
     MatInput,
     MatLabel,
     MatProgressSpinner,
-    ReactiveFormsModule,
+    PasswordChange,
+    RequestFeedback,
   ],
   selector: 'app-org-user-detail',
   styleUrl: './org-user-detail.scss',
@@ -40,7 +41,6 @@ import { requestStatus } from '../../../../utils/request-status';
 export class OrgUserDetail {
   private readonly usersService = inject(UsersService);
   private readonly groupsService = inject(GroupsService);
-  private readonly fb = inject(FormBuilder);
 
   readonly orgId = input.required<number>();
   readonly user = input.required<User>();
@@ -69,12 +69,19 @@ export class OrgUserDetail {
     success: 'Groups updated successfully.',
   });
 
-  protected readonly nameForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
-  });
+  protected readonly nameForm = form(
+    linkedSignal(() => ({ name: this.user().name })),
+    (path) => required(path.name),
+    { submission: { action: async () => this.saveName() } },
+  );
+
+  protected readonly changePassword: ChangePassword = (oldPassword, newPassword) =>
+    this.usersService.changePassword(this.orgId(), this.user().id, {
+      oldPassword,
+      password: newPassword,
+    });
 
   constructor() {
-    effect(() => this.nameForm.reset({ name: this.user().name }));
     effect(() => {
       if (this.groupsResource.hasValue()) {
         this.selectedGroups.set(this.groupsResource.value().member.map((group) => group.id));
@@ -82,12 +89,11 @@ export class OrgUserDetail {
     });
   }
 
-  protected saveName(): void {
-    if (this.nameForm.invalid) return;
+  private saveName(): void {
     const { id } = this.user();
     const request$ = this.usersService.updateUser(this.orgId(), id, {
       id,
-      ...this.nameForm.getRawValue(),
+      ...this.nameForm().value(),
     });
     this.nameStatus.run(request$, () => this.changed.emit());
   }
@@ -98,10 +104,4 @@ export class OrgUserDetail {
     const request$ = this.usersService.updateUserGroups(this.orgId(), this.user().id, groups);
     this.groupsStatus.run(request$, () => this.changed.emit());
   }
-
-  protected readonly changePassword: ChangePassword = (oldPassword, newPassword) =>
-    this.usersService.changePassword(this.orgId(), this.user().id, {
-      oldPassword,
-      password: newPassword,
-    });
 }

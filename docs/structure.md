@@ -43,7 +43,6 @@ src/app/
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells
     request-status.ts          requestStatus, runs a request and tracks its outcome
-    validation.ts              password match validator and error state matcher
 src/testing/                   test helpers: AuthService stub, axe-core check
 openapi/                       API specs the clients are generated from (vendored from Kerberos)
 ```

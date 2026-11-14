@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -17,15 +17,16 @@ import { requestStatus } from '../../../../utils/request-status';
 @Component({
   host: { class: 'section-card' },
   imports: [
-    PasswordChange,
-    RequestFeedback,
+    FormField,
+    FormRoot,
     MatButton,
     MatDivider,
     MatFormField,
     MatIcon,
     MatInput,
     MatLabel,
-    ReactiveFormsModule,
+    PasswordChange,
+    RequestFeedback,
   ],
   selector: 'app-profile',
   styleUrl: './profile.scss',
@@ -33,7 +34,6 @@ import { requestStatus } from '../../../../utils/request-status';
 })
 export class Profile {
   protected readonly authService = inject(AuthService);
-  private readonly fb = inject(FormBuilder);
 
   protected readonly usernameStatus = requestStatus({
     failure: 'Failed to update username. Please try again.',
@@ -43,15 +43,16 @@ export class Profile {
   protected readonly changePassword: ChangePassword = (oldPassword, newPassword) =>
     this.authService.changeOwnPassword(oldPassword, newPassword);
 
-  protected readonly usernameForm = this.fb.nonNullable.group({
-    newUsername: ['', [Validators.required]],
-  });
+  protected readonly usernameForm = form(
+    signal({ newUsername: '' }),
+    (path) => required(path.newUsername),
+    { submission: { action: async () => this.updateUsername() } },
+  );
 
-  protected submitUsername(): void {
-    if (this.usernameForm.invalid) return;
-    const { newUsername } = this.usernameForm.getRawValue();
+  private updateUsername(): void {
+    const { newUsername } = this.usernameForm().value();
     this.usernameStatus.run(this.authService.updateUsername(newUsername), () =>
-      this.usernameForm.reset(),
+      this.usernameForm().reset({ newUsername: '' }),
     );
   }
 }
