@@ -3,9 +3,9 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ErrorDisplay } from '../../components/error-display/error-display';
+import { Skeleton } from '../../components/skeleton/skeleton';
 import { DebugSessionCall, FlowService } from '../../services/admin';
 import { flowComponentData } from '../../utils/flow-meta';
 import { Debug } from './components/debug/debug';
@@ -22,8 +22,8 @@ import { Oas } from './components/oas/oas';
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
-    MatProgressSpinner,
     Oas,
+    Skeleton,
   ],
   selector: 'app-flow',
   styleUrl: './flow.scss',
@@ -35,6 +35,8 @@ export class Flow {
   protected readonly flowResource = rxResource({
     stream: () => this.flowService.getFlow(),
   });
+  /** Placeholder stages while the flow loads, of varied widths like real stage names. */
+  protected readonly skeletonStages = ['5rem', '6.5rem', '8rem', '7rem'];
 
   /** The loaded flow, or no components while it loads or if it failed. */
   private readonly flow = computed(() =>

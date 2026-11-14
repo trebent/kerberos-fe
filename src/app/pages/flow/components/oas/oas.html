@@ -5,10 +5,16 @@
       <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
-  <div class="oas-body">
+  <div class="oas-body" [attr.aria-busy]="oasResource.isLoading()">
+    <p class="visually-hidden" role="status">
+      {{ oasResource.isLoading() ? 'Loading specification…' : '' }}
+    </p>
     @if (oasResource.isLoading()) {
-      <div class="oas-loading">
-        <mat-spinner diameter="32" aria-label="Loading specification" />
+      <!-- Indented lines in the specification's own font, like the YAML that replaces them. -->
+      <div class="oas-skeleton">
+        @for (line of skeletonLines; track $index) {
+          <app-skeleton [width]="line.width" [style.margin-inline-start]="line.indent" />
+        }
       </div>
     }
     @if (oasResource.error() && !oasResource.isLoading()) {

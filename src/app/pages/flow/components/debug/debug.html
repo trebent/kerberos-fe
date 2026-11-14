@@ -45,24 +45,32 @@
       <h3 class="session-ctrl-header">Session controls</h3>
 
       <app-request-feedback [status]="stopStatus" />
-      <div class="session-controls">
-        <mat-form-field>
-          <mat-label>Select session</mat-label>
-          <mat-select
-            placeholder="Ex. #1337"
-            [disabled]="!sessionsResource.hasValue()"
-            [value]="selectedSessionId()"
-            (selectionChange)="selectedSessionId.set($event.value)"
-          >
-            @if (sessionsResource.hasValue()) {
-              @for (session of sessionsResource.value(); track session.id) {
-                <mat-option [value]="session.id"
-                  >#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option
-                >
+      <div class="session-controls" [attr.aria-busy]="sessionsResource.isLoading()">
+        <p class="visually-hidden" role="status">
+          {{ sessionsResource.isLoading() ? 'Loading sessions…' : '' }}
+        </p>
+        @if (sessionsResource.isLoading()) {
+          <!-- Holds the session picker's place until its options arrive. -->
+          <app-skeleton class="select-skeleton" shape="rect" height="56px" />
+        } @else {
+          <mat-form-field>
+            <mat-label>Select session</mat-label>
+            <mat-select
+              placeholder="Ex. #1337"
+              [disabled]="!sessionsResource.hasValue()"
+              [value]="selectedSessionId()"
+              (selectionChange)="selectedSessionId.set($event.value)"
+            >
+              @if (sessionsResource.hasValue()) {
+                @for (session of sessionsResource.value(); track session.id) {
+                  <mat-option [value]="session.id"
+                    >#{{ session.id }} — {{ session.startedAt | date: 'medium' }}</mat-option
+                  >
+                }
               }
-            }
-          </mat-select>
-        </mat-form-field>
+            </mat-select>
+          </mat-form-field>
+        }
 
         <button
           matButton="outlined"
@@ -78,11 +86,6 @@
       </div>
     </div>
 
-    @if (sessionsResource.isLoading()) {
-      <div class="session-loading">
-        <mat-spinner diameter="28" aria-label="Loading sessions" />
-      </div>
-    }
     @if (sessionsResource.error()) {
       <app-error-display [errors]="['Failed to load debug sessions.']" />
     }

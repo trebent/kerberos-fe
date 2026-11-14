@@ -69,9 +69,17 @@
     </div>
 
     <div class="flow-main">
-      <div class="flow-stage">
+      <div class="flow-stage" [attr.aria-busy]="flowResource.isLoading()">
+        <p class="visually-hidden" role="status">
+          {{ flowResource.isLoading() ? 'Loading flow…' : '' }}
+        </p>
         @if (flowResource.isLoading()) {
-          <mat-spinner diameter="32" aria-label="Loading flow" />
+          <!-- A row of placeholder stages, shaped like the pipeline that replaces it. -->
+          <div class="pipeline-skeleton">
+            @for (width of skeletonStages; track $index) {
+              <app-skeleton shape="rect" [width]="width" height="3rem" />
+            }
+          </div>
         }
 
         @if (flowResource.hasValue()) {

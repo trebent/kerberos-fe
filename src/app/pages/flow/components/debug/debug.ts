@@ -11,6 +11,7 @@ import { map } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
+import { Skeleton } from '../../../../components/skeleton/skeleton';
 import { DebugService, DebugSession, DebugSessionCall } from '../../../../services/admin';
 import { httpStatusClass } from '../../../../utils/http-status';
 import { requestStatus } from '../../../../utils/request-status';
@@ -40,6 +41,7 @@ interface CallsRequest {
     MatProgressSpinner,
     MatSelect,
     RequestFeedback,
+    Skeleton,
   ],
   selector: 'app-debug',
   styleUrl: './debug.scss',

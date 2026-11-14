@@ -5,17 +5,15 @@
   padding: 1rem;
 }
 
-.oas-loading {
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
-}
-
+.oas-skeleton,
 .oas-pre {
   margin: 0;
   font: var(--mat-sys-body-small);
   font-family: var(--app-font-mono);
   line-height: 1.5;
+}
+
+.oas-pre {
   white-space: pre;
   color: var(--mat-sys-on-surface);
 }
