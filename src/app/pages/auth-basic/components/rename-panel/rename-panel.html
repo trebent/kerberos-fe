@@ -1,13 +1,17 @@
 <app-edit-panel [heading]="heading()" (closed)="closed.emit()">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formGroup]="form" (ngSubmit)="save()">
+  <form class="compact-form" [formRoot]="form">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput formControlName="name" />
+      <input matInput [formField]="form.name" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="form.invalid || saveStatus.pending()">
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="form().invalid() || saveStatus.pending()"
+      >
         Save
       </button>
     </div>

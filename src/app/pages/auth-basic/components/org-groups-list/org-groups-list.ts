@@ -1,6 +1,6 @@
-import { Component, inject, input, linkedSignal } from '@angular/core';
+import { Component, inject, input, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -20,12 +20,13 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
     ListCard,
     RequestFeedback,
     FilteredTable,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     ...MAT_TABLE,
-    ReactiveFormsModule,
     RowActions,
     RenamePanel,
   ],
@@ -34,7 +35,6 @@ import { Rename, RenamePanel } from '../rename-panel/rename-panel';
 })
 export class OrgGroupsList {
   private readonly groupsService = inject(GroupsService);
-  private readonly fb = inject(FormBuilder);
 
   readonly orgId = input.required<number | null>();
 
@@ -58,8 +58,8 @@ export class OrgGroupsList {
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete group. Please try again.',
   });
-  protected readonly createForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
+  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
+    submission: { action: async () => this.create() },
   });
 
   protected readonly renameGroup: Rename = (id, name) => {
@@ -76,16 +76,13 @@ export class OrgGroupsList {
     computation: () => null,
   });
 
-  protected submitCreate(): void {
+  private create(): void {
     const orgId = this.orgId();
-    if (this.createForm.invalid || orgId === null) return;
-    this.createStatus.run(
-      this.groupsService.createGroup(orgId, this.createForm.getRawValue()),
-      () => {
-        this.createForm.reset();
-        this.groupsResource.reload();
-      },
-    );
+    if (orgId === null) return;
+    this.createStatus.run(this.groupsService.createGroup(orgId, this.createForm().value()), () => {
+      this.createForm().reset({ name: '' });
+      this.groupsResource.reload();
+    });
   }
 
   protected onDetailSaved(): void {
