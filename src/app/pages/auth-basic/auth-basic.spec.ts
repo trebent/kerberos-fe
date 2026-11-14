@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 
 import { expectNoAxeViolations } from '../../../testing/axe';
 import {
@@ -21,7 +22,12 @@ describe('AuthBasic', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        // Dialogs open and close without waiting for animations.
+        { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
+      ],
     });
     http = TestBed.inject(HttpTestingController);
 
@@ -44,6 +50,15 @@ describe('AuthBasic', () => {
       .flush(body, status === 200 ? {} : { status, statusText: 'Error' });
   }
 
+  /** Answers the list reload a closing dialog triggers, once the dialog has finished closing. */
+  async function flushReload(url: string, body: object): Promise<void> {
+    await vi.waitFor(() => {
+      TestBed.tick();
+      flushGet(url, body);
+    });
+    await fixture.whenStable();
+  }
+
   /** Answers the one request with this method and URL, and returns its body. */
   function expectRequest(method: string, url: string, response: object | null = null): unknown {
     const request = http.expectOne((req) => req.method === method && req.url.endsWith(url));
@@ -60,7 +75,7 @@ describe('AuthBasic', () => {
     await fixture.whenStable();
   }
 
-  /** Opens bob's edit panel in acme, where he is in staff and ops also exists. */
+  /** Opens bob's edit dialog in acme, where he is in staff and ops also exists. */
   async function openBob(): Promise<Element> {
     await selectOrg('acme', 7, [{ id: 1, name: 'bob', groups: [] }]);
     clickLabelled(element, 'Edit user bob');
@@ -71,7 +86,7 @@ describe('AuthBasic', () => {
     ]);
     flushGet(`${ORGS}/7/users/1/groups`, [{ id: 2, name: 'staff' }]);
     await fixture.whenStable();
-    return element.querySelector('app-org-user-detail')!;
+    return document.querySelector('mat-dialog-container')!;
   }
 
   it('asks for an organisation before showing its users and groups', async () => {
@@ -136,15 +151,15 @@ describe('AuthBasic', () => {
     await fixture.whenStable();
   });
 
-  it("saves a user's name and groups from the edit panel", async () => {
+  it("saves a user's name and groups, and reloads the users when the dialog closes", async () => {
     const detail = await openBob();
+    await expectNoAxeViolations(fixture, detail);
 
     fillIn(detail, { Name: 'robert' });
     submitForm(detail.querySelector('input')!);
     expect(expectRequest('PUT', `${ORGS}/7/users/1`)).toEqual({ id: 1, name: 'robert' });
-    TestBed.tick();
-    flushGet(`${ORGS}/7/users`, [{ id: 1, name: 'robert', groups: [] }]);
     await fixture.whenStable();
+    // The dialog holds several forms, so it stays open after a save.
     expect(detail.textContent).toContain('Name updated successfully.');
 
     toggleCheckbox(detail, 'ops');
@@ -153,11 +168,13 @@ describe('AuthBasic', () => {
       { id: 2, name: 'staff' },
       { id: 3, name: 'ops' },
     ]);
-    TestBed.tick();
-    flushGet(`${ORGS}/7/users`, []);
     await fixture.whenStable();
     expect(detail.textContent).toContain('Groups updated successfully.');
-    await expectNoAxeViolations(fixture);
+
+    clickLabelled(detail, 'Close dialog');
+    await flushReload(`${ORGS}/7/users`, [{ id: 1, name: 'robert', groups: [] }]);
+    expect(document.querySelector('app-org-user-detail')).toBeNull();
+    expect(element.textContent).toContain('robert');
   });
 
   it("changes a user's password through the organisation endpoint", async () => {
@@ -175,16 +192,6 @@ describe('AuthBasic', () => {
       oldPassword: 'old',
       password: 'new',
     });
-  });
-
-  it('closes the user edit panel when another organisation is selected', async () => {
-    await openBob();
-    expect(element.querySelector('app-org-user-detail')).not.toBeNull();
-
-    await selectOrg('globex', 8);
-
-    expect(element.querySelector('app-org-user-detail')).toBeNull();
-    await expectNoAxeViolations(fixture);
   });
 
   it("drops the previous organisation's users when the next one fails to load", async () => {
@@ -206,18 +213,17 @@ describe('AuthBasic', () => {
     clickLabelled(element, 'Edit organisation acme');
     await fixture.whenStable();
 
-    const panel = element.querySelector('app-rename-panel')!;
-    expect(panel.querySelector('input')?.value).toBe('acme');
-    fillIn(panel, { Name: 'acme-corp' });
-    submitForm(panel.querySelector('input')!);
+    const dialog = document.querySelector('mat-dialog-container')!;
+    expect(dialog.querySelector('h2')?.textContent).toBe('Edit organisation');
+    expect(dialog.querySelector('input')?.value).toBe('acme');
+    await expectNoAxeViolations(fixture, dialog);
+    fillIn(dialog, { Name: 'acme-corp' });
+    submitForm(dialog.querySelector('input')!);
 
     expect(expectRequest('PUT', `${ORGS}/7`)).toEqual({ id: 7, name: 'acme-corp' });
-    // Saving reloads the list, which the resource requests on the next tick.
-    TestBed.tick();
-    flushGet(ORGS, [{ id: 7, name: 'acme-corp' }]);
-    await fixture.whenStable();
+    await flushReload(ORGS, [{ id: 7, name: 'acme-corp' }]);
 
-    expect(element.querySelector('app-rename-panel')).toBeNull();
+    expect(document.querySelector('app-rename-dialog')).toBeNull();
     await expectNoAxeViolations(fixture);
   });
 });

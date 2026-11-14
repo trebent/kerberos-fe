@@ -1,10 +1,10 @@
-<app-edit-panel [heading]="heading()" (closed)="closed.emit()">
+<app-edit-dialog [heading]="data.heading">
   <app-request-feedback [status]="saveStatus" />
 
   <form class="compact-form" [formRoot]="form">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput [formField]="form.name" />
+      <input matInput cdkFocusInitial [formField]="form.name" />
     </mat-form-field>
     <div class="form-actions">
       <button
@@ -16,4 +16,4 @@
       </button>
     </div>
   </form>
-</app-edit-panel>
+</app-edit-dialog>

@@ -7,6 +7,10 @@ export class IdSelection {
   /** The ticked IDs, in the order they were ticked. */
   readonly selected = this.ids.asReadonly();
 
+  constructor(initial: readonly number[] = []) {
+    this.ids.set(initial);
+  }
+
   has(id: number): boolean {
     return this.ids().includes(id);
   }

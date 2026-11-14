@@ -46,7 +46,7 @@
         <td mat-cell *matCellDef="let g">
           <app-row-actions
             [label]="'group ' + g.name"
-            (edit)="selectedGroup.set(g)"
+            (edit)="editGroup(g)"
             (delete)="deleteGroup(g)"
           />
         </td>
@@ -55,8 +55,4 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </app-filtered-table>
-
-  @if (selectedGroup(); as group) {
-    <app-group-edit [group]="group" (saved)="onDetailSaved()" (closed)="selectedGroup.set(null)" />
-  }
 </app-list-card>

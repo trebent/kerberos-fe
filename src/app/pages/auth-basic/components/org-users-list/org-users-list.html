@@ -50,7 +50,7 @@
         <td mat-cell *matCellDef="let u">
           <app-row-actions
             [label]="'user ' + u.name"
-            (edit)="selectedUser.set(u)"
+            (edit)="editUser(u)"
             (delete)="deleteUser(u)"
           />
         </td>
@@ -59,16 +59,4 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </app-filtered-table>
-
-  @let org = orgId();
-  @if (selectedUser(); as user) {
-    @if (org !== null) {
-      <app-org-user-detail
-        [orgId]="org"
-        [user]="user"
-        (changed)="usersResource.reload()"
-        (closed)="selectedUser.set(null)"
-      />
-    }
-  }
 </app-list-card>

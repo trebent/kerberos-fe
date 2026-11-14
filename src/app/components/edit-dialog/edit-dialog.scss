@@ -1,0 +1,22 @@
+// Fills the dialog surface, so on phones the body scrolls inside a full-screen dialog.
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline-end: 0.75rem;
+}
+
+.dialog-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  // The top padding leaves room for the first field's floating label.
+  padding: 0.5rem 1.5rem 1.25rem;
+}

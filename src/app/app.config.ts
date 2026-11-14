@@ -5,6 +5,7 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { MAT_DIALOG_DEFAULT_OPTIONS, MatDialogConfig } from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -22,6 +23,12 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
     provideHttpClient(withInterceptors([csrfInterceptor])),
+    // Edit dialogs are about 32rem wide, and fill the screen on phones (see `.app-dialog`).
+    // Spread the defaults, as this value replaces them rather than merging with them.
+    {
+      provide: MAT_DIALOG_DEFAULT_OPTIONS,
+      useValue: { ...new MatDialogConfig(), width: '32rem', panelClass: 'app-dialog' },
+    },
     provideAdminApi({ basePath: environment.apiBaseUrl, withCredentials: true }),
     provideAuthBasicApi({ basePath: environment.apiBaseUrl, withCredentials: true }),
     provideAppInitializer(() => {

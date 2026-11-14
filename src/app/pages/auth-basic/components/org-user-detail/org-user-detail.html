@@ -1,12 +1,12 @@
-<app-edit-panel heading="Edit user" (closed)="closed.emit()">
-  <h4>Name</h4>
+<app-edit-dialog heading="Edit user">
+  <h3>Name</h3>
 
   <app-request-feedback [status]="nameStatus" />
 
   <form class="compact-form" [formRoot]="nameForm">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput [formField]="nameForm.name" autocomplete="username" />
+      <input matInput cdkFocusInitial [formField]="nameForm.name" autocomplete="username" />
     </mat-form-field>
     <div class="form-actions">
       <button
@@ -19,7 +19,7 @@
     </div>
   </form>
 
-  <h4>Groups</h4>
+  <h3>Groups</h3>
 
   @if (groupsResource.isLoading()) {
     <mat-spinner diameter="24" aria-label="Loading" />
@@ -47,6 +47,6 @@
     </div>
   }
 
-  <h4>Change password</h4>
+  <h3>Change password</h3>
   <app-password-change [change]="changePassword" />
-</app-edit-panel>
+</app-edit-dialog>

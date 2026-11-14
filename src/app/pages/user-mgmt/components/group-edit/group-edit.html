@@ -1,10 +1,10 @@
-<app-edit-panel heading="Edit group" (closed)="closed.emit()">
+<app-edit-dialog heading="Edit group">
   <app-request-feedback [status]="saveStatus" />
 
   <form class="compact-form" [formRoot]="editForm">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput [formField]="editForm.name" />
+      <input matInput cdkFocusInitial [formField]="editForm.name" />
     </mat-form-field>
 
     @if (permissionsResource.isLoading()) {
@@ -28,4 +28,4 @@
       </button>
     </div>
   </form>
-</app-edit-panel>
+</app-edit-dialog>

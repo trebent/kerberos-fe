@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
@@ -31,13 +32,13 @@ import { GroupEdit } from '../group-edit/group-edit';
     MatLabel,
     ...MAT_TABLE,
     RowActions,
-    GroupEdit,
   ],
   selector: 'app-groups',
   templateUrl: './groups.html',
 })
 export class Groups {
   private readonly usersService = inject(UsersService);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
 
@@ -64,8 +65,6 @@ export class Groups {
     submission: { action: async () => this.create() },
   });
 
-  protected readonly selectedGroup = signal<Group | null>(null);
-
   private create(): void {
     const { name } = this.createForm().value();
     const permissionIDs = [...this.createPermissions.selected()];
@@ -76,17 +75,18 @@ export class Groups {
     });
   }
 
-  protected onDetailSaved(): void {
-    this.selectedGroup.set(null);
-    this.groupsResource.reload();
+  protected editGroup(group: Group): void {
+    this.dialog
+      .open<GroupEdit, Group, boolean>(GroupEdit, { data: group })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) this.groupsResource.reload();
+      });
   }
 
   protected deleteGroup(group: Group): void {
-    this.deleteStatus.run(this.usersService.deleteGroup(group.id), () => {
-      if (this.selectedGroup()?.id === group.id) {
-        this.selectedGroup.set(null);
-      }
-      this.groupsResource.reload();
-    });
+    this.deleteStatus.run(this.usersService.deleteGroup(group.id), () =>
+      this.groupsResource.reload(),
+    );
   }
 }

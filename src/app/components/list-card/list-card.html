@@ -18,6 +18,8 @@
     @if (resource().error()) {
       <app-error-display [errors]="[loadError()]" />
     }
-    <ng-content />
+    <div class="list">
+      <ng-content />
+    </div>
   }
 </div>
