@@ -1,0 +1,8 @@
+<div class="edit-header">
+  <h3 class="edit-title">{{ heading() }}</h3>
+  <button matIconButton type="button" aria-label="Close edit panel" (click)="closed.emit()">
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>
+
+<ng-content />

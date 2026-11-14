@@ -1,101 +1,101 @@
-<div class="edit-header">
-  <h3 class="edit-title">Edit User</h3>
-  <button matIconButton type="button" (click)="close()" aria-label="Close edit panel">
-    <mat-icon aria-hidden="true">close</mat-icon>
-  </button>
-</div>
+<app-edit-panel heading="Edit user" (closed)="closed.emit()">
+  <div class="form-section-header">
+    <h4>Name</h4>
 
-<div class="form-section-header">
-  <h4>Name</h4>
-
-  @if (nameSuccess()) {
-    <span class="success-message" role="status">Name updated successfully.</span>
-  }
-</div>
-
-@if (nameErrors().length) {
-  <app-error-display [errors]="nameErrors()" />
-}
-
-<form [formGroup]="nameForm" (ngSubmit)="saveName()">
-  <mat-form-field appearance="outline">
-    <mat-label>Name</mat-label>
-    <input matInput formControlName="name" autocomplete="username" />
-  </mat-form-field>
-  <div class="form-actions">
-    <button matButton="filled" type="submit" [disabled]="nameForm.invalid">Save name</button>
-  </div>
-</form>
-
-<div class="form-section-header">
-  <h4>Groups</h4>
-
-  @if (groupSuccess()) {
-    <span class="success-message" role="status">Groups updated successfully.</span>
-  }
-</div>
-
-@if (groupsLoading()) {
-  <mat-spinner diameter="24" aria-label="Loading" />
-}
-
-@if (groupErrors().length) {
-  <app-error-display [errors]="groupErrors()" />
-}
-
-@if (!groupsLoading() && availableGroups().length) {
-  <fieldset class="groups-fieldset">
-    <legend>Select groups</legend>
-    @for (g of availableGroups(); track g.id) {
-      <mat-checkbox [checked]="selectedGroupIds().has(g.id)" (change)="toggleGroup(g)">
-        {{ g.name }}
-      </mat-checkbox>
+    @if (nameSuccess()) {
+      <span class="success-message" role="status">Name updated successfully.</span>
     }
-  </fieldset>
-  <div class="form-actions">
-    <button matButton="filled" type="button" (click)="saveGroups()">Save groups</button>
   </div>
-}
 
-<div class="form-section-header">
-  <h4>Change Password</h4>
-
-  @if (passwordSuccess()) {
-    <p class="success-message" role="status">Password changed successfully.</p>
+  @if (nameErrors().length) {
+    <app-error-display [errors]="nameErrors()" />
   }
-</div>
 
-@if (passwordErrors().length) {
-  <app-error-display [errors]="passwordErrors()" />
-}
+  <form [formGroup]="nameForm" (ngSubmit)="saveName()">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" autocomplete="username" />
+    </mat-form-field>
+    <div class="form-actions">
+      <button matButton="filled" type="submit" [disabled]="nameForm.invalid">Save name</button>
+    </div>
+  </form>
 
-<form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
-  <mat-form-field appearance="outline">
-    <mat-label>Current password</mat-label>
-    <input matInput type="password" formControlName="oldPassword" autocomplete="current-password" />
-  </mat-form-field>
-  <mat-form-field appearance="outline">
-    <mat-label>New password</mat-label>
-    <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
-  </mat-form-field>
-  <mat-form-field appearance="outline">
-    <mat-label>Confirm new password</mat-label>
-    <input
-      matInput
-      type="password"
-      formControlName="confirmPassword"
-      autocomplete="new-password"
-      [errorStateMatcher]="mismatchMatcher"
-    />
-    @if (
-      passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched
-    ) {
-      <mat-error>Passwords do not match.</mat-error>
+  <div class="form-section-header">
+    <h4>Groups</h4>
+
+    @if (groupSuccess()) {
+      <span class="success-message" role="status">Groups updated successfully.</span>
     }
-  </mat-form-field>
-  <div class="form-actions">
-    <button matButton="filled" type="submit" [disabled]="passwordForm.invalid">
-      Change password
-    </button>
   </div>
-</form>
+
+  @if (groupsLoading()) {
+    <mat-spinner diameter="24" aria-label="Loading" />
+  }
+
+  @if (groupErrors().length) {
+    <app-error-display [errors]="groupErrors()" />
+  }
+
+  @if (!groupsLoading() && availableGroups().length) {
+    <fieldset class="groups-fieldset">
+      <legend>Select groups</legend>
+      @for (g of availableGroups(); track g.id) {
+        <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
+          {{ g.name }}
+        </mat-checkbox>
+      }
+    </fieldset>
+    <div class="form-actions">
+      <button matButton="filled" type="button" (click)="saveGroups()">Save groups</button>
+    </div>
+  }
+
+  <div class="form-section-header">
+    <h4>Change Password</h4>
+
+    @if (passwordSuccess()) {
+      <p class="success-message" role="status">Password changed successfully.</p>
+    }
+  </div>
+
+  @if (passwordErrors().length) {
+    <app-error-display [errors]="passwordErrors()" />
+  }
+
+  <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+    <mat-form-field appearance="outline">
+      <mat-label>Current password</mat-label>
+      <input
+        matInput
+        type="password"
+        formControlName="oldPassword"
+        autocomplete="current-password"
+      />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>New password</mat-label>
+      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Confirm new password</mat-label>
+      <input
+        matInput
+        type="password"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+        [errorStateMatcher]="mismatchMatcher"
+      />
+      @if (
+        passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched
+      ) {
+        <mat-error>Passwords do not match.</mat-error>
+      }
+    </mat-form-field>
+    <div class="form-actions">
+      <button matButton="filled" type="submit" [disabled]="passwordForm.invalid">
+        Change password
+      </button>
+    </div>
+  </form>
+</app-edit-panel>

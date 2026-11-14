@@ -13,6 +13,7 @@ import { FilteredTable } from '../../../../components/filtered-table/filtered-ta
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, UsersService } from '../../../../services/admin';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
+import { IdSelection } from '../../../../utils/id-selection';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
@@ -51,7 +52,7 @@ export class Groups {
     stream: () => this.usersService.getPermissions(),
   });
 
-  protected readonly createSelectedPermissionIds = signal<number[]>([]);
+  protected readonly createPermissions = new IdSelection();
 
   protected readonly createErrors = signal<string[]>([]);
   protected readonly createForm = this.fb.nonNullable.group({
@@ -60,21 +61,8 @@ export class Groups {
 
   protected readonly selectedGroup = signal<Group | null>(null);
 
-  protected isCreateSelected(permissionId: number): boolean {
-    return this.createSelectedPermissionIds().includes(permissionId);
-  }
-
   protected getPermissionIDs(group: Group): string {
     return (group.permissions ?? []).map((p) => p.id).join(', ');
-  }
-
-  protected toggleCreatePermission(permissionId: number): void {
-    const current = this.createSelectedPermissionIds();
-    if (current.includes(permissionId)) {
-      this.createSelectedPermissionIds.set(current.filter((id) => id !== permissionId));
-    } else {
-      this.createSelectedPermissionIds.set([...current, permissionId]);
-    }
   }
 
   protected submitCreate(): void {
@@ -82,11 +70,11 @@ export class Groups {
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
     this.usersService
-      .createGroup({ name, permissionIDs: this.createSelectedPermissionIds() })
+      .createGroup({ name, permissionIDs: [...this.createPermissions.selected()] })
       .subscribe({
         next: () => {
           this.createForm.reset();
-          this.createSelectedPermissionIds.set([]);
+          this.createPermissions.set([]);
           this.groupsResource.reload();
         },
         error: () => {

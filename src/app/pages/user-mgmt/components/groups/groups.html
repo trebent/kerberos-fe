@@ -17,7 +17,10 @@
       <fieldset class="permissions-fieldset">
         <legend>Permissions</legend>
         @for (p of permissionsResource.value()!; track p.id) {
-          <mat-checkbox [checked]="isCreateSelected(p.id)" (change)="toggleCreatePermission(p.id)">
+          <mat-checkbox
+            [checked]="createPermissions.has(p.id)"
+            (change)="createPermissions.toggle(p.id)"
+          >
             {{ p.name }}
           </mat-checkbox>
         }

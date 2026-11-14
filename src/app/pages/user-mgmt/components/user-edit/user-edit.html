@@ -1,37 +1,31 @@
-<div class="edit-header">
-  <h3 class="edit-title">Edit User</h3>
-
-  <button matIconButton type="button" (click)="close()" aria-label="Close edit panel">
-    <mat-icon aria-hidden="true">close</mat-icon>
-  </button>
-</div>
-
-@if (saveErrors().length) {
-  <app-error-display [errors]="saveErrors()" />
-}
-
-<form [formGroup]="editForm" (ngSubmit)="save()">
-  <mat-form-field appearance="outline">
-    <mat-label>Username</mat-label>
-    <input matInput formControlName="username" autocomplete="username" />
-  </mat-form-field>
-
-  @if (groupsResource.isLoading()) {
-    <mat-spinner diameter="24" aria-label="Loading" />
+<app-edit-panel heading="Edit user" (closed)="closed.emit()">
+  @if (saveErrors().length) {
+    <app-error-display [errors]="saveErrors()" />
   }
 
-  @if (groupsResource.hasValue()) {
-    <fieldset class="groups-fieldset">
-      <legend>Groups</legend>
-      @for (g of groupsResource.value()!; track g.id) {
-        <mat-checkbox [checked]="isSelected(g.id)" (change)="toggleGroup(g.id)">
-          {{ g.name }}
-        </mat-checkbox>
-      }
-    </fieldset>
-  }
+  <form [formGroup]="editForm" (ngSubmit)="save()">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" autocomplete="username" />
+    </mat-form-field>
 
-  <div class="form-actions">
-    <button matButton="filled" type="submit" [disabled]="editForm.invalid">Save</button>
-  </div>
-</form>
+    @if (groupsResource.isLoading()) {
+      <mat-spinner diameter="24" aria-label="Loading" />
+    }
+
+    @if (groupsResource.hasValue()) {
+      <fieldset class="groups-fieldset">
+        <legend>Groups</legend>
+        @for (g of groupsResource.value()!; track g.id) {
+          <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
+            {{ g.name }}
+          </mat-checkbox>
+        }
+      </fieldset>
+    }
+
+    <div class="form-actions">
+      <button matButton="filled" type="submit" [disabled]="editForm.invalid">Save</button>
+    </div>
+  </form>
+</app-edit-panel>

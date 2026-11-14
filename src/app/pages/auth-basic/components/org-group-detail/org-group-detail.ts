@@ -1,20 +1,19 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 
+import { EditPanel } from '../../../../components/edit-panel/edit-panel';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Group, GroupsService } from '../../../../services/auth-basic';
 
 @Component({
   imports: [
+    EditPanel,
     ErrorDisplay,
     MatButton,
     MatFormField,
-    MatIcon,
-    MatIconButton,
     MatInput,
     MatLabel,
     ReactiveFormsModule,
@@ -57,9 +56,5 @@ export class OrgGroupDetail {
       },
       error: () => this.saveErrors.set(['Failed to save. Please try again.']),
     });
-  }
-
-  protected close(): void {
-    this.closed.emit();
   }
 }
