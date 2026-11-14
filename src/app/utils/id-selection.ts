@@ -1,14 +1,19 @@
-import { signal } from '@angular/core';
+import { linkedSignal, Signal, WritableSignal } from '@angular/core';
 
 /** The IDs ticked in a list of checkboxes, such as a group's permissions or a user's groups. */
 export class IdSelection {
-  private readonly ids = signal<readonly number[]>([]);
+  private readonly ids: WritableSignal<readonly number[]>;
 
   /** The ticked IDs, in the order they were ticked. */
-  readonly selected = this.ids.asReadonly();
+  readonly selected: Signal<readonly number[]>;
 
-  constructor(initial: readonly number[] = []) {
-    this.ids.set(initial);
+  /**
+   * Starts with the IDs `initial` returns. When `initial` reads signals, such as a resource
+   * that is still loading, the selection starts over from it each time they change.
+   */
+  constructor(initial: () => readonly number[] = () => []) {
+    this.ids = linkedSignal(initial);
+    this.selected = this.ids.asReadonly();
   }
 
   has(id: number): boolean {

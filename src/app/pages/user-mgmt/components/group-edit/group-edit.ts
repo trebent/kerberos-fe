@@ -41,7 +41,7 @@ export class GroupEdit {
   });
 
   // Not every endpoint includes a group's permissions.
-  protected readonly selectedPermissions = new IdSelection(
+  protected readonly selectedPermissions = new IdSelection(() =>
     (this.group.permissions ?? []).map((p) => p.id),
   );
   protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
