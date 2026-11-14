@@ -1,15 +1,7 @@
 <app-edit-panel heading="Edit user" (closed)="closed.emit()">
-  <div class="form-section-header">
-    <h4>Name</h4>
+  <h4>Name</h4>
 
-    @if (nameSuccess()) {
-      <span class="success-message" role="status">Name updated successfully.</span>
-    }
-  </div>
-
-  @if (nameErrors().length) {
-    <app-error-display [errors]="nameErrors()" />
-  }
+  <app-request-feedback [status]="nameStatus" />
 
   <form [formGroup]="nameForm" (ngSubmit)="saveName()">
     <mat-form-field appearance="outline">
@@ -17,51 +9,50 @@
       <input matInput formControlName="name" autocomplete="username" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="nameForm.invalid">Save name</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="nameForm.invalid || nameStatus.pending()"
+      >
+        Save name
+      </button>
     </div>
   </form>
 
-  <div class="form-section-header">
-    <h4>Groups</h4>
+  <h4>Groups</h4>
 
-    @if (groupSuccess()) {
-      <span class="success-message" role="status">Groups updated successfully.</span>
-    }
-  </div>
-
-  @if (groupsLoading()) {
+  @if (groupsResource.isLoading()) {
     <mat-spinner diameter="24" aria-label="Loading" />
   }
-
-  @if (groupErrors().length) {
-    <app-error-display [errors]="groupErrors()" />
+  @if (groupsResource.error()) {
+    <app-error-display [errors]="['Failed to load groups.']" />
   }
+  <app-request-feedback [status]="groupsStatus" />
 
-  @if (!groupsLoading() && availableGroups().length) {
+  @if (groupsResource.hasValue() && groupsResource.value().all.length) {
     <fieldset class="groups-fieldset">
       <legend>Select groups</legend>
-      @for (g of availableGroups(); track g.id) {
+      @for (g of groupsResource.value().all; track g.id) {
         <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
           {{ g.name }}
         </mat-checkbox>
       }
     </fieldset>
     <div class="form-actions">
-      <button matButton="filled" type="button" (click)="saveGroups()">Save groups</button>
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="groupsStatus.pending()"
+        (click)="saveGroups()"
+      >
+        Save groups
+      </button>
     </div>
   }
 
-  <div class="form-section-header">
-    <h4>Change Password</h4>
+  <h4>Change password</h4>
 
-    @if (passwordSuccess()) {
-      <p class="success-message" role="status">Password changed successfully.</p>
-    }
-  </div>
-
-  @if (passwordErrors().length) {
-    <app-error-display [errors]="passwordErrors()" />
-  }
+  <app-request-feedback [status]="passwordStatus" />
 
   <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
     <mat-form-field appearance="outline">
@@ -93,7 +84,11 @@
       }
     </mat-form-field>
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="passwordForm.invalid">
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="passwordForm.invalid || passwordStatus.pending()"
+      >
         Change password
       </button>
     </div>

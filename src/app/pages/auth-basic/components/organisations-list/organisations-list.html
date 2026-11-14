@@ -3,16 +3,20 @@
 </div>
 <div class="card-content">
   <h3>Create Organisation</h3>
-  @if (createErrors().length) {
-    <app-error-display [errors]="createErrors()" />
-  }
+  <app-request-feedback [status]="createStatus" />
   <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="createForm.invalid">Create</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="createForm.invalid || createStatus.pending()"
+      >
+        Create
+      </button>
     </div>
   </form>
 
@@ -28,7 +32,7 @@
       <p>
         Admin password: <code>{{ newOrgCredentials()!.adminPassword }}</code>
       </p>
-      <button matButton type="button" (click)="dismissCredentials()">Dismiss</button>
+      <button matButton type="button" (click)="newOrgCredentials.set(null)">Dismiss</button>
     </section>
   }
 
@@ -42,6 +46,7 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
+  <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="my-org">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
@@ -68,7 +73,7 @@
             <app-row-actions
               [label]="'organisation ' + o.name"
               (edit)="selectedOrg.set(o)"
-              (delete)="deleteOrg(o.id)"
+              (delete)="deleteOrg(o)"
             />
           </div>
         </td>

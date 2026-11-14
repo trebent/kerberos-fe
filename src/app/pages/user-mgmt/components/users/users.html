@@ -3,9 +3,7 @@
 </div>
 <div class="card-content">
   <h3>Create User</h3>
-  @if (createErrors().length) {
-    <app-error-display [errors]="createErrors()" />
-  }
+  <app-request-feedback [status]="createStatus" />
   <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
@@ -16,7 +14,13 @@
       <input matInput type="password" formControlName="password" autocomplete="new-password" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton="filled" type="submit" [disabled]="createForm.invalid">Create</button>
+      <button
+        matButton="filled"
+        type="submit"
+        [disabled]="createForm.invalid || createStatus.pending()"
+      >
+        Create
+      </button>
     </div>
   </form>
 
@@ -31,6 +35,7 @@
     <mat-spinner diameter="32" aria-label="Loading" />
   }
 
+  <app-request-feedback [status]="deleteStatus" />
   <app-filtered-table [dataSource]="dataSource" filterExample="admin">
     <table mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="id">
@@ -53,7 +58,7 @@
           <app-row-actions
             [label]="'user ' + u.username"
             (edit)="selectedUser.set(u)"
-            (delete)="deleteUser(u.id)"
+            (delete)="deleteUser(u)"
           />
         </td>
       </ng-container>

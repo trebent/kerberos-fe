@@ -9,15 +9,18 @@ import { MatInput } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { Group, UsersService } from '../../../../services/admin';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { IdSelection } from '../../../../utils/id-selection';
+import { requestStatus } from '../../../../utils/request-status';
 import { GroupEdit } from '../group-edit/group-edit';
 
 @Component({
   imports: [
+    RequestFeedback,
     ErrorDisplay,
     FilteredTable,
     MatButton,
@@ -54,7 +57,12 @@ export class Groups {
 
   protected readonly createPermissions = new IdSelection();
 
-  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createStatus = requestStatus({
+    failure: 'Failed to create group. Please try again.',
+  });
+  protected readonly deleteStatus = requestStatus({
+    failure: 'Failed to delete group. Please try again.',
+  });
   protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
@@ -67,20 +75,13 @@ export class Groups {
 
   protected submitCreate(): void {
     if (this.createForm.invalid) return;
-    this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
-    this.usersService
-      .createGroup({ name, permissionIDs: [...this.createPermissions.selected()] })
-      .subscribe({
-        next: () => {
-          this.createForm.reset();
-          this.createPermissions.set([]);
-          this.groupsResource.reload();
-        },
-        error: () => {
-          this.createErrors.set(['Failed to create group. Please try again.']);
-        },
-      });
+    const permissionIDs = [...this.createPermissions.selected()];
+    this.createStatus.run(this.usersService.createGroup({ name, permissionIDs }), () => {
+      this.createForm.reset();
+      this.createPermissions.set([]);
+      this.groupsResource.reload();
+    });
   }
 
   protected onDetailSaved(): void {
@@ -88,12 +89,12 @@ export class Groups {
     this.groupsResource.reload();
   }
 
-  protected deleteGroup(groupId: number): void {
-    if (this.selectedGroup()?.id === groupId) {
-      this.selectedGroup.set(null);
-    }
-    this.usersService.deleteGroup(groupId).subscribe({
-      next: () => this.groupsResource.reload(),
+  protected deleteGroup(group: Group): void {
+    this.deleteStatus.run(this.usersService.deleteGroup(group.id), () => {
+      if (this.selectedGroup()?.id === group.id) {
+        this.selectedGroup.set(null);
+      }
+      this.groupsResource.reload();
     });
   }
 }

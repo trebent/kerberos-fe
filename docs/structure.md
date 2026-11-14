@@ -27,6 +27,7 @@ src/app/
     edit-panel/                card with a heading and close button around an edit form
     error-display/             lists error messages and announces them
     filtered-table/            filter field and paginator around a projected mat-table
+    request-feedback/          shows a requestStatus's error or success message
     row-actions/               a table row's edit and delete buttons
   services/                    all services, hand-written and generated
     auth.service.ts
@@ -37,6 +38,7 @@ src/app/
     id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells
+    request-status.ts          requestStatus, runs a request and tracks its outcome
     validation.ts              password match validator and error state matcher
 src/testing/                   test helpers: AuthService stub, axe-core check
 openapi/                       API specs the clients are generated from (vendored from Kerberos)

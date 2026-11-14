@@ -1,4 +1,4 @@
-import { Component, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, inject, input, linkedSignal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -9,15 +9,18 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { of } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { FilteredTable } from '../../../../components/filtered-table/filtered-table';
 import { RowActions } from '../../../../components/row-actions/row-actions';
 import { User, UsersService } from '../../../../services/auth-basic';
 import { MAT_TABLE, resourceDataSource } from '../../../../utils/material-table';
 import { joinNames } from '../../../../utils/names';
+import { requestStatus } from '../../../../utils/request-status';
 import { OrgUserDetail } from '../org-user-detail/org-user-detail';
 
 @Component({
   imports: [
+    RequestFeedback,
     ErrorDisplay,
     FilteredTable,
     MatButton,
@@ -56,7 +59,12 @@ export class OrgUsersList {
   protected readonly joinNames = joinNames;
   protected readonly dataSource = resourceDataSource(this.usersResource);
 
-  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createStatus = requestStatus({
+    failure: 'Failed to create user. Please try again.',
+  });
+  protected readonly deleteStatus = requestStatus({
+    failure: 'Failed to delete user. Please try again.',
+  });
   protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
     password: ['', Validators.required],
@@ -69,31 +77,25 @@ export class OrgUsersList {
   });
 
   protected submitCreate(): void {
-    if (this.createForm.invalid || this.orgId() === null) return;
-    this.createErrors.set([]);
-    const { name, password } = this.createForm.getRawValue();
-    this.usersService.createUser(this.orgId()!, { name, password }).subscribe({
-      next: () => {
+    const orgId = this.orgId();
+    if (this.createForm.invalid || orgId === null) return;
+    this.createStatus.run(
+      this.usersService.createUser(orgId, this.createForm.getRawValue()),
+      () => {
         this.createForm.reset();
         this.usersResource.reload();
       },
-      error: () => {
-        this.createErrors.set(['Failed to create user. Please try again.']);
-      },
-    });
+    );
   }
 
-  protected onDataChanged(): void {
-    this.usersResource.reload();
-  }
-
-  protected deleteUser(userId: number): void {
-    if (this.orgId() === null) return;
-    if (this.selectedUser()?.id === userId) {
-      this.selectedUser.set(null);
-    }
-    this.usersService.deleteUser(this.orgId()!, userId).subscribe({
-      next: () => this.usersResource.reload(),
+  protected deleteUser(user: User): void {
+    const orgId = this.orgId();
+    if (orgId === null) return;
+    this.deleteStatus.run(this.usersService.deleteUser(orgId, user.id), () => {
+      if (this.selectedUser()?.id === user.id) {
+        this.selectedUser.set(null);
+      }
+      this.usersResource.reload();
     });
   }
 }
