@@ -37,7 +37,7 @@ src/app/
     admin/                     generated from openapi/admin.yaml
     auth-basic/                generated from openapi/auth_basic.yaml
   utils/                       plain functions and classes, no components or services
-    flow-meta.ts               flowComponentData, typed access to a flow component's data
+    flow-meta.ts               flowComponentData, componentsOnPath, describeFlowData: reading flow data
     http-status.ts             httpStatusClass, the color class for an HTTP status
     id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource

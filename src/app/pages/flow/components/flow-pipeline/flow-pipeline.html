@@ -8,7 +8,7 @@
       @for (comp of flowMetas(); track comp.name; let last = $last; let i = $index) {
         <div class="flow-col">
           <app-transition-badges
-            [transitions]="getTransitions(comp.name, 'inbound')"
+            [transitions]="transitions(comp.name, 'inbound')"
             [placeholder]="placeholder(comp.name, 'inbound')"
           />
           <div
@@ -16,13 +16,13 @@
             tabindex="0"
             [class.involved]="hoveredBackend() !== null && !isComponentDimmed(comp.name)"
             [class.dimmed]="isComponentDimmed(comp.name)"
-            [matTooltip]="formatData(comp.data)"
+            [matTooltip]="describeFlowData(comp.data)"
             matTooltipClass="flow-meta-tooltip"
           >
             {{ comp.name }}
           </div>
           <app-transition-badges
-            [transitions]="getTransitions(comp.name, 'outbound')"
+            [transitions]="transitions(comp.name, 'outbound')"
             [placeholder]="placeholder(comp.name, 'outbound')"
           />
         </div>
@@ -45,7 +45,7 @@
           <div
             class="backend-box"
             tabindex="0"
-            [matTooltip]="formatBackend(backend)"
+            [matTooltip]="describeBackend(backend)"
             matTooltipClass="flow-meta-tooltip"
             (mouseenter)="hoveredBackend.set(backend.name)"
             (mouseleave)="hoveredBackend.set(null)"
