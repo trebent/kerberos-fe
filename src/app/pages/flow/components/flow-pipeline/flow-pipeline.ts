@@ -26,9 +26,9 @@ export class FlowPipeline {
   readonly selectedCall = input<DebugSessionCall | null>(null);
   readonly callBackend = input<string | null>(null);
 
-  readonly hasValue = computed(() => this.flowMetas() != null);
+  protected readonly hasValue = computed(() => this.flowMetas() != null);
 
-  readonly backends = computed<FlowMetaDataRouterBackend[]>(() => {
+  protected readonly backends = computed<FlowMetaDataRouterBackend[]>(() => {
     const flow = this.flowMetas();
     if (!flow) return [];
     const router = flow.find((c) => c.name === 'router');
@@ -36,15 +36,15 @@ export class FlowPipeline {
     return (router.data as unknown as FlowMetaDataRouter).backends ?? [];
   });
 
-  readonly hoveredBackend = signal<string | null>(null);
+  protected readonly hoveredBackend = signal<string | null>(null);
 
-  readonly effectiveBackend = computed<string | null>(
+  protected readonly effectiveBackend = computed<string | null>(
     () => this.callBackend() ?? this.hoveredBackend(),
   );
 
   private static readonly ALWAYS_INVOLVED = new Set(['obs', 'router', 'forwarder']);
 
-  readonly transitionsByComponent = computed<
+  protected readonly transitionsByComponent = computed<
     Map<string, { inbound: FlowTransition[]; outbound: FlowTransition[] }>
   >(() => {
     const call = this.selectedCall();
@@ -65,7 +65,7 @@ export class FlowPipeline {
     return map;
   });
 
-  readonly involvedMap = computed<Map<string, Set<string>>>(() => {
+  protected readonly involvedMap = computed<Map<string, Set<string>>>(() => {
     const flow = this.flowMetas();
     if (!flow) return new Map();
 
@@ -85,26 +85,26 @@ export class FlowPipeline {
     return map;
   });
 
-  isComponentDimmed(compName: string): boolean {
+  protected isComponentDimmed(compName: string): boolean {
     const hovered = this.hoveredBackend();
     if (!hovered) return false;
     return !(this.involvedMap().get(hovered)?.has(compName) ?? false);
   }
 
-  isArrowDimmed(index: number): boolean {
+  protected isArrowDimmed(index: number): boolean {
     const flow = this.flowMetas();
     if (!flow) return false;
     return this.isComponentDimmed(flow[index].name) || this.isComponentDimmed(flow[index + 1].name);
   }
 
-  shouldShowNA(compName: string): boolean {
+  protected shouldShowNA(compName: string): boolean {
     if (!this.selectedCall()) return false;
     const eb = this.effectiveBackend();
     if (!eb) return false;
     return !(this.involvedMap().get(eb)?.has(compName) ?? false);
   }
 
-  shouldShowNone(compName: string, direction: 'inbound' | 'outbound'): boolean {
+  protected shouldShowNone(compName: string, direction: 'inbound' | 'outbound'): boolean {
     const eb = this.effectiveBackend();
     if (!eb) return false;
     const involved = this.involvedMap().get(eb)?.has(compName) ?? false;
@@ -112,12 +112,12 @@ export class FlowPipeline {
     return !!(this.selectedCall() && this.getTransitions(compName, direction).length === 0);
   }
 
-  getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
+  protected getTransitions(compName: string, direction: 'inbound' | 'outbound'): FlowTransition[] {
     const entry = this.transitionsByComponent().get(compName);
     return entry ? entry[direction] : [];
   }
 
-  callDuration(call: DebugSessionCall): string {
+  protected callDuration(call: DebugSessionCall): string {
     if (!call.stoppedAt) return '—';
     const ms = this.parseIsoMs(call.stoppedAt) - this.parseIsoMs(call.startedAt);
     return `${ms.toFixed(3)}ms`;
@@ -134,7 +134,7 @@ export class FlowPipeline {
     return base + subMs;
   }
 
-  formatTransitionTooltip(t: FlowTransition): string {
+  protected formatTransitionTooltip(t: FlowTransition): string {
     const lines = [
       `Started:  ${this.formatTimestamp(t.startedAt)}`,
       `Stopped:  ${this.formatTimestamp(t.stoppedAt)}`,
@@ -164,11 +164,11 @@ export class FlowPipeline {
     return false;
   }
 
-  formatBackend(backend: FlowMetaDataRouterBackend): string {
+  protected formatBackend(backend: FlowMetaDataRouterBackend): string {
     return `host: ${backend.host}\nport: ${backend.port}`;
   }
 
-  formatData(data: unknown): string {
+  protected formatData(data: unknown): string {
     if (data === null || data === undefined) return '';
     if (typeof data !== 'object' || Array.isArray(data)) return String(data);
     return this.renderObject(data as Record<string, unknown>, '');

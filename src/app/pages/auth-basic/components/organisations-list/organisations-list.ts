@@ -46,13 +46,13 @@ export class OrganisationsList {
 
   readonly orgSelected = output<number | null>();
 
-  readonly displayedColumns = ['id', 'name', 'actions'];
+  protected readonly displayedColumns = ['id', 'name', 'actions'];
 
-  readonly orgsResource = rxResource({
+  protected readonly orgsResource = rxResource({
     stream: () => this.orgsService.listOrganisations(),
   });
 
-  readonly dataSource = new MatTableDataSource<Organisation>();
+  protected readonly dataSource = new MatTableDataSource<Organisation>();
 
   private readonly paginator = viewChild(MatPaginator);
 
@@ -71,20 +71,20 @@ export class OrganisationsList {
     });
   }
 
-  readonly createErrors = signal<string[]>([]);
-  readonly createForm = this.fb.nonNullable.group({
+  protected readonly createErrors = signal<string[]>([]);
+  protected readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
   });
 
-  readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
-  readonly selectedOrg = signal<Organisation | null>(null);
-  readonly selectedOrgId = signal<number | null>(null);
+  protected readonly newOrgCredentials = signal<CreateOrganisation201Response | null>(null);
+  protected readonly selectedOrg = signal<Organisation | null>(null);
+  protected readonly selectedOrgId = signal<number | null>(null);
 
-  applyFilter(event: Event): void {
+  protected applyFilter(event: Event): void {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
   }
 
-  submitCreate(): void {
+  protected submitCreate(): void {
     if (this.createForm.invalid) return;
     this.createErrors.set([]);
     const { name } = this.createForm.getRawValue();
@@ -100,11 +100,11 @@ export class OrganisationsList {
     });
   }
 
-  dismissCredentials(): void {
+  protected dismissCredentials(): void {
     this.newOrgCredentials.set(null);
   }
 
-  toggleManage(org: Organisation): void {
+  protected toggleManage(org: Organisation): void {
     const current = this.selectedOrgId();
     if (current === org.id) {
       this.selectedOrgId.set(null);
@@ -115,20 +115,20 @@ export class OrganisationsList {
     }
   }
 
-  openEdit(org: Organisation): void {
+  protected openEdit(org: Organisation): void {
     this.selectedOrg.set(org);
   }
 
-  onDetailSaved(): void {
+  protected onDetailSaved(): void {
     this.selectedOrg.set(null);
     this.orgsResource.reload();
   }
 
-  onDetailClosed(): void {
+  protected onDetailClosed(): void {
     this.selectedOrg.set(null);
   }
 
-  deleteOrg(orgId: number): void {
+  protected deleteOrg(orgId: number): void {
     if (this.selectedOrgId() === orgId) {
       this.selectedOrgId.set(null);
       this.orgSelected.emit(null);

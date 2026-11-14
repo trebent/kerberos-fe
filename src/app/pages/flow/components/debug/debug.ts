@@ -50,30 +50,30 @@ export class Debug {
   readonly callSelected = output<DebugSessionCall | null>();
   readonly backendChange = output<string | null>();
 
-  readonly selectedBackend = signal<string | null>(null);
-  readonly sessions = signal<DebugSession[]>([]);
-  readonly selectedSessionId = signal<number | null>(null);
-  readonly isLoadingSession = signal(false);
-  readonly isStarting = signal(false);
-  readonly isStopping = signal(false);
-  readonly isDeleting = signal(false);
-  readonly calls = signal<DebugSessionCall[]>([]);
-  readonly callsFetched = signal(false);
-  readonly isFetchingCalls = signal(false);
-  readonly callsFetchError = signal(false);
-  readonly selectedCallId = signal<number | null>(null);
-  readonly isFetchingCallDetail = signal(false);
-  readonly callDetailError = signal(false);
+  protected readonly selectedBackend = signal<string | null>(null);
+  protected readonly sessions = signal<DebugSession[]>([]);
+  protected readonly selectedSessionId = signal<number | null>(null);
+  protected readonly isLoadingSession = signal(false);
+  protected readonly isStarting = signal(false);
+  protected readonly isStopping = signal(false);
+  protected readonly isDeleting = signal(false);
+  protected readonly calls = signal<DebugSessionCall[]>([]);
+  protected readonly callsFetched = signal(false);
+  protected readonly isFetchingCalls = signal(false);
+  protected readonly callsFetchError = signal(false);
+  protected readonly selectedCallId = signal<number | null>(null);
+  protected readonly isFetchingCallDetail = signal(false);
+  protected readonly callDetailError = signal(false);
 
   private callDetailSub: Subscription | null = null;
 
-  readonly selectedSession = computed<DebugSession | null>(() => {
+  protected readonly selectedSession = computed<DebugSession | null>(() => {
     const id = this.selectedSessionId();
     if (id === null) return null;
     return this.sessions().find((s) => s.id === id) ?? null;
   });
 
-  readonly isSessionRunning = computed(() => {
+  protected readonly isSessionRunning = computed(() => {
     const session = this.selectedSession();
     return !!session && !session.stoppedAt && new Date(session.expiresAt) > new Date();
   });
@@ -102,12 +102,12 @@ export class Debug {
     });
   }
 
-  onSessionSelect(id: number | null): void {
+  protected onSessionSelect(id: number | null): void {
     this.selectedSessionId.set(id);
     this._resetCallState();
   }
 
-  startSession(): void {
+  protected startSession(): void {
     const backend = this.selectedBackend();
     if (!backend || this.isStarting()) return;
 
@@ -126,7 +126,7 @@ export class Debug {
       });
   }
 
-  stopSession(): void {
+  protected stopSession(): void {
     const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isStopping()) return;
@@ -145,7 +145,7 @@ export class Debug {
       });
   }
 
-  deleteSession(): void {
+  protected deleteSession(): void {
     const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isDeleting()) return;
@@ -165,7 +165,7 @@ export class Debug {
       });
   }
 
-  fetchCalls(): void {
+  protected fetchCalls(): void {
     const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isFetchingCalls()) return;
@@ -191,7 +191,7 @@ export class Debug {
       });
   }
 
-  onCallClick(call: DebugSessionCall): void {
+  protected onCallClick(call: DebugSessionCall): void {
     const session = this.selectedSession();
     const backend = this.selectedBackend();
     if (!session || !backend || this.isFetchingCallDetail()) return;
@@ -224,7 +224,7 @@ export class Debug {
       });
   }
 
-  statusClass(code: number): string {
+  protected statusClass(code: number): string {
     return code >= 200 && code < 300 ? 'status-ok' : 'status-err';
   }
 
