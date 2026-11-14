@@ -1,5 +1,5 @@
-import { Component, effect, inject, input, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, input, linkedSignal, output } from '@angular/core';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -16,11 +16,12 @@ export type Rename = (id: number, name: string) => Observable<unknown>;
 @Component({
   imports: [
     EditPanel,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
-    ReactiveFormsModule,
     RequestFeedback,
   ],
   selector: 'app-rename-panel',
@@ -36,17 +37,15 @@ export class RenamePanel {
 
   protected readonly saveStatus = requestStatus({ failure: 'Failed to save. Please try again.' });
 
-  protected readonly form = inject(FormBuilder).nonNullable.group({
-    name: ['', Validators.required],
-  });
+  /** Starts from the item's name, and again whenever another item is edited. */
+  protected readonly form = form(
+    linkedSignal(() => ({ name: this.item().name })),
+    (path) => required(path.name),
+    { submission: { action: async () => this.save() } },
+  );
 
-  constructor() {
-    effect(() => this.form.reset({ name: this.item().name }));
-  }
-
-  protected save(): void {
-    if (this.form.invalid) return;
-    const request$ = this.rename()(this.item().id, this.form.getRawValue().name);
+  private save(): void {
+    const request$ = this.rename()(this.item().id, this.form().value().name);
     this.saveStatus.run(request$, () => this.saved.emit());
   }
 }

@@ -23,6 +23,12 @@ This file records only the facts specific to this project. Where it conflicts wi
 
 - A component's public members are its inputs and outputs. Everything its template uses is `protected`, and everything else `private`, so the class shows at a glance what a parent can bind to. Specs drive components through the DOM rather than their internals
 
+## Forms
+
+- Every form uses Signal Forms: `form(model, schema, { submission: { action: async () => this.save() } })` bound with `<form [formRoot]>` and `[formField]`. The action delegates to a private method that runs the request through a `requestStatus`
+- An edit form takes its model from `linkedSignal(() => ({ ... this.item() }))`, so it follows the edited record without an `effect`
+- Put cross-field rules on the field that shows the error (`validate(path.confirmPassword, ...)`), so `<mat-error>` shows it without an `ErrorStateMatcher`
+
 ## Angular Material
 
 - The single M3 theme lives in `src/styles.scss` (`mat.$cyan-palette` primary, `mat.$orange-palette` tertiary, Roboto, density 0). `color-scheme` is set on `html`; `ThemeService` switches it between `light`, `dark`, and `light dark`

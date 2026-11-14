@@ -8,16 +8,16 @@
 >
   <div create>
     <app-request-feedback [status]="createStatus" />
-    <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <form class="compact-form" [formRoot]="createForm">
       <mat-form-field appearance="outline">
         <mat-label>Name</mat-label>
-        <input matInput formControlName="name" />
+        <input matInput [formField]="createForm.name" />
       </mat-form-field>
       <div class="form-actions">
         <button
           matButton="filled"
           type="submit"
-          [disabled]="createForm.invalid || createStatus.pending()"
+          [disabled]="createForm().invalid() || createStatus.pending()"
         >
           Create
         </button>

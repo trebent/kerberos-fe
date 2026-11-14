@@ -1,16 +1,17 @@
-import { Component, inject, input } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, input, signal } from '@angular/core';
+import { form, FormField, FormRoot, required, validate } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { Observable } from 'rxjs';
 
 import { requestStatus } from '../../utils/request-status';
-import { PasswordMismatchStateMatcher, passwordsMatchValidator } from '../../utils/validation';
 import { RequestFeedback } from '../request-feedback/request-feedback';
 
 /** Sends a password change; the caller decides whose password and which endpoint. */
 export type ChangePassword = (oldPassword: string, newPassword: string) => Observable<unknown>;
+
+const EMPTY = { oldPassword: '', newPassword: '', confirmPassword: '' };
 
 /** A current/new/confirm password form that reports how the change went. */
 @Component({
@@ -20,7 +21,8 @@ export type ChangePassword = (oldPassword: string, newPassword: string) => Obser
     MatFormField,
     MatInput,
     MatLabel,
-    ReactiveFormsModule,
+    FormField,
+    FormRoot,
     RequestFeedback,
   ],
   selector: 'app-password-change',
@@ -34,20 +36,21 @@ export class PasswordChange {
     success: 'Password changed successfully.',
   });
 
-  protected readonly mismatchMatcher = new PasswordMismatchStateMatcher();
-
-  protected readonly form = inject(FormBuilder).nonNullable.group(
-    {
-      oldPassword: ['', Validators.required],
-      newPassword: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
+  protected readonly form = form(
+    signal(EMPTY),
+    (path) => {
+      required(path.oldPassword);
+      required(path.newPassword);
+      required(path.confirmPassword);
+      validate(path.confirmPassword, ({ value, valueOf }) =>
+        value() === valueOf(path.newPassword) ? undefined : { kind: 'mismatch' },
+      );
     },
-    { validators: passwordsMatchValidator },
+    { submission: { action: async () => this.submit() } },
   );
 
-  protected submit(): void {
-    if (this.form.invalid) return;
-    const { oldPassword, newPassword } = this.form.getRawValue();
-    this.status.run(this.change()(oldPassword, newPassword), () => this.form.reset());
+  private submit(): void {
+    const { oldPassword, newPassword } = this.form().value();
+    this.status.run(this.change()(oldPassword, newPassword), () => this.form().reset(EMPTY));
   }
 }

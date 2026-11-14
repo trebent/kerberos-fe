@@ -3,16 +3,16 @@
 
   <app-request-feedback [status]="nameStatus" />
 
-  <form class="compact-form" [formGroup]="nameForm" (ngSubmit)="saveName()">
+  <form class="compact-form" [formRoot]="nameForm">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput formControlName="name" autocomplete="username" />
+      <input matInput [formField]="nameForm.name" autocomplete="username" />
     </mat-form-field>
     <div class="form-actions">
       <button
         matButton="filled"
         type="submit"
-        [disabled]="nameForm.invalid || nameStatus.pending()"
+        [disabled]="nameForm().invalid() || nameStatus.pending()"
       >
         Save name
       </button>

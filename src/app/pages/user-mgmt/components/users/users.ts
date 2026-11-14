@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -15,17 +15,20 @@ import { joinNames } from '../../../../utils/names';
 import { requestStatus } from '../../../../utils/request-status';
 import { UserEdit } from '../user-edit/user-edit';
 
+const NEW_USER = { username: '', password: '' };
+
 @Component({
   imports: [
     ListCard,
     RequestFeedback,
     FilteredTable,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     ...MAT_TABLE,
-    ReactiveFormsModule,
     RowActions,
     UserEdit,
   ],
@@ -34,7 +37,6 @@ import { UserEdit } from '../user-edit/user-edit';
 })
 export class Users {
   private readonly usersService = inject(UsersService);
-  private readonly fb = inject(FormBuilder);
 
   protected readonly displayedColumns = ['id', 'username', 'groups', 'actions'];
 
@@ -51,24 +53,27 @@ export class Users {
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete user. Please try again.',
   });
-  protected readonly createForm = this.fb.nonNullable.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required],
-  });
+  protected readonly createForm = form(
+    signal(NEW_USER),
+    (path) => {
+      required(path.username);
+      required(path.password);
+    },
+    { submission: { action: async () => this.create() } },
+  );
 
   protected readonly selectedUser = signal<User | null>(null);
-
-  protected submitCreate(): void {
-    if (this.createForm.invalid) return;
-    this.createStatus.run(this.usersService.createUser(this.createForm.getRawValue()), () => {
-      this.createForm.reset();
-      this.usersResource.reload();
-    });
-  }
 
   protected onDetailSaved(): void {
     this.selectedUser.set(null);
     this.usersResource.reload();
+  }
+
+  private create(): void {
+    this.createStatus.run(this.usersService.createUser(this.createForm().value()), () => {
+      this.createForm().reset(NEW_USER);
+      this.usersResource.reload();
+    });
   }
 
   protected deleteUser(user: User): void {

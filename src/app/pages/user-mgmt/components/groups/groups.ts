@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -21,12 +21,13 @@ import { GroupEdit } from '../group-edit/group-edit';
     ListCard,
     RequestFeedback,
     FilteredTable,
+    FormField,
+    FormRoot,
     MatButton,
     MatFormField,
     MatInput,
     MatLabel,
     ...MAT_TABLE,
-    ReactiveFormsModule,
     RowActions,
     GroupEdit,
     MatCheckbox,
@@ -36,7 +37,6 @@ import { GroupEdit } from '../group-edit/group-edit';
 })
 export class Groups {
   private readonly usersService = inject(UsersService);
-  private readonly fb = inject(FormBuilder);
 
   protected readonly displayedColumns = ['id', 'name', 'permissions', 'actions'];
 
@@ -58,8 +58,8 @@ export class Groups {
   protected readonly deleteStatus = requestStatus({
     failure: 'Failed to delete group. Please try again.',
   });
-  protected readonly createForm = this.fb.nonNullable.group({
-    name: ['', Validators.required],
+  protected readonly createForm = form(signal({ name: '' }), (path) => required(path.name), {
+    submission: { action: async () => this.create() },
   });
 
   protected readonly selectedGroup = signal<Group | null>(null);
@@ -68,12 +68,11 @@ export class Groups {
     return (group.permissions ?? []).map((p) => p.id).join(', ');
   }
 
-  protected submitCreate(): void {
-    if (this.createForm.invalid) return;
-    const { name } = this.createForm.getRawValue();
+  private create(): void {
+    const { name } = this.createForm().value();
     const permissionIDs = [...this.createPermissions.selected()];
     this.createStatus.run(this.usersService.createGroup({ name, permissionIDs }), () => {
-      this.createForm.reset();
+      this.createForm().reset({ name: '' });
       this.createPermissions.set([]);
       this.groupsResource.reload();
     });

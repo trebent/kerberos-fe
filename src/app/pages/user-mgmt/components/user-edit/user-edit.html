@@ -1,10 +1,10 @@
 <app-edit-panel heading="Edit user" (closed)="closed.emit()">
   <app-request-feedback [status]="saveStatus" />
 
-  <form class="compact-form" [formGroup]="editForm" (ngSubmit)="save()">
+  <form class="compact-form" [formRoot]="editForm">
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
-      <input matInput formControlName="username" autocomplete="username" />
+      <input matInput [formField]="editForm.username" autocomplete="username" />
     </mat-form-field>
 
     @if (groupsResource.isLoading()) {
@@ -26,7 +26,7 @@
       <button
         matButton="filled"
         type="submit"
-        [disabled]="editForm.invalid || saveStatus.pending()"
+        [disabled]="editForm().invalid() || saveStatus.pending()"
       >
         Save
       </button>

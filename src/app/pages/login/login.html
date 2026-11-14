@@ -3,20 +3,24 @@
 
   <app-request-feedback [status]="signInStatus" />
 
-  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
+  <form class="form-stack" [formRoot]="form">
     <mat-form-field>
       <mat-label>Username</mat-label>
-      <input matInput formControlName="username" autocomplete="username" />
+      <input matInput [formField]="form.username" autocomplete="username" />
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Password</mat-label>
-      <input matInput type="password" formControlName="password" autocomplete="current-password" />
+      <input matInput type="password" [formField]="form.password" autocomplete="current-password" />
     </mat-form-field>
 
-    <mat-slide-toggle formControlName="superLogin">Sign in as superuser</mat-slide-toggle>
+    <mat-slide-toggle [formField]="form.superLogin">Sign in as superuser</mat-slide-toggle>
 
-    <button matButton="filled" type="submit" [disabled]="form.invalid || signInStatus.pending()">
+    <button
+      matButton="filled"
+      type="submit"
+      [disabled]="form().invalid() || signInStatus.pending()"
+    >
       {{ signInStatus.pending() ? 'Signing in…' : 'Sign in' }}
     </button>
   </form>

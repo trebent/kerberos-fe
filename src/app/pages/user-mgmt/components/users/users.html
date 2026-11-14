@@ -7,20 +7,25 @@
 >
   <div create>
     <app-request-feedback [status]="createStatus" />
-    <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+    <form class="compact-form" [formRoot]="createForm">
       <mat-form-field appearance="outline">
         <mat-label>Username</mat-label>
-        <input matInput formControlName="username" autocomplete="username" />
+        <input matInput [formField]="createForm.username" autocomplete="username" />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
-        <input matInput type="password" formControlName="password" autocomplete="new-password" />
+        <input
+          matInput
+          type="password"
+          [formField]="createForm.password"
+          autocomplete="new-password"
+        />
       </mat-form-field>
       <div class="form-actions">
         <button
           matButton="filled"
           type="submit"
-          [disabled]="createForm.invalid || createStatus.pending()"
+          [disabled]="createForm().invalid() || createStatus.pending()"
         >
           Create
         </button>
