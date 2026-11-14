@@ -1,6 +1,6 @@
 <app-edit-panel heading="Edit organisation" (closed)="closed.emit()">
   <app-request-feedback [status]="saveStatus" />
-  <form [formGroup]="editForm" (ngSubmit)="save()">
+  <form class="compact-form" [formGroup]="editForm" (ngSubmit)="save()">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />

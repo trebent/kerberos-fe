@@ -3,7 +3,7 @@
 
   <app-request-feedback [status]="nameStatus" />
 
-  <form [formGroup]="nameForm" (ngSubmit)="saveName()">
+  <form class="compact-form" [formGroup]="nameForm" (ngSubmit)="saveName()">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" autocomplete="username" />
@@ -30,7 +30,7 @@
   <app-request-feedback [status]="groupsStatus" />
 
   @if (groupsResource.hasValue() && groupsResource.value().all.length) {
-    <fieldset class="groups-fieldset">
+    <fieldset class="checkbox-fieldset">
       <legend>Select groups</legend>
       @for (g of groupsResource.value().all; track g.id) {
         <mat-checkbox [checked]="selectedGroups.has(g.id)" (change)="selectedGroups.toggle(g.id)">
@@ -54,7 +54,7 @@
 
   <app-request-feedback [status]="passwordStatus" />
 
-  <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+  <form class="compact-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
     <mat-form-field appearance="outline">
       <mat-label>Current password</mat-label>
       <input

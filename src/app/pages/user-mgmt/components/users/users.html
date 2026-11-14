@@ -4,7 +4,7 @@
 <div class="card-content">
   <h3>Create User</h3>
   <app-request-feedback [status]="createStatus" />
-  <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+  <form class="compact-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
       <input matInput formControlName="username" autocomplete="username" />

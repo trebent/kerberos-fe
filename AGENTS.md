@@ -27,6 +27,7 @@ This file records only the facts specific to this project. Where it conflicts wi
 
 - The single M3 theme lives in `src/styles.scss` (`mat.$cyan-palette` primary, `mat.$orange-palette` tertiary, Roboto, density 0). `color-scheme` is set on `html`; `ThemeService` switches it between `light`, `dark`, and `light dark`
 - Use `--app-success` (defined in `src/styles.scss`) for success states; M3 has no success role
+- Shared building blocks: section cards (`.section-card`, `.card-header-container`, `.card-content`), forms (`.form-stack`, `.compact-form`, `.checkbox-fieldset`) are global classes documented in `src/styles.scss`; tables, edit panels, row buttons and request feedback are components in `src/app/components/` (`FilteredTable`, `EditPanel`, `RowActions`, `RequestFeedback`, with `requestStatus` and `resourceDataSource` in `utils/`). Use them instead of restyling or rewiring the same thing in a component
 - Import table directives through `MAT_TABLE` from `src/app/utils/material-table.ts`
 
 ## API clients

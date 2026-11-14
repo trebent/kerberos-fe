@@ -21,6 +21,7 @@ import { requestStatus } from '../../../../utils/request-status';
 import { OrganisationDetail } from '../organisation-detail/organisation-detail';
 
 @Component({
+  host: { class: 'section-card' },
   imports: [
     RequestFeedback,
     ErrorDisplay,

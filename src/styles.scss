@@ -119,7 +119,19 @@ a {
   }
 }
 
-// Section cards used by the management pages.
+// Section cards: a bordered surface for one part of a page, such as a table with its create
+// form. A component that is a card puts the class on its own element with
+// `host: { class: 'section-card' }` and lays its content out in `.card-header-container`
+// (title and actions) and `.card-content`.
+.section-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
 .card-header-container {
   display: flex;
   align-items: center;
@@ -130,6 +142,49 @@ a {
 
 .card-content {
   padding: 0.5rem 1rem;
+}
+
+// Dividers between the parts of a section card, such as its create form and its table.
+.card-content > mat-divider {
+  margin: 0.5rem 0;
+}
+
+// Hint shown in a section card that has nothing to show yet.
+.prompt-message {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+// The create and edit forms in section cards: fields stacked at their natural width (not the
+// full card width, unlike `.form-stack`), with the submit button in a `.form-actions` row.
+.compact-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .form-actions {
+    display: flex;
+  }
+
+  mat-form-field {
+    min-width: min(15rem, 100%);
+  }
+}
+
+// A labelled group of checkboxes, such as a group's permissions or a user's groups.
+.checkbox-fieldset {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0.25rem;
+
+  legend {
+    padding: 0 0.25rem;
+    font: var(--mat-sys-label-medium);
+  }
 }
 
 // Cells of the tables inside `app-filtered-table`. They are written in each page's template and

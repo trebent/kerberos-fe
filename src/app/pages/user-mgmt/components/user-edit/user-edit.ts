@@ -27,7 +27,6 @@ import { requestStatus } from '../../../../utils/request-status';
     ReactiveFormsModule,
   ],
   selector: 'app-user-edit',
-  styleUrl: './user-edit.scss',
   templateUrl: './user-edit.html',
 })
 export class UserEdit {

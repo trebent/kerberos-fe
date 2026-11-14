@@ -1,36 +1,9 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container);
-  border-radius: 0.75rem;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  .form-actions {
-    display: flex;
-  }
-
-  mat-form-field {
-    min-width: min(15rem, 100%);
-  }
-}
-
 .org-actions-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-}
-
-mat-divider {
-  margin: 0.5rem 0;
 }
 
 .credentials-box {

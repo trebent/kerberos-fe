@@ -20,7 +20,6 @@ import { requestStatus } from '../../../../utils/request-status';
     ReactiveFormsModule,
   ],
   selector: 'app-organisation-detail',
-  styleUrl: './organisation-detail.scss',
   templateUrl: './organisation-detail.html',
 })
 export class OrganisationDetail {
