@@ -91,16 +91,43 @@ describe('Flow', () => {
     const debugButton = Array.from(element.querySelectorAll<HTMLButtonElement>('button')).find(
       (button) => button.textContent?.trim().endsWith('Debug'),
     )!;
-    expect(debugButton.getAttribute('aria-pressed')).toBe('false');
+    expect(debugButton.getAttribute('aria-expanded')).toBe('false');
 
     debugButton.click();
     await fixture.whenStable();
-    expect(debugButton.getAttribute('aria-pressed')).toBe('true');
+    expect(debugButton.getAttribute('aria-expanded')).toBe('true');
     expect(element.querySelector('app-debug')).not.toBeNull();
     await expectNoAxeViolations(fixture);
 
     debugButton.click();
     await fixture.whenStable();
     expect(element.querySelector('app-debug')).toBeNull();
+  });
+
+  it('shows the debug panel and a specification at the same time', async () => {
+    http.expectOne((req) => req.url.endsWith('/api/admin/flow')).flush(flow);
+    await fixture.whenStable();
+
+    const element: HTMLElement = fixture.nativeElement;
+    Array.from(element.querySelectorAll<HTMLButtonElement>('button'))
+      .find((button) => button.textContent?.trim().endsWith('Debug'))!
+      .click();
+    await fixture.whenStable();
+
+    element.querySelector<HTMLButtonElement>('[aria-label="OpenAPI specification"]')!.click();
+    await fixture.whenStable();
+    document.querySelector<HTMLButtonElement>('[role="menuitemradio"]')?.click();
+    TestBed.tick();
+    http
+      .expectOne((req) => req.url.endsWith('/api/admin/oas/echo'))
+      .flush(new Blob(['openapi: 3.0.0']));
+    await fixture.whenStable();
+
+    // Both panels sit in the tool column, debug above the specification.
+    const panels = Array.from(
+      element.querySelectorAll('.flow-tools app-debug, .flow-tools app-oas'),
+    );
+    expect(panels.map((panel) => panel.tagName.toLowerCase())).toEqual(['app-debug', 'app-oas']);
+    await expectNoAxeViolations(fixture);
   });
 });

@@ -1,23 +1,36 @@
-// Below this width the tool panel stacks above the pipeline instead of sitting beside it.
+// Below this width the tools stack above the pipeline instead of sitting beside it.
 $stack-below: 64rem;
 
-.flow-heading {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1rem;
-  margin-block-end: 1.5rem;
+// Tools on the left, the pipeline in the remaining space. The tool column is only as wide as
+// its buttons until a panel opens.
+.flow-layout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem 1.5rem;
 
-  .page-title {
-    margin: 0;
+  &.panel-open {
+    grid-template-columns: min(32rem, 45%) minmax(0, 1fr);
   }
 }
 
 .flow-tools {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.flow-tool {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.5rem;
+
+  app-debug,
+  app-oas {
+    align-self: stretch;
+  }
 }
 
 .tool-label {
@@ -31,43 +44,19 @@ $stack-below: 64rem;
   margin-inline: 0 -0.5rem;
 }
 
-.flow-layout {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.flow-panel {
-  flex: 0 1 32rem;
-  min-width: 0;
-}
-
 .flow-main {
-  flex: 1 1 0;
   min-width: 0;
 }
 
 @media (max-width: $stack-below) {
-  .flow-layout {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .flow-panel {
-    flex-basis: auto;
+  .flow-layout,
+  .flow-layout.panel-open {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 40rem) {
-  .flow-heading {
-    margin-block-end: 1rem;
-  }
-
-  .flow-tools {
-    width: 100%;
-
-    > button {
-      flex: 1 1 0;
-    }
+  .flow-tool > button {
+    align-self: stretch;
   }
 }
