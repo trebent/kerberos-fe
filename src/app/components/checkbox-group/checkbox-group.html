@@ -1,6 +1,6 @@
 <fieldset class="checkbox-fieldset" [attr.aria-busy]="loading()">
   <legend>{{ legend() }}</legend>
-  @if (loading()) {
+  @if (showSkeleton()) {
     <p class="visually-hidden" role="status">Loading {{ legend().toLowerCase() }}…</p>
     @for (line of skeletonLines; track line) {
       <div class="skeleton-line">

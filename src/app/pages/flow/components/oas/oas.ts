@@ -6,6 +6,7 @@ import { from, switchMap } from 'rxjs';
 
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Skeleton } from '../../../../components/skeleton/skeleton';
+import { skeletonVisible } from '../../../../utils/skeleton-visible';
 import { OasService } from '../../../../services/admin';
 
 /** Shows the OpenAPI specification Kerberos validates a backend's requests against. */
@@ -40,4 +41,5 @@ export class Oas {
         .getBackendOAS(backend, 'body', false, { httpHeaderAccept: 'application/yaml' })
         .pipe(switchMap((response) => from((response as unknown as Blob).text()))),
   });
+  protected readonly showSkeleton = skeletonVisible(this.oasResource.isLoading);
 }

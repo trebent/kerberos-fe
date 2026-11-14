@@ -20,16 +20,16 @@
         @let org = selectedOrg();
         <div class="detail-header">
           <h2 id="org-detail-heading" class="section-title">
-            @if (org) {
-              {{ org.name }}
-            } @else if (orgsResource.isLoading()) {
+            @if (showOrgNameSkeleton()) {
               <app-skeleton width="10rem" />
               <span class="visually-hidden">Loading organisation…</span>
+            } @else if (org) {
+              {{ org.name }}
             } @else {
               Organisation not found
             }
           </h2>
-          @if (org) {
+          @if (org && !showOrgNameSkeleton()) {
             <button
               matIconButton
               type="button"

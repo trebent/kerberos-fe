@@ -30,7 +30,7 @@
         <input matInput cdkFocusInitial [formField]="form.name" />
       </mat-form-field>
       <div class="form-actions">
-        <button matButton type="button" mat-dialog-close>Cancel</button>
+        <button matButton type="button" [mat-dialog-close]="undefined">Cancel</button>
         <button
           matButton="filled"
           type="submit"

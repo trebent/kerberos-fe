@@ -49,7 +49,7 @@
         <p class="visually-hidden" role="status">
           {{ sessionsResource.isLoading() ? 'Loading sessions…' : '' }}
         </p>
-        @if (sessionsResource.isLoading()) {
+        @if (showSessionsSkeleton()) {
           <!-- Holds the session picker's place until its options arrive. -->
           <app-skeleton class="select-skeleton" shape="rect" height="56px" />
         } @else {

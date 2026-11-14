@@ -12,6 +12,7 @@ import { map } from 'rxjs';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { Skeleton } from '../../../../components/skeleton/skeleton';
+import { skeletonVisible } from '../../../../utils/skeleton-visible';
 import { DebugService, DebugSession, DebugSessionCall } from '../../../../services/admin';
 import { httpStatusClass } from '../../../../utils/http-status';
 import { requestStatus } from '../../../../utils/request-status';
@@ -63,6 +64,7 @@ export class Debug {
     stream: ({ params: backend }) =>
       this.debugService.listDebugSessions(backend).pipe(map(oldestFirst)),
   });
+  protected readonly showSessionsSkeleton = skeletonVisible(this.sessionsResource.isLoading);
 
   protected readonly selectedSessionId = linkedSignal<string | null, number | null>({
     source: this.selectedBackend,

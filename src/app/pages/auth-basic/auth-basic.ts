@@ -11,6 +11,7 @@ import { Skeleton } from '../../components/skeleton/skeleton';
 import { Organisation, OrganisationsService } from '../../services/auth-basic';
 import { Notifier } from '../../services/notifier.service';
 import { requestStatus } from '../../utils/request-status';
+import { skeletonVisible } from '../../utils/skeleton-visible';
 import { NameDialog, NameDialogData } from './components/name-dialog/name-dialog';
 import { OrgGroupsList } from './components/org-groups-list/org-groups-list';
 import { OrgUsersList } from './components/org-users-list/org-users-list';
@@ -55,6 +56,10 @@ export class AuthBasic {
 
   protected readonly selectedOrg = computed(() =>
     this.orgsResource.value()?.find((org) => org.id === this.selectedOrgId()),
+  );
+  /** The selected organisation's name is not known until the list loads. */
+  protected readonly showOrgNameSkeleton = skeletonVisible(
+    () => this.orgsResource.isLoading() && !this.selectedOrg(),
   );
 
   protected readonly deleteStatus = requestStatus({

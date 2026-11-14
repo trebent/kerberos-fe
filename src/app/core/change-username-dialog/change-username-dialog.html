@@ -7,7 +7,7 @@
       <input matInput cdkFocusInitial [formField]="form.username" autocomplete="username" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton type="button" mat-dialog-close>Cancel</button>
+      <button matButton type="button" [mat-dialog-close]="undefined">Cancel</button>
       <button
         matButton="filled"
         type="submit"

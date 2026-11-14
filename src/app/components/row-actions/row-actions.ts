@@ -6,6 +6,13 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
   imports: [MatIcon, MatIconButton],
   selector: 'app-row-actions',
+  // Side by side with a little room between, so neither button's touch target overlaps the other.
+  styles: `
+    :host {
+      display: inline-flex;
+      gap: 0.25rem;
+    }
+  `,
   templateUrl: './row-actions.html',
 })
 export class RowActions {

@@ -43,35 +43,35 @@
       />
     </mat-form-field>
 
-    @if (organisations().status() === 'loading') {
+    @if (showSkeleton()) {
       @for (line of skeletonItems; track line) {
         <div class="skeleton-item">
           <app-skeleton [width]="line" />
           <app-skeleton width="2.5rem" class="skeleton-secondary" />
         </div>
       }
-    }
+    } @else {
+      <mat-nav-list aria-label="Organisations">
+        @for (org of shownOrgs(); track org.id) {
+          <a
+            mat-list-item
+            [routerLink]="[]"
+            [queryParams]="{ org: org.id }"
+            [activated]="org.id === selectedOrgId()"
+          >
+            <span matListItemTitle>{{ org.name }}</span>
+            <span matListItemLine>ID {{ org.id }}</span>
+          </a>
+        }
+      </mat-nav-list>
 
-    <mat-nav-list aria-label="Organisations">
-      @for (org of shownOrgs(); track org.id) {
-        <a
-          mat-list-item
-          [routerLink]="[]"
-          [queryParams]="{ org: org.id }"
-          [activated]="org.id === selectedOrgId()"
-        >
-          <span matListItemTitle>{{ org.name }}</span>
-          <span matListItemLine>ID {{ org.id }}</span>
-        </a>
+      @if (organisations().hasValue() && shownOrgs().length === 0) {
+        <p class="empty-state">
+          {{
+            filterText() ? 'No organisations match “' + filterText() + '”' : 'No organisations yet'
+          }}
+        </p>
       }
-    </mat-nav-list>
-
-    @if (organisations().hasValue() && shownOrgs().length === 0) {
-      <p class="empty-state">
-        {{
-          filterText() ? 'No organisations match “' + filterText() + '”' : 'No organisations yet'
-        }}
-      </p>
     }
   </div>
 </div>

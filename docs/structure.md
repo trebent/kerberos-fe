@@ -48,6 +48,7 @@ src/app/
   utils/                       plain functions and classes, no components or services
     flow-meta.ts               flowComponentData, componentsOnPath, describeFlowData: reading flow data
     http-status.ts             httpStatusClass, the color class for an HTTP status
+    skeleton-visible.ts        skeletonVisible, keeps a loading skeleton up for a minimum time
     id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells

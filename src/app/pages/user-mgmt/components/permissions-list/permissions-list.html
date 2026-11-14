@@ -12,14 +12,14 @@
     </div>
   }
 
-  <table mat-table [dataSource]="permissionsResource.value() ?? []">
+  <table mat-table [dataSource]="showSkeleton() ? [] : (permissionsResource.value() ?? [])">
     <mat-text-column name="id" headerText="ID" />
     <mat-text-column name="name" />
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 
-  @if (permissionsResource.isLoading()) {
+  @if (showSkeleton()) {
     @for (row of skeletonRows; track row) {
       <div class="skeleton-row">
         <app-skeleton width="1.5rem" />

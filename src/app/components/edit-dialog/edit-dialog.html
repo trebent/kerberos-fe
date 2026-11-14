@@ -1,6 +1,6 @@
 <div class="dialog-header">
   <h2 mat-dialog-title>{{ heading() }}</h2>
-  <button matIconButton type="button" mat-dialog-close aria-label="Close dialog">
+  <button matIconButton type="button" [mat-dialog-close]="undefined" aria-label="Close dialog">
     <mat-icon aria-hidden="true">close</mat-icon>
   </button>
 </div>

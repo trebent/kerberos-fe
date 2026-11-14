@@ -38,10 +38,10 @@
   </div>
 
   <!-- Scrolls sideways when a row is wider than the card, rather than widening the page. -->
-  <div class="table-wrapper">
+  <div class="table-wrapper" [class.list-loading]="showSkeleton()">
     <ng-content />
 
-    @if (resource().status() === 'loading') {
+    @if (showSkeleton()) {
       @for (row of skeletonRows; track row) {
         <div class="skeleton-row">
           <app-skeleton width="1.5rem" />

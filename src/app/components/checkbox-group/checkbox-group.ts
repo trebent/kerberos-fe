@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 
 import { IdSelection } from '../../utils/id-selection';
+import { skeletonVisible } from '../../utils/skeleton-visible';
 import { Skeleton } from '../skeleton/skeleton';
 
 /**
@@ -39,4 +40,5 @@ export class CheckboxGroup {
   readonly loading = input(false);
 
   protected readonly skeletonLines = ['6rem', '8rem', '5rem'];
+  protected readonly showSkeleton = skeletonVisible(this.loading);
 }

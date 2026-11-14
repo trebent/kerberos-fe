@@ -243,6 +243,23 @@ describe('UserMgmt', () => {
     expect(document.querySelector('app-group-edit')).toBeNull();
   });
 
+  for (const button of ['Cancel', 'Close dialog']) {
+    it(`closes the add dialog with ${button} without confirming or reloading`, async () => {
+      await loadPage();
+      const dialog = await openFromPage(() =>
+        clickButton(element.querySelector('app-users')!, 'Add user'),
+      );
+
+      if (button === 'Cancel') clickButton(dialog, button);
+      else clickLabelled(dialog, button);
+      await fixture.whenStable();
+
+      expect(document.querySelector('app-user-create')).toBeNull();
+      expect(snackBarText()).toBeUndefined();
+      http.expectNone((req) => req.url.endsWith('/api/admin/users'));
+    });
+  }
+
   it('asks before deleting, and does nothing when cancelled', async () => {
     await loadPage();
     const dialog = await openFromPage(() => clickLabelled(element, 'Delete user alice'));

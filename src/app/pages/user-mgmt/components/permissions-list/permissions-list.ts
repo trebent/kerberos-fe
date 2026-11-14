@@ -4,6 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Skeleton } from '../../../../components/skeleton/skeleton';
 import { MAT_TABLE } from '../../../../utils/material-table';
+import { skeletonVisible } from '../../../../utils/skeleton-visible';
 import { UsersService } from '../../../../services/admin';
 
 /** A read-only reference list of every permission a group can be given. */
@@ -23,4 +24,5 @@ export class PermissionsList {
   protected readonly permissionsResource = rxResource({
     stream: () => this.usersService.getPermissions(),
   });
+  protected readonly showSkeleton = skeletonVisible(this.permissionsResource.isLoading);
 }

@@ -73,24 +73,20 @@
         <p class="visually-hidden" role="status">
           {{ flowResource.isLoading() ? 'Loading flow…' : '' }}
         </p>
-        @if (flowResource.isLoading()) {
+        @if (showSkeleton()) {
           <!-- A row of placeholder stages, shaped like the pipeline that replaces it. -->
           <div class="pipeline-skeleton">
             @for (width of skeletonStages; track $index) {
               <app-skeleton shape="rect" [width]="width" height="3rem" />
             }
           </div>
-        }
-
-        @if (flowResource.hasValue()) {
+        } @else if (flowResource.hasValue()) {
           <app-flow-pipeline
             [flowMetas]="flowResource.value()"
             [selectedCall]="selectedDebugCall()"
             [callBackend]="selectedDebugBackend()"
           />
-        }
-
-        @if (flowResource.error()) {
+        } @else if (flowResource.error()) {
           <app-error-display
             [errors]="['Failed to load flow view.', 'This is probably due to missing permissions.']"
           />

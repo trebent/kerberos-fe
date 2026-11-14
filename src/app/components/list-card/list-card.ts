@@ -17,6 +17,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { Observable, switchMap } from 'rxjs';
 
+import { skeletonVisible } from '../../utils/skeleton-visible';
 import { ErrorDisplay } from '../error-display/error-display';
 import { Skeleton } from '../skeleton/skeleton';
 
@@ -76,6 +77,8 @@ export class ListCard {
   protected readonly noun = computed(() => this.heading().toLowerCase());
   protected readonly filterText = signal('');
   protected readonly skeletonRows = [1, 2, 3, 4, 5];
+  /** Skeleton rows on the first load or after a parameter change, not on a reload. */
+  protected readonly showSkeleton = skeletonVisible(() => this.resource().status() === 'loading');
 
   /** The rows the table shows now: filtered and paged. */
   private readonly shownRows = toSignal(

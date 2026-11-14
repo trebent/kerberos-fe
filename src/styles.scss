@@ -186,8 +186,12 @@ a {
 // projected into the card, so they are styled here rather than in either component.
 // The sticky `actions` column holds the row's buttons and keeps them in view while the table
 // scrolls sideways, so it needs an opaque background: the card's, or the hovered row's.
+// It is as narrow as its buttons (`width: 1%` lets the table shrink it to its content), and
+// unlike other cells it never clips: a clipped cell squashes the buttons behind an ellipsis.
 .table-wrapper .mat-column-actions {
-  width: 6rem;
+  width: 1%;
+  overflow: visible;
+  padding-inline: 0.5rem;
   background: var(--mat-sys-surface-container);
   text-align: end;
   white-space: nowrap;
@@ -197,22 +201,22 @@ a {
   background: var(--mat-sys-surface-container-high);
 }
 
+// The rows wait while `app-list-card` holds its skeleton, so they don't appear beside it.
+.table-wrapper.list-loading tr[mat-row] {
+  display: none;
+}
+
 // IDs are short numbers, so their column stays narrow and the names get the room.
 .table-wrapper .mat-column-id {
   width: 4rem;
 }
 
-// On phones table cells wrap long values and the actions column gives up its fixed width,
-// so every column stays visible without sideways scrolling.
+// On phones table cells wrap long values and pack closer, so every column stays visible
+// without sideways scrolling.
 @media (max-width: 40rem) {
   // Breaks a word only when it cannot fit on a line of its own, so names stay whole.
   .table-wrapper .mat-mdc-cell {
     overflow-wrap: break-word;
-  }
-
-  .table-wrapper .mat-column-actions.mat-mdc-table-sticky {
-    width: 1%;
-    padding-inline: 0.25rem;
   }
 
   .table-wrapper .mat-mdc-header-cell,

@@ -6,6 +6,7 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 
 import { ErrorDisplay } from '../../components/error-display/error-display';
 import { Skeleton } from '../../components/skeleton/skeleton';
+import { skeletonVisible } from '../../utils/skeleton-visible';
 import { DebugSessionCall, FlowService } from '../../services/admin';
 import { flowComponentData } from '../../utils/flow-meta';
 import { Debug } from './components/debug/debug';
@@ -35,6 +36,7 @@ export class Flow {
   protected readonly flowResource = rxResource({
     stream: () => this.flowService.getFlow(),
   });
+  protected readonly showSkeleton = skeletonVisible(this.flowResource.isLoading);
   /** Placeholder stages while the flow loads, of varied widths like real stage names. */
   protected readonly skeletonStages = ['5rem', '6.5rem', '8rem', '7rem'];
 

@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
 import { Skeleton } from '../../../../components/skeleton/skeleton';
 import { Organisation } from '../../../../services/auth-basic';
+import { skeletonVisible } from '../../../../utils/skeleton-visible';
 import { OrgCreate } from '../org-create/org-create';
 
 /**
@@ -52,6 +53,9 @@ export class OrganisationsList {
 
   protected readonly filterText = signal('');
   protected readonly skeletonItems = ['8rem', '6rem', '9rem', '7rem'];
+  protected readonly showSkeleton = skeletonVisible(
+    () => this.organisations().status() === 'loading',
+  );
 
   protected readonly orgs = computed(() =>
     this.organisations().hasValue() ? (this.organisations().value() ?? []) : [],

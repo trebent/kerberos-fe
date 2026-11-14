@@ -11,7 +11,7 @@
       <input matInput type="password" [formField]="form.password" autocomplete="new-password" />
     </mat-form-field>
     <div class="form-actions">
-      <button matButton type="button" mat-dialog-close>Cancel</button>
+      <button matButton type="button" [mat-dialog-close]="undefined">Cancel</button>
       <button
         matButton="filled"
         type="submit"

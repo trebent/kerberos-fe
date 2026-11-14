@@ -9,18 +9,16 @@
     <p class="visually-hidden" role="status">
       {{ oasResource.isLoading() ? 'Loading specification…' : '' }}
     </p>
-    @if (oasResource.isLoading()) {
+    @if (showSkeleton()) {
       <!-- Indented lines in the specification's own font, like the YAML that replaces them. -->
       <div class="oas-skeleton">
         @for (line of skeletonLines; track $index) {
           <app-skeleton [width]="line.width" [style.margin-inline-start]="line.indent" />
         }
       </div>
-    }
-    @if (oasResource.error() && !oasResource.isLoading()) {
+    } @else if (oasResource.error()) {
       <app-error-display [errors]="['Failed to load OAS spec.']" />
-    }
-    @if (oasResource.hasValue()) {
+    } @else if (oasResource.hasValue()) {
       <pre class="oas-pre" tabindex="0" aria-label="OpenAPI specification">{{
         oasResource.value()
       }}</pre>
