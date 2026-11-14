@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatDialogClose, MatDialogRef } from '@angular/material/dialog';
@@ -16,7 +16,7 @@ import { requestStatus } from '../../../../utils/request-status';
 /**
  * Creates an organisation, then shows its admin credentials, which Kerberos returns only once.
  * It stays open until the user confirms they saved them, and closes with the new organisation's
- * ID. Opened with `disableClose`, so a stray click outside cannot lose the credentials.
+ * ID. Before that it closes like any other dialog, on Escape or a click outside.
  */
 @Component({
   imports: [
@@ -47,6 +47,13 @@ export class OrgCreate {
   });
 
   protected readonly credentials = signal<CreateOrganisation201Response | null>(null);
+
+  constructor() {
+    // Once a create is under way, closing would lose credentials Kerberos shows only once.
+    effect(() => {
+      this.dialogRef.disableClose = this.createStatus.pending() || this.credentials() !== null;
+    });
+  }
 
   private create(): void {
     this.createStatus.run(this.orgsService.createOrganisation(this.form().value()), (created) =>

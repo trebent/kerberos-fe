@@ -75,7 +75,7 @@ export class OrganisationsList {
   /** Creates an organisation, then selects it. The dialog closes with its ID once created. */
   protected addOrg(): void {
     this.dialog
-      .open<OrgCreate, void, number>(OrgCreate, { disableClose: true })
+      .open<OrgCreate, void, number>(OrgCreate)
       .afterClosed()
       .subscribe((orgId) => {
         if (orgId === undefined) return;

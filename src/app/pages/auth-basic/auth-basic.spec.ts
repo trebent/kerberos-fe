@@ -76,6 +76,10 @@ describe('AuthBasic', () => {
     await harness.fixture.whenStable();
   }
 
+  function clickBackdrop(): void {
+    document.querySelector<HTMLElement>('.cdk-overlay-backdrop')!.click();
+  }
+
   /** Opens the page with no organisation selected, and answers the organisation list. */
   async function open(): Promise<void> {
     const navigation = harness.navigateByUrl('/auth-basic');
@@ -179,11 +183,28 @@ describe('AuthBasic', () => {
     expect(dialog.textContent).toContain('s3cret');
     await expectNoAxeViolations(harness.fixture, dialog);
 
+    // A stray click outside must not lose credentials that are shown only once.
+    clickBackdrop();
+    await harness.fixture.whenStable();
+    expect(document.querySelector('app-org-create')).not.toBeNull();
+
     clickButton(dialog, "I've saved these");
     await flushGet(ORGS, [...orgs, { id: 9, name: 'initech' }]);
     await flushOrg(9);
 
     expect(TestBed.inject(Router).url).toBe('/auth-basic?org=9');
+    expect(document.querySelector('app-org-create')).toBeNull();
+  });
+
+  it('closes the add organisation dialog on a click outside before anything is created', async () => {
+    await open();
+    clickLabelled(element, 'Add organisation');
+    await harness.fixture.whenStable();
+    openDialog();
+
+    clickBackdrop();
+    await harness.fixture.whenStable();
+
     expect(document.querySelector('app-org-create')).toBeNull();
   });
 
