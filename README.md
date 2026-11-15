@@ -25,5 +25,6 @@ make check        # format check, lint, production build and tests, as CI runs t
 | `make serve/staging`                 | Dev server against the staging configuration, with local certificates                                    |
 
 The API specs in `openapi/` are vendored from Kerberos and must stay byte-identical with
-upstream; regenerate the clients rather than editing them. `AGENTS.md` describes the code
-conventions and `docs/structure.md` maps the source tree.
+upstream; regenerate the clients rather than editing them. `docs/overview.md` introduces the
+design, `docs/structure.md` maps the source tree and `docs/design-rules.md` lists the code
+conventions.
