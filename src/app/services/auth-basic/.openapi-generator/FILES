@@ -19,6 +19,7 @@ model/group.ts
 model/loginRequest.ts
 model/models.ts
 model/organisation.ts
+model/resetPasswordRequest.ts
 model/user.ts
 param.ts
 provide-api.ts

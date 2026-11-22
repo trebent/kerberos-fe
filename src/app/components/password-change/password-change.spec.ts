@@ -36,14 +36,25 @@ describe('PasswordChange', () => {
     await expectNoAxeViolations(fixture);
   });
 
+  it('does not allow a new password shorter than 10 characters', async () => {
+    await fill('old', 'short', 'short');
+    fixture.nativeElement
+      .querySelector('input[autocomplete="new-password"]')
+      .dispatchEvent(new Event('blur'));
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.textContent).toContain('Use 10 to 64 characters.');
+    expect(submitButton().disabled).toBe(true);
+  });
+
   it('sends the change and confirms it', async () => {
     const changed = vi.fn();
     fixture.componentInstance.changed.subscribe(changed);
-    await fill('old', 'new', 'new');
+    await fill('old', 'new-password', 'new-password');
     submitButton().click();
     await fixture.whenStable();
 
-    expect(change).toHaveBeenCalledWith('old', 'new');
+    expect(change).toHaveBeenCalledWith('old', 'new-password');
     expect(changed).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('[role="status"]')?.textContent).toContain(
       'Password changed successfully.',

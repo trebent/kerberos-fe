@@ -3,6 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
+import { MatDivider } from '@angular/material/divider';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { switchMap } from 'rxjs';
@@ -10,12 +11,16 @@ import { switchMap } from 'rxjs';
 import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
 import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
+import { PasswordReset, ResetPassword } from '../../../../components/password-reset/password-reset';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { User, UsersService } from '../../../../services/admin';
 import { IdSelection } from '../../../../utils/id-selection';
 import { requestStatus } from '../../../../utils/request-status';
 
-/** Edits a user's name and groups. Open it with `MatDialog`; it closes with the saved name. */
+/**
+ * Edits a user's name and groups. Open it with `MatDialog`; it closes with the saved name.
+ * Resetting the password is a separate action that keeps the dialog open.
+ */
 @Component({
   imports: [
     CheckboxGroup,
@@ -25,12 +30,15 @@ import { requestStatus } from '../../../../utils/request-status';
     FormRoot,
     MatButton,
     MatDialogClose,
+    MatDivider,
     MatFormField,
     MatInput,
     MatLabel,
+    PasswordReset,
     RequestFeedback,
   ],
   selector: 'app-user-edit',
+  styleUrl: './user-edit.scss',
   templateUrl: './user-edit.html',
 })
 export class UserEdit {
@@ -52,6 +60,10 @@ export class UserEdit {
     (path) => required(path.username),
     { submission: { action: async () => this.save() } },
   );
+
+  /** Kerberos allows this only with the admin-user-mgmt-admin permission, and answers 403 otherwise. */
+  protected readonly resetPassword: ResetPassword = (newPassword) =>
+    this.usersService.resetUserPassword(this.user.id, { newPassword });
 
   /** Saves the username, then the group membership. */
   private save(): void {

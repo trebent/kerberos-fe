@@ -1,6 +1,6 @@
 # @
 
-The Kerberos basic authentication API provides support for managing user accounts, groups, and organisations.  Organisations provide support for user isolation. A user in org. A cannot access information protected by org. B. Organisations provide isolation by associating sets of users with an organisation entity, the target backend will receive an information element pointing out  which organisation a request was made for. This method of isolation only works if Kerberos is the only possible path to reach the target backend service, or the information element  will be possible to spoof.  The basic authentication API provides user group support, allowing for role-based authorization. 
+The Kerberos basic authentication API provides support for managing user accounts, groups, and organisations.  Organisations provide support for user isolation. A user in org. A cannot access information protected by org. B. Organisations provide isolation by associating sets of users with an organisation entity, the target backend will receive an information element pointing out  which organisation a request was made for. Deploy Kerberos as the only path to the target backend service so that every request carries this information.  The basic authentication API provides user group support, allowing for role-based authorization. 
 
 The version of the OpenAPI document: 0.3.0
 

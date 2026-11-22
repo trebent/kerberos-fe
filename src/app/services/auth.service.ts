@@ -7,6 +7,8 @@ import { UsersService } from './admin';
 
 const SESSION_EXPIRY_KEY = 'sessionExpiry';
 const SESSION_SUPER_KEY = 'isSuper';
+/** The superuser's name (client ID), kept to log in again after a password change. Not a secret. */
+const SUPERUSER_CLIENT_ID_KEY = 'superuserClientId';
 
 /** How long a session lives before it must be refreshed. */
 const SESSION_TTL_MS = 15 * 60 * 1000;
@@ -86,9 +88,12 @@ export class AuthService {
   }
 
   superLogin(clientId: string, clientSecret: string): Observable<null> {
-    return this.usersService
-      .loginSuperuser({ clientId, clientSecret })
-      .pipe(tap(() => this.startSuperuserSession()));
+    return this.usersService.loginSuperuser({ clientId, clientSecret }).pipe(
+      tap(() => {
+        this.startSuperuserSession();
+        localStorage.setItem(SUPERUSER_CLIENT_ID_KEY, clientId);
+      }),
+    );
   }
 
   /**
@@ -118,14 +123,51 @@ export class AuthService {
     );
   }
 
-  /** Changes the signed-in user's own password, through the superuser endpoint for the superuser. */
+  /**
+   * Changes the signed-in user's own password, through the superuser endpoint for the superuser,
+   * then logs in again with the new password: Kerberos ends every session of a user whose
+   * password changes, this one included.
+   */
   changeOwnPassword(oldPassword: string, newPassword: string): Observable<null> {
-    if (this._isSuperuser()) {
-      return this.usersService.changeSuperuserPassword({ newPassword, oldPassword });
-    }
-    return this.withUserID((userID) =>
-      this.usersService.changeUserPassword(userID, { newPassword, oldPassword }),
+    const change$ = this._isSuperuser()
+      ? this.usersService.changeSuperuserPassword({ newPassword, oldPassword })
+      : this.withUserID((userID) =>
+          this.usersService.changeUserPassword(userID, { newPassword, oldPassword }),
+        );
+    return change$.pipe(switchMap(() => this.loginAgain(newPassword)));
+  }
+
+  /**
+   * Logs in again after a password change ended the session. The change itself went through, so
+   * this never errors: when the new login is not possible, it signs out to the login page.
+   */
+  private loginAgain(password: string): Observable<null> {
+    const login$ = this._isSuperuser()
+      ? this.superLoginAgain(password)
+      : this.userLoginAgain(password);
+    return login$.pipe(
+      catchError((error: unknown) => {
+        console.error('Could not log in again after the password change:', error);
+        this.endSession();
+        void this.router.navigateByUrl('/login');
+        return of(null);
+      }),
     );
+  }
+
+  private userLoginAgain(password: string): Observable<null> {
+    const username = this._username();
+    return username === null
+      ? throwError(() => new Error('No username available'))
+      : this.login(username, password);
+  }
+
+  /** Sessions started before the client ID was stored have none, so they sign in by hand. */
+  private superLoginAgain(password: string): Observable<null> {
+    const clientId = localStorage.getItem(SUPERUSER_CLIENT_ID_KEY);
+    return clientId === null
+      ? throwError(() => new Error('No superuser client ID stored'))
+      : this.superLogin(clientId, password);
   }
 
   /** Loads the signed-in regular user's ID and name. */
@@ -167,6 +209,7 @@ export class AuthService {
   private endSession(): void {
     localStorage.removeItem(SESSION_EXPIRY_KEY);
     localStorage.removeItem(SESSION_SUPER_KEY);
+    localStorage.removeItem(SUPERUSER_CLIENT_ID_KEY);
 
     this._isLoggedIn.set(false);
     this._username.set(null);

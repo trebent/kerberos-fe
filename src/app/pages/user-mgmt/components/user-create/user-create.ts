@@ -2,12 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
 import { MatDialogClose, MatDialogRef } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatError, MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
 import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { UsersService } from '../../../../services/admin';
+import { newPasswordRules } from '../../../../utils/password-rules';
 import { requestStatus } from '../../../../utils/request-status';
 
 /** Creates a user. Open it with `MatDialog`; it closes with the new username once created. */
@@ -18,7 +19,9 @@ import { requestStatus } from '../../../../utils/request-status';
     FormRoot,
     MatButton,
     MatDialogClose,
+    MatError,
     MatFormField,
+    MatHint,
     MatInput,
     MatLabel,
     RequestFeedback,
@@ -38,7 +41,7 @@ export class UserCreate {
     signal({ username: '', password: '' }),
     (path) => {
       required(path.username);
-      required(path.password);
+      newPasswordRules(path.password);
     },
     { submission: { action: async () => this.create() } },
   );

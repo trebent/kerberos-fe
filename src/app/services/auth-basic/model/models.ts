@@ -6,4 +6,5 @@ export * from './createUserRequest';
 export * from './group';
 export * from './loginRequest';
 export * from './organisation';
+export * from './resetPasswordRequest';
 export * from './user';

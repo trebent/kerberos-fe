@@ -12,7 +12,7 @@ import { FlowMetaData } from './flowMetaData';
 
 export interface FlowMeta { 
     /**
-     * The name of the flow component, e.g. \"observability\", \"router\".
+     * The name of the flow component, e.g. \"obs\", \"router\".
      */
     name: string;
     data: FlowMetaData;

@@ -95,7 +95,7 @@ describe('AuthService', () => {
     expect(navigate).toHaveBeenCalledWith('/login');
   });
 
-  it("changes the signed-in user's own password", () => {
+  it("changes the signed-in user's own password and logs in again with it", () => {
     auth.login('alice', 'secret').subscribe();
     expectRequest('/api/admin/login').flush(null);
     expectRequest('/api/admin/me').flush({
@@ -103,17 +103,66 @@ describe('AuthService', () => {
       user: { id: 4, username: 'alice' },
     });
 
-    auth.changeOwnPassword('old', 'new').subscribe();
+    const done = vi.fn();
+    auth.changeOwnPassword('old', 'new').subscribe(done);
     const request = expectRequest('/api/admin/users/4/password');
     expect(request.request.body).toEqual({ oldPassword: 'old', newPassword: 'new' });
     request.flush(null);
+
+    const login = expectRequest('/api/admin/login');
+    expect(login.request.body).toEqual({ username: 'alice', password: 'new' });
+    login.flush(null);
+    expectRequest('/api/admin/me').flush({
+      isSuperuser: false,
+      user: { id: 4, username: 'alice' },
+    });
+
+    expect(done).toHaveBeenCalled();
+    expect(auth.isLoggedIn()).toBe(true);
   });
 
-  it("changes the superuser's password through the superuser endpoint", () => {
+  it("changes the superuser's password and logs in again with its client ID", () => {
     auth.superLogin('admin', 'secret').subscribe();
     expectRequest('/api/admin/superuser/login').flush(null);
 
     auth.changeOwnPassword('old', 'new').subscribe();
     expectRequest('/api/admin/superuser/password').flush(null);
+
+    const login = expectRequest('/api/admin/superuser/login');
+    expect(login.request.body).toEqual({ clientId: 'admin', clientSecret: 'new' });
+    login.flush(null);
+
+    expect(auth.isLoggedIn()).toBe(true);
+    expect(auth.isSuperuser()).toBe(true);
+  });
+
+  it('sends the user to log in when logging in again after a password change fails', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    auth.superLogin('admin', 'secret').subscribe();
+    expectRequest('/api/admin/superuser/login').flush(null);
+
+    const done = vi.fn();
+    const error = vi.fn();
+    auth.changeOwnPassword('old', 'new').subscribe({ next: done, error });
+    expectRequest('/api/admin/superuser/password').flush(null);
+    expectRequest('/api/admin/superuser/login').flush(null, serverError);
+
+    expect(done).toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
+    expect(auth.isLoggedIn()).toBe(false);
+    expect(navigate).toHaveBeenCalledWith('/login');
+  });
+
+  it('sends a superuser without a stored client ID to log in after a password change', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    auth.superLogin('admin', 'secret').subscribe();
+    expectRequest('/api/admin/superuser/login').flush(null);
+    localStorage.removeItem('superuserClientId');
+
+    auth.changeOwnPassword('old', 'new').subscribe();
+    expectRequest('/api/admin/superuser/password').flush(null);
+
+    expect(auth.isLoggedIn()).toBe(false);
+    expect(navigate).toHaveBeenCalledWith('/login');
   });
 });

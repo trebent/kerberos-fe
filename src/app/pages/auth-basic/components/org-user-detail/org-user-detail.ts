@@ -11,10 +11,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { CheckboxGroup } from '../../../../components/checkbox-group/checkbox-group';
 import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { ErrorDisplay } from '../../../../components/error-display/error-display';
-import {
-  ChangePassword,
-  PasswordChange,
-} from '../../../../components/password-change/password-change';
+import { PasswordReset, ResetPassword } from '../../../../components/password-reset/password-reset';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import { GroupsService, User, UsersService } from '../../../../services/auth-basic';
 import { IdSelection } from '../../../../utils/id-selection';
@@ -27,7 +24,7 @@ export interface OrgUserDetailData {
 
 /**
  * Edits an organisation user. The name and groups save together and close the dialog with the
- * saved name. Changing the password is a separate action that keeps the dialog open.
+ * saved name. Resetting the password is a separate action that keeps the dialog open.
  */
 @Component({
   imports: [
@@ -42,7 +39,7 @@ export interface OrgUserDetailData {
     MatFormField,
     MatInput,
     MatLabel,
-    PasswordChange,
+    PasswordReset,
     RequestFeedback,
   ],
   selector: 'app-org-user-detail',
@@ -80,11 +77,9 @@ export class OrgUserDetail {
     submission: { action: async () => this.save() },
   });
 
-  protected readonly changePassword: ChangePassword = (oldPassword, newPassword) =>
-    this.usersService.changePassword(this.orgId, this.user.id, {
-      oldPassword,
-      password: newPassword,
-    });
+  /** An administrator does not know the user's password, so this sets one without it. */
+  protected readonly resetPassword: ResetPassword = (password) =>
+    this.usersService.resetPassword(this.orgId, this.user.id, { password });
 
   /** Saves the name, and the groups when they loaded; the two endpoints are independent. */
   private save(): void {

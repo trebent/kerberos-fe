@@ -10,9 +10,8 @@ info:
     Organisations provide support for user isolation. A user in org. A cannot access information
     protected by org. B. Organisations provide isolation by associating sets of users with an
     organisation entity, the target backend will receive an information element pointing out 
-    which organisation a request was made for. This method of isolation only works if Kerberos
-    is the only possible path to reach the target backend service, or the information element 
-    will be possible to spoof.
+    which organisation a request was made for. Deploy Kerberos as the only path to the target
+    backend service so that every request carries this information.
 
     The basic authentication API provides user group support, allowing for role-based authorization.
 components:
@@ -46,7 +45,7 @@ components:
               password:
                 type: string
                 minLength: 10
-                maxLength: 40
+                maxLength: 64
             required:
               - name
               - password
@@ -550,6 +549,33 @@ paths:
                 $ref: "#/components/schemas/APIErrorResponse"
           description: Internal error.
 
+  /api/auth/basic/organisations/{orgID}/users/me:
+    parameters:
+      - $ref: "#/components/parameters/orgid"
+    get:
+      tags:
+        - users
+      operationId: GetMe
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: Got user self.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Failed to get the user.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Internal error.
+
   /api/auth/basic/organisations/{orgID}/users/{userID}:
     parameters:
       - $ref: "#/components/parameters/orgid"
@@ -756,6 +782,7 @@ paths:
                 password:
                   type: string
                   minLength: 10
+                  maxLength: 64
               required:
                 - oldPassword
                 - password
@@ -774,6 +801,60 @@ paths:
               schema:
                 $ref: "#/components/schemas/APIErrorResponse"
           description: Failed to change password.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Internal error.
+
+  /api/auth/basic/organisations/{orgID}/users/{userID}/password/reset:
+    parameters:
+      - $ref: "#/components/parameters/orgid"
+      - $ref: "#/components/parameters/userid"
+    put:
+      tags:
+        - users
+      operationId: ResetPassword
+      description: |
+        Sets a new password for a user without the old one, and ends all of the user's sessions.
+        Requires an organisation administrator.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  minLength: 10
+                  maxLength: 64
+              required:
+                - password
+      responses:
+        "204":
+          description: Reset the user's password and ended their sessions.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Bad request.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Unauthorized.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIErrorResponse"
+          description: Forbidden.
+        "404":
+          description: User not found.
         "500":
           content:
             application/json:
