@@ -221,12 +221,12 @@ describe('AuthBasic', () => {
       'new-password',
     );
 
-    fillIn(dialog, { Name: 'carol', Password: 'secret' });
+    fillIn(dialog, { Name: 'carol', Password: 'secret-password' });
     submitForm(dialog.querySelector('input')!);
 
     expect(await expectRequest('POST', `${ORGS}/7/users`)).toEqual({
       name: 'carol',
-      password: 'secret',
+      password: 'secret-password',
     });
     await flushGet(`${ORGS}/7/users`, [{ id: 2, name: 'carol', groups: [] }]);
     await harness.fixture.whenStable();
@@ -254,20 +254,18 @@ describe('AuthBasic', () => {
     expect(element.textContent).toContain('robert');
   });
 
-  it("changes a user's password through the organisation endpoint", async () => {
+  it("resets a user's password through the organisation endpoint", async () => {
     const detail = await openBob();
 
     fillIn(detail, {
-      'Current password': 'old',
-      'New password': 'new',
-      'Confirm new password': 'new',
+      'New password': 'new-password',
+      'Confirm new password': 'new-password',
     });
     await harness.fixture.whenStable();
-    clickButton(detail, 'Change password');
+    clickButton(detail, 'Reset password');
 
-    expect(await expectRequest('PUT', `${ORGS}/7/users/1/password`)).toEqual({
-      oldPassword: 'old',
-      password: 'new',
+    expect(await expectRequest('PUT', `${ORGS}/7/users/1/password/reset`)).toEqual({
+      password: 'new-password',
     });
   });
 

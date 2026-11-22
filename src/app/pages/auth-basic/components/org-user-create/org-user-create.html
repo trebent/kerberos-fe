@@ -9,6 +9,10 @@
     <mat-form-field appearance="outline">
       <mat-label>Password</mat-label>
       <input matInput type="password" [formField]="form.password" autocomplete="new-password" />
+      <mat-hint>10 to 64 characters</mat-hint>
+      @if (form.password().getError('minLength') || form.password().getError('maxLength')) {
+        <mat-error>Use 10 to 64 characters.</mat-error>
+      }
     </mat-form-field>
     <div class="form-actions">
       <button matButton type="button" [mat-dialog-close]="undefined">Cancel</button>

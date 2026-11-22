@@ -12,12 +12,17 @@ The app has three pages behind a login, each a lazy route:
   shows the backend's OpenAPI spec and lets an administrator start debug sessions, which record
   real calls; picking a recorded call shows how each pipeline stage handled it.
 - **Users** (`/user-mgmt`): the gateway's own administrators, their groups, and the permissions
-  each group grants.
+  each group grants. An administrator can reset another administrator's password.
 - **Basic authentication** (`/auth-basic`): organisations configured for Kerberos's basic
-  authentication, and the users and groups inside each one.
+  authentication, and the users and groups inside each one. An administrator can reset a
+  user's password.
 
 A header with navigation, a color-theme menu and an account menu (change username or password,
-log out) and a footer frame every page.
+log out) and a footer frame every page. Kerberos ends all of a user's sessions when their
+password changes, so after changing your own password the app signs you in again with the new
+one.
+
+Every form that sets a new password checks that it is 10 to 64 characters, as Kerberos requires.
 
 ## How it is built
 

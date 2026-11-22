@@ -137,12 +137,12 @@ describe('UserMgmt', () => {
       'new-password',
     );
 
-    fillIn(dialog, { Username: 'bob', Password: 'secret' });
+    fillIn(dialog, { Username: 'bob', Password: 'secret-password' });
     submitForm(dialog.querySelector('input')!);
 
     expect(expectRequest('POST', '/api/admin/users')).toEqual({
       username: 'bob',
-      password: 'secret',
+      password: 'secret-password',
     });
     await flushReload('/api/admin/users', users);
     expect(document.querySelector('app-user-create')).toBeNull();
@@ -215,6 +215,29 @@ describe('UserMgmt', () => {
 
     expect(document.querySelector('app-user-edit')).toBeNull();
     expect(snackBarText()).toContain('User alicia updated');
+  });
+
+  it("resets a user's password without the old one", async () => {
+    await loadPage();
+    const editor = await openFromPage(
+      () => clickLabelled(element, 'Edit user alice'),
+      '/api/admin/groups',
+      groups,
+    );
+
+    fillIn(editor, {
+      'New password': 'new-password',
+      'Confirm new password': 'new-password',
+    });
+    await fixture.whenStable();
+    clickButton(editor, 'Reset password');
+
+    expect(expectRequest('PUT', '/api/admin/users/1/password/reset')).toEqual({
+      newPassword: 'new-password',
+    });
+    await fixture.whenStable();
+    expect(editor.textContent).toContain('Password reset.');
+    expect(document.querySelector('app-user-edit')).not.toBeNull();
   });
 
   it('opens the group editor for a group listed without its permissions', async () => {

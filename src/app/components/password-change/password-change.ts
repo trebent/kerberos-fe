@@ -1,10 +1,11 @@
 import { Component, input, output, signal } from '@angular/core';
 import { form, FormField, FormRoot, required, validate } from '@angular/forms/signals';
 import { MatButton } from '@angular/material/button';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatError, MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { Observable } from 'rxjs';
 
+import { newPasswordRules } from '../../utils/password-rules';
 import { requestStatus } from '../../utils/request-status';
 import { RequestFeedback } from '../request-feedback/request-feedback';
 
@@ -19,6 +20,7 @@ const EMPTY = { oldPassword: '', newPassword: '', confirmPassword: '' };
     MatButton,
     MatError,
     MatFormField,
+    MatHint,
     MatInput,
     MatLabel,
     FormField,
@@ -42,7 +44,7 @@ export class PasswordChange {
     signal(EMPTY),
     (path) => {
       required(path.oldPassword);
-      required(path.newPassword);
+      newPasswordRules(path.newPassword);
       required(path.confirmPassword);
       validate(path.confirmPassword, ({ value, valueOf }) =>
         value() === valueOf(path.newPassword) ? undefined : { kind: 'mismatch' },

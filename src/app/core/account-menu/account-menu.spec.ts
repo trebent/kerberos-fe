@@ -92,14 +92,14 @@ describe('AccountMenu', () => {
 
     fillIn(dialog, {
       'Current password': 'old',
-      'New password': 'new',
-      'Confirm new password': 'new',
+      'New password': 'new-password',
+      'Confirm new password': 'new-password',
     });
     await fixture.whenStable();
     submitForm(dialog.querySelector('input')!);
     await fixture.whenStable();
 
-    expect(auth.changeOwnPassword).toHaveBeenCalledWith('old', 'new');
+    expect(auth.changeOwnPassword).toHaveBeenCalledWith('old', 'new-password');
     expect(document.querySelector('app-change-password-dialog')).toBeNull();
     expect(snackBarText()).toContain('Password changed');
   });

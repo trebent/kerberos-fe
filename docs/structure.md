@@ -36,6 +36,7 @@ src/app/
     list-card/                 card for one kind of record: title, filter and add button above
                                a projected mat-table, with loading, empty and paging states
     password-change/           current/new/confirm password form
+    password-reset/            new/confirm password form for an administrator, no old password
     request-feedback/          shows a requestStatus's error or success message
     row-actions/               a table row's edit and delete buttons
     skeleton/                  pulsing placeholder for loading content, copied from the
@@ -53,6 +54,7 @@ src/app/
     id-selection.ts            IdSelection, the ticked IDs of a checkbox list
     material-table.ts          MAT_TABLE imports, resourceDataSource
     names.ts                   joinNames, for name lists in table cells
+    password-rules.ts          newPasswordRules: the 10 to 64 characters Kerberos accepts
     request-status.ts          requestStatus, runs a request and tracks its outcome
 src/
   main.ts                      bootstraps App with appConfig
@@ -80,7 +82,9 @@ angular.json                   build configurations (development, staging, produ
 - **`src/app/app.routes.ts`**: every page is a lazy route behind `authGuard`, except `login`
   behind `guestGuard`. A new page needs a route and a `title` here.
 - **`src/app/services/auth.service.ts`**: the single owner of the admin session. It keeps the
-  session expiry and superuser flag in `localStorage`, refreshes the session on a timer, and
+  session expiry, the superuser flag and the superuser's client ID in `localStorage`, refreshes
+  the session on a timer, logs in again after the user changes their own password (Kerberos
+  ends every session of that user), and
   exposes `isLoggedIn`, `username`, `userID` and `isSuperuser` as read-only signals. Guards, the
   header and the account menu read these; never track session state anywhere else.
 - **`src/styles.scss`**: the one M3 theme and the global classes pages and cards share (`.page`,
