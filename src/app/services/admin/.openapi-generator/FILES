@@ -32,10 +32,12 @@ model/flowMetaDataRouterBackend.ts
 model/flowTransition.ts
 model/flowTransitionResult.ts
 model/group.ts
+model/loginRequest.ts
 model/loginSuperuserRequest.ts
 model/meResponse.ts
 model/models.ts
 model/permission.ts
+model/resetUserPasswordRequest.ts
 model/startDebugSessionRequest.ts
 model/updateUserGroupsRequest.ts
 model/updateUserRequest.ts
