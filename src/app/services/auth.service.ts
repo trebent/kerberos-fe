@@ -51,8 +51,8 @@ export class AuthService {
       return of(null);
     }
 
-    const expiryTime = parseInt(expiry, 10);
-    if (isNaN(expiryTime) || Date.now() > expiryTime + REFRESH_GRACE_MS) {
+    const expiryTime = Number(expiry);
+    if (Number.isNaN(expiryTime) || Date.now() > expiryTime + REFRESH_GRACE_MS) {
       localStorage.removeItem(SESSION_EXPIRY_KEY);
       return of(null);
     }
@@ -60,7 +60,7 @@ export class AuthService {
     const restore$ = this.storedIsSuper()
       ? this.usersService.refreshSuperuserSession().pipe(tap(() => this.startSuperuserSession()))
       : this.usersService.refreshUserSession().pipe(
-          tap(() => this.startSession(false)),
+          tap(() => this.startSession(/* isSuper= */ false)),
           switchMap(() => this.loadCurrentUser()),
         );
 
@@ -76,7 +76,7 @@ export class AuthService {
 
   login(username: string, password: string): Observable<null> {
     return this.usersService.login({ username, password }).pipe(
-      tap(() => this.startSession(false)),
+      tap(() => this.startSession(/* isSuper= */ false)),
       // The login response has no user ID, so load the current user.
       switchMap(() => this.loadCurrentUser()),
       // Without the current user the session is unusable, so don't leave it half signed in.
@@ -191,7 +191,7 @@ export class AuthService {
 
   /** The superuser has no user record, so the name is fixed. */
   private startSuperuserSession(): void {
-    this.startSession(true);
+    this.startSession(/* isSuper= */ true);
     this._username.set('superuser');
   }
 

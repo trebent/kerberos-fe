@@ -24,8 +24,6 @@ import { componentsOnPath, describeFlowData, flowComponentData } from '../../../
 import { CallDetails } from '../call-details/call-details';
 import { Placeholder, TransitionBadges } from '../transition-badges/transition-badges';
 
-type Direction = 'inbound' | 'outbound';
-
 @Component({
   imports: [CallDetails, MatIcon, MatTooltip, TransitionBadges],
   host: { '[class.vertical]': 'vertical()' },
@@ -72,15 +70,14 @@ export class FlowPipeline {
 
   /** The selected call's transitions, by component and direction. */
   private readonly transitionsByComponent = computed(() => {
-    const byComponent = new Map<string, Record<Direction, FlowTransition[]>>();
+    const byComponent = new Map<string, Record<FlowTransition.DirectionEnum, FlowTransition[]>>();
     for (const transition of this.selectedCall()?.flowTransitions ?? []) {
       let entry = byComponent.get(transition.component);
       if (!entry) {
         entry = { inbound: [], outbound: [] };
         byComponent.set(transition.component, entry);
       }
-      const inbound = transition.direction === FlowTransition.DirectionEnum.Inbound;
-      entry[inbound ? 'inbound' : 'outbound'].push(transition);
+      entry[transition.direction].push(transition);
     }
     return byComponent;
   });
@@ -145,14 +142,20 @@ export class FlowPipeline {
    * What to show in a component's badge row when it recorded no transitions for the selected call:
    * "n/a" when the call's backend does not pass through it, "none" when it does.
    */
-  protected placeholder(component: string, direction: Direction): Placeholder | null {
+  protected placeholder(
+    component: string,
+    direction: FlowTransition.DirectionEnum,
+  ): Placeholder | null {
     const backend = this.effectiveBackend();
     if (!this.selectedCall() || !backend) return null;
     if (!this.isOnPath(backend, component)) return 'n/a';
     return this.transitions(component, direction).length === 0 ? 'none' : null;
   }
 
-  protected transitions(component: string, direction: Direction): FlowTransition[] {
+  protected transitions(
+    component: string,
+    direction: FlowTransition.DirectionEnum,
+  ): FlowTransition[] {
     return this.transitionsByComponent().get(component)?.[direction] ?? [];
   }
 

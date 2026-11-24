@@ -9,6 +9,7 @@ import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
 import {
   CreateOrganisation201Response,
+  CreateOrganisationRequest,
   OrganisationsService,
 } from '../../../../services/auth-basic';
 import { requestStatus } from '../../../../utils/request-status';
@@ -42,9 +43,11 @@ export class OrgCreate {
     failure: 'Failed to create organisation. Please try again.',
   });
 
-  protected readonly form = form(signal({ name: '' }), (path) => required(path.name), {
-    submission: { action: async () => this.create() },
-  });
+  protected readonly form = form(
+    signal<CreateOrganisationRequest>({ name: '' }),
+    (path) => required(path.name),
+    { submission: { action: async () => this.create() } },
+  );
 
   protected readonly credentials = signal<CreateOrganisation201Response | null>(null);
 

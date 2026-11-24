@@ -38,7 +38,11 @@ export class Oas {
     params: () => this.backend(),
     stream: ({ params: backend }) =>
       this.oasService
-        .getBackendOAS(backend, 'body', false, { httpHeaderAccept: 'application/yaml' })
+        .getBackendOAS(backend, 'body', /* reportProgress= */ false, {
+          httpHeaderAccept: 'application/yaml',
+        })
+        // The spec types the body as the parsed document, but a YAML Accept makes the client
+        // return the raw Blob.
         .pipe(switchMap((response) => from((response as unknown as Blob).text()))),
   });
   protected readonly showSkeleton = skeletonVisible(this.oasResource.isLoading);

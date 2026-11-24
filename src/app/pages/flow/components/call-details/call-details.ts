@@ -32,5 +32,5 @@ function preciseTimeMs(iso: string): number {
   const ms = new Date(iso).getTime();
   const fraction = /\.(\d+)Z?$/.exec(iso)?.[1];
   if (!fraction || fraction.length <= 3) return ms;
-  return ms + parseFloat(`0.${fraction.slice(3)}`);
+  return ms + Number(`0.${fraction.slice(3)}`);
 }
