@@ -35,6 +35,14 @@ formatting, say), move the pure logic to `src/app/utils/` with a spec.
 **Why:** Pure functions are easy to test and keep components short.
 **When:** Always.
 
+### Label literal arguments whose meaning is not obvious
+
+**Rule:** When a call passes a bare `true`, `false` or `null` whose meaning the call does not
+show, name it with an inline comment: `listDebugSessionCalls(backend, id, /* includeTransitions= */
+false)`.
+**Why:** A bare boolean says nothing at the call site, and the generated clients take several.
+**When:** Every call with such an argument, generated clients included.
+
 ### Name for behavior, comment the why
 
 **Rule:** Name things for what they do, and write comments that explain why rather than what.
@@ -151,6 +159,17 @@ control that started a request. Every skeleton shows through `skeletonVisible`
 upstream Kerberos.
 **Why:** Hand edits are lost on the next codegen, and a drifted spec no longer describes the API.
 **When:** Always.
+
+### Type data with the generated models
+
+**Rule:** The generated models are the source of truth for API data. Use them (`User`,
+`FlowTransition.DirectionEnum`) rather than declaring look-alike types, and type a form model
+that is sent as-is with its request model: `signal<CreateUserRequest>({ … })`. Declare a type
+of your own only for UI state the API does not describe, or when it makes the code much easier
+to read.
+**Why:** A hand-written copy drifts from the spec silently; the generated type turns a spec
+change into a compile error where the data is used.
+**When:** Every type that describes API data.
 
 ### Import from the client's own directory
 

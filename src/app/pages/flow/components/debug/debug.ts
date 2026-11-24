@@ -92,7 +92,9 @@ export class Debug {
   protected readonly callsResource = rxResource({
     params: () => this.callsRequest(),
     stream: ({ params: { backend, sessionId } }) =>
-      this.debugService.listDebugSessionCalls(backend, sessionId, false).pipe(map(newestFirst)),
+      this.debugService
+        .listDebugSessionCalls(backend, sessionId, /* includeTransitions= */ false)
+        .pipe(map(newestFirst)),
   });
 
   protected readonly selectedCallId = linkedSignal<number | null, number | null>({

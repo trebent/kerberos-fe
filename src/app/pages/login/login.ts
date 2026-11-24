@@ -10,12 +10,6 @@ import { RequestFeedback } from '../../components/request-feedback/request-feedb
 import { AuthService } from '../../services/auth.service';
 import { requestStatus } from '../../utils/request-status';
 
-interface Credentials {
-  superLogin: boolean;
-  username: string;
-  password: string;
-}
-
 @Component({
   imports: [
     FormField,
@@ -40,16 +34,17 @@ export class Login {
   });
 
   protected readonly form = form(
-    signal<Credentials>({ superLogin: false, username: '', password: '' }),
+    signal({ superLogin: false, username: '', password: '' }),
     (path) => {
       required(path.username);
       required(path.password);
     },
-    { submission: { action: async (login) => this.signIn(login().value()) } },
+    { submission: { action: async () => this.signIn() } },
   );
 
-  private signIn({ superLogin, username, password }: Credentials): void {
+  private signIn(): void {
     if (this.signInStatus.pending()) return;
+    const { superLogin, username, password } = this.form().value();
     const login$ = superLogin
       ? this.auth.superLogin(username, password)
       : this.auth.login(username, password);

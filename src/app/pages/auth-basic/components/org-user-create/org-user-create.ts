@@ -7,7 +7,7 @@ import { MatInput } from '@angular/material/input';
 
 import { EditDialog } from '../../../../components/edit-dialog/edit-dialog';
 import { RequestFeedback } from '../../../../components/request-feedback/request-feedback';
-import { UsersService } from '../../../../services/auth-basic';
+import { CreateUserRequest, UsersService } from '../../../../services/auth-basic';
 import { newPasswordRules } from '../../../../utils/password-rules';
 import { requestStatus } from '../../../../utils/request-status';
 
@@ -46,7 +46,7 @@ export class OrgUserCreate {
   });
 
   protected readonly form = form(
-    signal({ name: '', password: '' }),
+    signal<CreateUserRequest>({ name: '', password: '' }),
     (path) => {
       required(path.name);
       newPasswordRules(path.password);
